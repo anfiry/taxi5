@@ -1,6 +1,10 @@
-﻿using Npgsql;
+﻿using Microsoft.Extensions.Configuration;
+using Npgsql;
 using System;
+using System.Configuration;
+using System.Threading.Tasks;
 using System.Windows.Forms;
+using taxi4.Services;
 
 namespace taxi4
 {
@@ -9,14 +13,58 @@ namespace taxi4
         public RegistrationMenu()
         {
             InitializeComponent();
+
+            // Загружаем строку подключения из конфига (если есть)
+            try
+            {
+                string configConnectionString = ConfigurationManager.AppSettings["ConnectionString"];
+                if (!string.IsNullOrEmpty(configConnectionString))
+                {
+                    connectionString = configConnectionString;
+                }
+            }
+            catch
+            {
+                // Оставляем значение по умолчанию
+            }
+
+            InitializeTelegramBot();
         }
 
         private string connectionString = "Server=localhost;Port=5432;Database=taxi4;User Id=postgres;Password=123";
         private string currentPhoneNumber;
         private string currentVerificationCode;
+        private TelegramBotService _telegramBot;
+
+        private void InitializeTelegramBot()
+        {
+            try
+            {
+                // Используйте ключи из App.config, а не сами значения
+                string botToken = ConfigurationManager.AppSettings["TelegramBotToken"];
+                string chatIdStr = ConfigurationManager.AppSettings["TelegramChatId"];
+
+                if (!string.IsNullOrEmpty(botToken) &&
+                    !string.IsNullOrEmpty(chatIdStr) &&
+                    long.TryParse(chatIdStr, out long chatId))
+                {
+                    _telegramBot = new TelegramBotService(botToken, chatId);
+                }
+                else
+                {
+                    // Если настройки не найдены, используем демо-режим
+                    _telegramBot = null;
+                    Console.WriteLine("Telegram бот не настроен. Используется демо-режим.");
+                }
+            }
+            catch
+            {
+                _telegramBot = null;
+            }
+        }
 
         // Кнопка "Получить код"
-        private void btnSendCode_Click(object sender, EventArgs e)
+        private async void btnSendCode_Click(object sender, EventArgs e)
         {
             string phone_number = txtPhone.Text.Trim();
 
@@ -51,13 +99,31 @@ namespace taxi4
 
                 // Генерация кода
                 currentVerificationCode = new Random().Next(100000, 999999).ToString();
-                currentPhoneNumber = phone_number; // Сохраняем с "+"
+                currentPhoneNumber = phone_number;
 
-                // Показываем код (вместо отправки SMS)
-                MessageBox.Show($"Код подтверждения: {currentVerificationCode}\n(В демо-режиме)",
-                    "Код отправлен",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Information);
+                // Пытаемся отправить код через Telegram
+                bool telegramSent = false;
+                if (_telegramBot != null)
+                {
+                    telegramSent = await _telegramBot.SendVerificationCodeAsync(phone_number, currentVerificationCode);
+                }
+
+                if (telegramSent)
+                {
+                    MessageBox.Show($"Код подтверждения отправлен в Telegram!\n\n" +
+                                  $"Код: {currentVerificationCode}",
+                        "Код отправлен",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Information);
+                }
+                else
+                {
+                    // Fallback: показываем код в MessageBox
+                    MessageBox.Show($"Код подтверждения: {currentVerificationCode}\n(Telegram недоступен, демо-режим)",
+                        "Код отправлен",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Information);
+                }
 
                 // Активируем поле для кода
                 txtVerificationCode.Enabled = true;
@@ -103,7 +169,7 @@ namespace taxi4
         }
 
         // Кнопка "Зарегистрироваться"
-        private void btnRegister_Click(object sender, EventArgs e)
+        private async void btnRegister_Click(object sender, EventArgs e)
         {
             // Проверки
             if (string.IsNullOrWhiteSpace(txtFirstName.Text))
@@ -186,7 +252,6 @@ namespace taxi4
                             }
 
                             // 2. Регистрация в таблице account
-                            // Убираем phone из параметра, так как его нет в таблице account
                             string accountQuery = @"
                                 INSERT INTO account 
                                 (role_id, login, password, confirmation) 
@@ -206,9 +271,10 @@ namespace taxi4
                             }
 
                             // 3. Регистрация в таблице client
+                            // ВАЖНО: В запросе пропущено client_status_id, исправлено
                             string clientQuery = @"
                                 INSERT INTO client 
-                                (account_id, address_id, first_name, last_name, patronymic, phone_number) 
+                                (client_status_id, account_id, address_id, first_name, last_name, patronymic, phone_number) 
                                 VALUES 
                                 (1, @account_id, @address_id, @first_name, @last_name, @patronymic, @phone_number) 
                                 RETURNING client_id";
@@ -237,6 +303,24 @@ namespace taxi4
 
                             // 4. Фиксируем транзакцию
                             transaction.Commit();
+
+                            // Отправляем уведомление в Telegram о регистрации
+                            if (_telegramBot != null)
+                            {
+                                try
+                                {
+                                    await _telegramBot.SendRegistrationNotificationAsync(
+                                        currentPhoneNumber,
+                                        txtFirstName.Text,
+                                        txtLastName.Text,
+                                        txtLogin.Text
+                                    );
+                                }
+                                catch
+                                {
+                                    // Игнорируем ошибки отправки в Telegram
+                                }
+                            }
 
                             MessageBox.Show(
                                 $"Регистрация успешна!\n\n" +
@@ -281,8 +365,8 @@ namespace taxi4
         private void BtnCancel_Click(object sender, EventArgs e)
         {
             LoginForm loginForm = new LoginForm();
-            loginForm.ShowDialog();
-            this.Hide();
+            loginForm.Show();
+            this.Close();
         }
     }
 }
