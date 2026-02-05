@@ -1,10 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
-using Npgsql;
+﻿using Npgsql;
 using System;
-using System.Configuration;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using taxi4.Services;
 
 namespace taxi4
 {
@@ -13,58 +9,14 @@ namespace taxi4
         public RegistrationMenu()
         {
             InitializeComponent();
-
-            // Загружаем строку подключения из конфига (если есть)
-            try
-            {
-                string configConnectionString = ConfigurationManager.AppSettings["ConnectionString"];
-                if (!string.IsNullOrEmpty(configConnectionString))
-                {
-                    connectionString = configConnectionString;
-                }
-            }
-            catch
-            {
-                // Оставляем значение по умолчанию
-            }
-
-            InitializeTelegramBot();
         }
 
         private string connectionString = "Server=localhost;Port=5432;Database=taxi4;User Id=postgres;Password=123";
         private string currentPhoneNumber;
         private string currentVerificationCode;
-        private TelegramBotService _telegramBot;
-
-        private void InitializeTelegramBot()
-        {
-            try
-            {
-                // Используйте ключи из App.config, а не сами значения
-                string botToken = ConfigurationManager.AppSettings["TelegramBotToken"];
-                string chatIdStr = ConfigurationManager.AppSettings["TelegramChatId"];
-
-                if (!string.IsNullOrEmpty(botToken) &&
-                    !string.IsNullOrEmpty(chatIdStr) &&
-                    long.TryParse(chatIdStr, out long chatId))
-                {
-                    _telegramBot = new TelegramBotService(botToken, chatId);
-                }
-                else
-                {
-                    // Если настройки не найдены, используем демо-режим
-                    _telegramBot = null;
-                    Console.WriteLine("Telegram бот не настроен. Используется демо-режим.");
-                }
-            }
-            catch
-            {
-                _telegramBot = null;
-            }
-        }
 
         // Кнопка "Получить код"
-        private async void btnSendCode_Click(object sender, EventArgs e)
+        private void btnSendCode_Click(object sender, EventArgs e)
         {
             string phone_number = txtPhone.Text.Trim();
 
@@ -101,29 +53,11 @@ namespace taxi4
                 currentVerificationCode = new Random().Next(100000, 999999).ToString();
                 currentPhoneNumber = phone_number;
 
-                // Пытаемся отправить код через Telegram
-                bool telegramSent = false;
-                if (_telegramBot != null)
-                {
-                    telegramSent = await _telegramBot.SendVerificationCodeAsync(phone_number, currentVerificationCode);
-                }
-
-                if (telegramSent)
-                {
-                    MessageBox.Show($"Код подтверждения отправлен в Telegram!\n\n" +
-                                  $"Код: {currentVerificationCode}",
-                        "Код отправлен",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Information);
-                }
-                else
-                {
-                    // Fallback: показываем код в MessageBox
-                    MessageBox.Show($"Код подтверждения: {currentVerificationCode}\n(Telegram недоступен, демо-режим)",
-                        "Код отправлен",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Information);
-                }
+                // Показываем код подтверждения в MessageBox
+                MessageBox.Show($"Код подтверждения: {currentVerificationCode}\nДля номера: {phone_number}",
+                    "Код подтверждения",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
 
                 // Активируем поле для кода
                 txtVerificationCode.Enabled = true;
@@ -154,6 +88,10 @@ namespace taxi4
                 txtLogin.Enabled = true;
                 txtPassword.Enabled = true;
                 txtConfirmPassword.Enabled = true;
+                textCity.Enabled = true;
+                textStreet.Enabled = true;
+                textHouse.Enabled = true;
+                textEntrance.Enabled = true;
                 btnRegister.Enabled = true;
 
                 // Фокусируемся на первом поле
@@ -169,7 +107,7 @@ namespace taxi4
         }
 
         // Кнопка "Зарегистрироваться"
-        private async void btnRegister_Click(object sender, EventArgs e)
+        private void btnRegister_Click(object sender, EventArgs e)
         {
             // Проверки
             if (string.IsNullOrWhiteSpace(txtFirstName.Text))
@@ -222,6 +160,17 @@ namespace taxi4
                 return;
             }
 
+            // Проверка полей адреса
+            if (string.IsNullOrWhiteSpace(textCity.Text) ||
+                string.IsNullOrWhiteSpace(textStreet.Text) ||
+                string.IsNullOrWhiteSpace(textHouse.Text) ||
+                string.IsNullOrWhiteSpace(textEntrance.Text))
+            {
+                MessageBox.Show("Заполните все поля адреса", "Ошибка",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
             try
             {
                 using (var connection = new NpgsqlConnection(connectionString))
@@ -270,11 +219,30 @@ namespace taxi4
                                 accountId = Convert.ToInt32(cmd.ExecuteScalar());
                             }
 
-                            // 3. Регистрация в таблице client
-                            // ВАЖНО: В запросе пропущено client_status_id, исправлено
+                            // 3. СОЗДАНИЕ АДРЕСА (НОВАЯ ЧАСТЬ)
+                            int addressId;
+                            string addressQuery = @"
+                                INSERT INTO address 
+                                (city, street, house, entrance) 
+                                VALUES 
+                                (@city, @street, @house, @entrance) 
+                                RETURNING address_id";
+
+                            using (NpgsqlCommand addressCmd = new NpgsqlCommand(addressQuery, connection))
+                            {
+                                addressCmd.Transaction = transaction;
+                                addressCmd.Parameters.AddWithValue("@city", textCity.Text.Trim());
+                                addressCmd.Parameters.AddWithValue("@street", textStreet.Text.Trim());
+                                addressCmd.Parameters.AddWithValue("@house", textHouse.Text.Trim());
+                                addressCmd.Parameters.AddWithValue("@entrance", textEntrance.Text.Trim());
+
+                                addressId = Convert.ToInt32(addressCmd.ExecuteScalar());
+                            }
+
+                            // 4. Регистрация в таблице client (ИСПРАВЛЕНА ОПЕЧАТКА)
                             string clientQuery = @"
                                 INSERT INTO client 
-                                (client_status_id, account_id, address_id, first_name, last_name, patronymic, phone_number) 
+                                (clent_status_id, account_id, address_id, first_name, last_name, patronymic, phone_number) 
                                 VALUES 
                                 (1, @account_id, @address_id, @first_name, @last_name, @patronymic, @phone_number) 
                                 RETURNING client_id";
@@ -285,7 +253,7 @@ namespace taxi4
                             {
                                 clientCmd.Transaction = transaction;
                                 clientCmd.Parameters.AddWithValue("@account_id", accountId);
-                                clientCmd.Parameters.AddWithValue("@address_id", DBNull.Value);
+                                clientCmd.Parameters.AddWithValue("@address_id", addressId); // Используем созданный адрес
                                 clientCmd.Parameters.AddWithValue("@first_name", txtFirstName.Text);
                                 clientCmd.Parameters.AddWithValue("@last_name", txtLastName.Text);
 
@@ -301,26 +269,8 @@ namespace taxi4
                                 clientId = Convert.ToInt32(clientCmd.ExecuteScalar());
                             }
 
-                            // 4. Фиксируем транзакцию
+                            // 5. Фиксируем транзакцию
                             transaction.Commit();
-
-                            // Отправляем уведомление в Telegram о регистрации
-                            if (_telegramBot != null)
-                            {
-                                try
-                                {
-                                    await _telegramBot.SendRegistrationNotificationAsync(
-                                        currentPhoneNumber,
-                                        txtFirstName.Text,
-                                        txtLastName.Text,
-                                        txtLogin.Text
-                                    );
-                                }
-                                catch
-                                {
-                                    // Игнорируем ошибки отправки в Telegram
-                                }
-                            }
 
                             MessageBox.Show(
                                 $"Регистрация успешна!\n\n" +
@@ -328,7 +278,8 @@ namespace taxi4
                                 $"Логин: {txtLogin.Text}\n" +
                                 $"Телефон: {currentPhoneNumber}\n" +
                                 $"Имя: {txtFirstName.Text} {txtLastName.Text} " +
-                                (string.IsNullOrWhiteSpace(txtPatronymic.Text) ? "" : " " + txtPatronymic.Text),
+                                (string.IsNullOrWhiteSpace(txtPatronymic.Text) ? "" : " " + txtPatronymic.Text) +
+                                $"\nАдрес: {textCity.Text}, {textStreet.Text}, д.{textHouse.Text}, подъезд {textEntrance.Text}",
                                 "Регистрация завершена",
                                 MessageBoxButtons.OK,
                                 MessageBoxIcon.Information);
@@ -349,7 +300,17 @@ namespace taxi4
                                     "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             }
 
-                            throw new Exception($"Ошибка при регистрации: {ex.Message}");
+                            // Проверка на конкретную ошибку
+                            if (ex.Message.Contains("client_status_id"))
+                            {
+                                MessageBox.Show($"Ошибка: столбец 'client_status_id' не найден. Проверьте структуру таблицы 'client' в базе данных.",
+                                    "Ошибка базы данных", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            }
+                            else
+                            {
+                                MessageBox.Show($"Ошибка при регистрации: {ex.Message}", "Ошибка",
+                                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            }
                         }
                     }
                 }

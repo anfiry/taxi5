@@ -145,6 +145,7 @@
     <Compile Include="LoginForm.Designer.cs">
       <DependentUpon>LoginForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Models\TelegramSettings.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RegistrationMenu.cs">
@@ -153,7 +154,10 @@
     <Compile Include="RegistrationMenu.Designer.cs">
       <DependentUpon>RegistrationMenu.cs</DependentUpon>
     </Compile>
-    <Compile Include="Services\TelegramBotService.cs" />
+    <Compile Include="Services\SimpleTelegramService.cs" />
+    <EmbeddedResource Include="AdminMenu.resx">
+      <DependentUpon>AdminMenu.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="LoginForm.resx">
       <DependentUpon>LoginForm.cs</DependentUpon>
     </EmbeddedResource>

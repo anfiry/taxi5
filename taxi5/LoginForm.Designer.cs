@@ -56,7 +56,7 @@
             this.MainPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.MainPanel.Location = new System.Drawing.Point(0, 0);
             this.MainPanel.Name = "MainPanel";
-            this.MainPanel.Size = new System.Drawing.Size(1021, 670);
+            this.MainPanel.Size = new System.Drawing.Size(1051, 673);
             this.MainPanel.TabIndex = 0;
             // 
             // button1
@@ -138,7 +138,7 @@
             this.panel2.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel2.Location = new System.Drawing.Point(0, 0);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(1021, 104);
+            this.panel2.Size = new System.Drawing.Size(1051, 104);
             this.panel2.TabIndex = 0;
             // 
             // label1
@@ -148,7 +148,7 @@
             this.label1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(5)))), ((int)(((byte)(0)))), ((int)(((byte)(67)))));
             this.label1.Location = new System.Drawing.Point(0, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(1021, 104);
+            this.label1.Size = new System.Drawing.Size(1051, 104);
             this.label1.TabIndex = 0;
             this.label1.Text = "Авторизация";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -157,7 +157,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1021, 670);
+            this.ClientSize = new System.Drawing.Size(1051, 673);
             this.Controls.Add(this.MainPanel);
             this.Name = "LoginForm";
             this.Text = "LoginForm";
