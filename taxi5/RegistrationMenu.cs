@@ -284,8 +284,9 @@ namespace taxi4
                                 MessageBoxButtons.OK,
                                 MessageBoxIcon.Information);
 
-                            this.DialogResult = DialogResult.OK;
-                            this.Close();
+                            LoginForm loginForm = new LoginForm();
+                            loginForm.Show();
+                            this.Hide();
                         }
                         catch (Exception ex)
                         {

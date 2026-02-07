@@ -21,5 +21,19 @@ namespace taxi4
         {
             InitializeComponent();
         }
+
+        private void AdmButtonCancel_Click(object sender, EventArgs e)
+        {
+            LoginForm loginForm = new LoginForm();
+            loginForm.Show();
+            this.Hide();
+        }
+
+        private void AdmButtonClient_Click(object sender, EventArgs e)
+        {
+            AdminClientForm adminClientForm = new AdminClientForm();
+            adminClientForm.Show();
+            this.Hide();
+        }
     }
 }

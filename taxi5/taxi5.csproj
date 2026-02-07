@@ -121,6 +121,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AdminClientForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AdminClientForm.Designer.cs">
+      <DependentUpon>AdminClientForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="AdminMenu.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -62,10 +62,11 @@
             // button1
             // 
             this.button1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.button1.Font = new System.Drawing.Font("Nirmala Text", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.button1.ForeColor = System.Drawing.Color.Violet;
-            this.button1.Location = new System.Drawing.Point(247, 458);
+            this.button1.Location = new System.Drawing.Point(242, 448);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(181, 24);
+            this.button1.Size = new System.Drawing.Size(195, 41);
             this.button1.TabIndex = 8;
             this.button1.Text = "Регистрация";
             this.button1.UseVisualStyleBackColor = true;
@@ -81,9 +82,9 @@
             this.CloseButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.CloseButton.Font = new System.Drawing.Font("Noto Sans Georgian", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.CloseButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(5)))), ((int)(((byte)(0)))), ((int)(((byte)(67)))));
-            this.CloseButton.Location = new System.Drawing.Point(226, 348);
+            this.CloseButton.Location = new System.Drawing.Point(224, 365);
             this.CloseButton.Name = "CloseButton";
-            this.CloseButton.Size = new System.Drawing.Size(212, 41);
+            this.CloseButton.Size = new System.Drawing.Size(225, 47);
             this.CloseButton.TabIndex = 7;
             this.CloseButton.Text = "Войти";
             this.CloseButton.UseVisualStyleBackColor = false;
