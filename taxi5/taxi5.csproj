@@ -121,11 +121,26 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AdminCar.cs" />
+    <Compile Include="AdminCarForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AdminCarForm.Designer.cs">
+      <DependentUpon>AdminCarForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="AdminClient.cs" />
     <Compile Include="AdminClientForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="AdminClientForm.Designer.cs">
       <DependentUpon>AdminClientForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="AdminDriver.cs" />
+    <Compile Include="AdminDriverForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AdminDriverForm.Designer.cs">
+      <DependentUpon>AdminDriverForm.cs</DependentUpon>
     </Compile>
     <Compile Include="AdminMenu.cs">
       <SubType>Form</SubType>
@@ -161,6 +176,12 @@
       <DependentUpon>RegistrationMenu.cs</DependentUpon>
     </Compile>
     <Compile Include="Services\SimpleTelegramService.cs" />
+    <EmbeddedResource Include="AdminClientForm.resx">
+      <DependentUpon>AdminClientForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AdminDriverForm.resx">
+      <DependentUpon>AdminDriverForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="AdminMenu.resx">
       <DependentUpon>AdminMenu.cs</DependentUpon>
     </EmbeddedResource>

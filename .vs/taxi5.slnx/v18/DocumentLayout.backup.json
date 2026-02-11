@@ -3,6 +3,22 @@
   "WorkspaceRootPath": "C:\\Users\\\u042F\\source\\repos\\taxi5\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{79E66E86-CA49-4D0D-A7F0-4A3D06C5CE47}|taxi5\\taxi5.csproj|c:\\users\\\u044F\\source\\repos\\taxi5\\taxi5\\admindriverform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{79E66E86-CA49-4D0D-A7F0-4A3D06C5CE47}|taxi5\\taxi5.csproj|solutionrelative:taxi5\\admindriverform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{79E66E86-CA49-4D0D-A7F0-4A3D06C5CE47}|taxi5\\taxi5.csproj|c:\\users\\\u044F\\source\\repos\\taxi5\\taxi5\\admindriverform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{79E66E86-CA49-4D0D-A7F0-4A3D06C5CE47}|taxi5\\taxi5.csproj|solutionrelative:taxi5\\admindriverform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{79E66E86-CA49-4D0D-A7F0-4A3D06C5CE47}|taxi5\\taxi5.csproj|c:\\users\\\u044F\\source\\repos\\taxi5\\taxi5\\admindriverform.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{79E66E86-CA49-4D0D-A7F0-4A3D06C5CE47}|taxi5\\taxi5.csproj|solutionrelative:taxi5\\admindriverform.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{79E66E86-CA49-4D0D-A7F0-4A3D06C5CE47}|taxi5\\taxi5.csproj|c:\\users\\\u044F\\source\\repos\\taxi5\\taxi5\\admindriver.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{79E66E86-CA49-4D0D-A7F0-4A3D06C5CE47}|taxi5\\taxi5.csproj|solutionrelative:taxi5\\admindriver.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{79E66E86-CA49-4D0D-A7F0-4A3D06C5CE47}|taxi5\\taxi5.csproj|c:\\users\\\u044F\\source\\repos\\taxi5\\taxi5\\adminmenu.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{79E66E86-CA49-4D0D-A7F0-4A3D06C5CE47}|taxi5\\taxi5.csproj|solutionrelative:taxi5\\adminmenu.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -11,12 +27,8 @@
       "RelativeMoniker": "D:0:0:{79E66E86-CA49-4D0D-A7F0-4A3D06C5CE47}|taxi5\\taxi5.csproj|solutionrelative:taxi5\\adminmenu.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{79E66E86-CA49-4D0D-A7F0-4A3D06C5CE47}|taxi5\\taxi5.csproj|C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\registrationmenu.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{79E66E86-CA49-4D0D-A7F0-4A3D06C5CE47}|taxi5\\taxi5.csproj|solutionrelative:taxi5\\registrationmenu.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{79E66E86-CA49-4D0D-A7F0-4A3D06C5CE47}|taxi5\\taxi5.csproj|C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\loginform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
-      "RelativeMoniker": "D:0:0:{79E66E86-CA49-4D0D-A7F0-4A3D06C5CE47}|taxi5\\taxi5.csproj|solutionrelative:taxi5\\loginform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+      "AbsoluteMoniker": "D:0:0:{79E66E86-CA49-4D0D-A7F0-4A3D06C5CE47}|taxi5\\taxi5.csproj|c:\\users\\\u044F\\source\\repos\\taxi5\\taxi5\\admincarform.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{79E66E86-CA49-4D0D-A7F0-4A3D06C5CE47}|taxi5\\taxi5.csproj|solutionrelative:taxi5\\admincarform.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -26,60 +38,100 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 0,
           "Children": [
-            {
-              "$type": "Bookmark",
-              "Name": "ST:128:0:{75188d03-9892-4ae2-abf1-207126247ce5}"
-            },
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "AdminMenu.cs",
-              "DocumentMoniker": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\AdminMenu.cs",
-              "RelativeDocumentMoniker": "taxi5\\AdminMenu.cs",
-              "ToolTip": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\AdminMenu.cs*",
-              "RelativeToolTip": "taxi5\\AdminMenu.cs*",
-              "ViewState": "AgIAAAgAAAAAAAAAAAAhwBwAAAAVAAAAAAAAAA==",
+              "Title": "AdminDriverForm.cs [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]",
+              "DocumentMoniker": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\AdminDriverForm.cs",
+              "RelativeDocumentMoniker": "taxi5\\AdminDriverForm.cs",
+              "ToolTip": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\AdminDriverForm.cs [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]",
+              "RelativeToolTip": "taxi5\\AdminDriverForm.cs [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-07T11:54:38.37Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "LoginForm.cs [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]",
-              "DocumentMoniker": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\LoginForm.cs",
-              "RelativeDocumentMoniker": "taxi5\\LoginForm.cs",
-              "ToolTip": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\LoginForm.cs [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]",
-              "RelativeToolTip": "taxi5\\LoginForm.cs [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-05T16:44:56.656Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "AdminMenu.cs [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]",
-              "DocumentMoniker": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\AdminMenu.cs",
-              "RelativeDocumentMoniker": "taxi5\\AdminMenu.cs",
-              "ToolTip": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\AdminMenu.cs [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]*",
-              "RelativeToolTip": "taxi5\\AdminMenu.cs [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]*",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-05T16:31:29.871Z",
+              "WhenOpened": "2026-02-11T17:36:08.677Z",
               "EditorCaption": " [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]"
             },
             {
               "$type": "Document",
               "DocumentIndex": 2,
-              "Title": "RegistrationMenu.cs",
-              "DocumentMoniker": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\RegistrationMenu.cs",
-              "RelativeDocumentMoniker": "taxi5\\RegistrationMenu.cs",
-              "ToolTip": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\RegistrationMenu.cs",
-              "RelativeToolTip": "taxi5\\RegistrationMenu.cs",
-              "ViewState": "AgIAADIBAAAAAAAAAAAuwEgBAAAMAAAAAAAAAA==",
+              "Title": "AdminDriverForm.Designer.cs",
+              "DocumentMoniker": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\AdminDriverForm.Designer.cs",
+              "RelativeDocumentMoniker": "taxi5\\AdminDriverForm.Designer.cs",
+              "ToolTip": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\AdminDriverForm.Designer.cs",
+              "RelativeToolTip": "taxi5\\AdminDriverForm.Designer.cs",
+              "ViewState": "AgIAAEgBAAAAAAAAAAAIwIcBAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-05T16:09:28.356Z",
+              "WhenOpened": "2026-02-11T17:33:22.587Z",
               "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "AdminDriverForm.cs",
+              "DocumentMoniker": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\AdminDriverForm.cs",
+              "RelativeDocumentMoniker": "taxi5\\AdminDriverForm.cs",
+              "ToolTip": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\AdminDriverForm.cs",
+              "RelativeToolTip": "taxi5\\AdminDriverForm.cs",
+              "ViewState": "AgIAABYCAAAAAAAAAAAIwDcCAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-11T17:32:59.065Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "AdminDriver.cs",
+              "DocumentMoniker": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\AdminDriver.cs",
+              "RelativeDocumentMoniker": "taxi5\\AdminDriver.cs",
+              "ToolTip": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\AdminDriver.cs",
+              "RelativeToolTip": "taxi5\\AdminDriver.cs",
+              "ViewState": "AgIAAHMBAAAAAAAAAAAIwJQBAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-11T17:32:31.475Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "AdminMenu.cs",
+              "DocumentMoniker": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\AdminMenu.cs",
+              "RelativeDocumentMoniker": "taxi5\\AdminMenu.cs",
+              "ToolTip": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\AdminMenu.cs",
+              "RelativeToolTip": "taxi5\\AdminMenu.cs",
+              "ViewState": "AgIAACIAAAAAAAAAAAAkwDQAAAAPAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-11T16:51:39.6Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "AdminMenu.cs [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]",
+              "DocumentMoniker": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\AdminMenu.cs",
+              "RelativeDocumentMoniker": "taxi5\\AdminMenu.cs",
+              "ToolTip": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\AdminMenu.cs [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]",
+              "RelativeToolTip": "taxi5\\AdminMenu.cs [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-11T16:51:38.193Z",
+              "EditorCaption": " [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "AdminCarForm.Designer.cs",
+              "DocumentMoniker": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\AdminCarForm.Designer.cs",
+              "RelativeDocumentMoniker": "taxi5\\AdminCarForm.Designer.cs",
+              "ToolTip": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\AdminCarForm.Designer.cs",
+              "RelativeToolTip": "taxi5\\AdminCarForm.Designer.cs",
+              "ViewState": "AgIAAGQBAAAAAAAAAAAIwIUBAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-11T16:50:58.856Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{75188d03-9892-4ae2-abf1-207126247ce5}"
             }
           ]
         }

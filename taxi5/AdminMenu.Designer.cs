@@ -33,7 +33,7 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.AdmButtonCancel = new System.Windows.Forms.Button();
             this.AdmButtonTarifs = new System.Windows.Forms.Button();
-            this.AdmButtonStatistic = new System.Windows.Forms.Button();
+            this.AdmButtonCar = new System.Windows.Forms.Button();
             this.AdmButtonOrders = new System.Windows.Forms.Button();
             this.AdmButtonPromotion = new System.Windows.Forms.Button();
             this.AdmButtonDrivers = new System.Windows.Forms.Button();
@@ -56,7 +56,7 @@
             // 
             this.panel1.Controls.Add(this.AdmButtonCancel);
             this.panel1.Controls.Add(this.AdmButtonTarifs);
-            this.panel1.Controls.Add(this.AdmButtonStatistic);
+            this.panel1.Controls.Add(this.AdmButtonCar);
             this.panel1.Controls.Add(this.AdmButtonOrders);
             this.panel1.Controls.Add(this.AdmButtonPromotion);
             this.panel1.Controls.Add(this.AdmButtonDrivers);
@@ -100,20 +100,21 @@
             this.AdmButtonTarifs.Text = "Тарифы";
             this.AdmButtonTarifs.UseVisualStyleBackColor = false;
             // 
-            // AdmButtonStatistic
+            // AdmButtonCar
             // 
-            this.AdmButtonStatistic.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(251)))), ((int)(((byte)(228)))), ((int)(((byte)(255)))));
-            this.AdmButtonStatistic.FlatAppearance.BorderSize = 0;
-            this.AdmButtonStatistic.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(227)))), ((int)(((byte)(255)))), ((int)(((byte)(233)))));
-            this.AdmButtonStatistic.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(227)))), ((int)(((byte)(255)))));
-            this.AdmButtonStatistic.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.AdmButtonStatistic.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.AdmButtonStatistic.Location = new System.Drawing.Point(425, 307);
-            this.AdmButtonStatistic.Name = "AdmButtonStatistic";
-            this.AdmButtonStatistic.Size = new System.Drawing.Size(182, 67);
-            this.AdmButtonStatistic.TabIndex = 5;
-            this.AdmButtonStatistic.Text = "Статистика";
-            this.AdmButtonStatistic.UseVisualStyleBackColor = false;
+            this.AdmButtonCar.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(251)))), ((int)(((byte)(228)))), ((int)(((byte)(255)))));
+            this.AdmButtonCar.FlatAppearance.BorderSize = 0;
+            this.AdmButtonCar.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(227)))), ((int)(((byte)(255)))), ((int)(((byte)(233)))));
+            this.AdmButtonCar.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(227)))), ((int)(((byte)(255)))));
+            this.AdmButtonCar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.AdmButtonCar.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.AdmButtonCar.Location = new System.Drawing.Point(425, 307);
+            this.AdmButtonCar.Name = "AdmButtonCar";
+            this.AdmButtonCar.Size = new System.Drawing.Size(182, 67);
+            this.AdmButtonCar.TabIndex = 5;
+            this.AdmButtonCar.Text = "Машины";
+            this.AdmButtonCar.UseVisualStyleBackColor = false;
+            this.AdmButtonCar.Click += new System.EventHandler(this.AdmButtonCar_Click);
             // 
             // AdmButtonOrders
             // 
@@ -159,6 +160,7 @@
             this.AdmButtonDrivers.TabIndex = 2;
             this.AdmButtonDrivers.Text = "Водители";
             this.AdmButtonDrivers.UseVisualStyleBackColor = false;
+            this.AdmButtonDrivers.Click += new System.EventHandler(this.AdmButtonDrivers_Click);
             // 
             // AdmButtonClient
             // 
@@ -218,7 +220,7 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button AdmButtonClient;
         private System.Windows.Forms.Button AdmButtonTarifs;
-        private System.Windows.Forms.Button AdmButtonStatistic;
+        private System.Windows.Forms.Button AdmButtonCar;
         private System.Windows.Forms.Button AdmButtonOrders;
         private System.Windows.Forms.Button AdmButtonPromotion;
         private System.Windows.Forms.Button AdmButtonDrivers;

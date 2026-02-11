@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using TaxiAdminApp;
 
 namespace taxi4
 {
@@ -31,8 +32,25 @@ namespace taxi4
 
         private void AdmButtonClient_Click(object sender, EventArgs e)
         {
-            AdminClientForm adminClientForm = new AdminClientForm();
-            adminClientForm.Show();
+            {
+                AdminClientForm clientForm = new AdminClientForm();
+                clientForm.Show();
+                this.Hide();
+            }
+        }
+
+        private void AdmButtonDrivers_Click(object sender, EventArgs e)
+        {
+            AdminDriverForm driverForm = new AdminDriverForm();
+            driverForm.Show();
+            this.Hide();
+
+        }
+
+        private void AdmButtonCar_Click(object sender, EventArgs e)
+        {
+            AdminCarForm carForm = new AdminCarForm();
+            carForm.Show();
             this.Hide();
         }
     }
