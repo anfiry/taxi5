@@ -98,44 +98,71 @@ namespace TaxiAdminApp
             comboBoxAddress.DataSource = addresses;
         }
 
+        // ✅ ПОЛНОСТЬЮ ИСПРАВЛЕННЫЙ МЕТОД НАСТРОЙКИ ТАБЛИЦЫ
         private void ConfigureDataGridView()
         {
-            if (dataGridViewClients.Columns.Count > 0)
+            if (dataGridViewClients.Columns.Count == 0) return;
+
+            // Отключаем авто-растяжение – включаем горизонтальную прокрутку
+            dataGridViewClients.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
+
+            // Настройка видимых колонок
+            SetColumn("client_id", "ID", 50, true);
+            SetColumn("first_name", "Имя", 100, true);      // ❄️ закреплено
+            SetColumn("last_name", "Фамилия", 120, true);   // ❄️ закреплено
+            SetColumn("patronymic", "Отчество", 120, false);
+            SetColumn("phone_number", "Телефон", 130, false);
+            SetColumn("status_name", "Статус", 100, false);
+            SetColumn("address_info", "Адрес", 250, false); // шире для читаемости
+
+            // Скрываем технические колонки
+            string[] hiddenColumns = { "clent_status_id", "address_id", "account_id", "city", "street", "house", "entrance" };
+            foreach (string col in hiddenColumns)
             {
-                dataGridViewClients.Columns["client_id"].HeaderText = "ID";
-                dataGridViewClients.Columns["client_id"].Width = 50;
+                if (dataGridViewClients.Columns.Contains(col))
+                    dataGridViewClients.Columns[col].Visible = false;
+            }
 
-                dataGridViewClients.Columns["first_name"].HeaderText = "Имя";
-                dataGridViewClients.Columns["first_name"].Width = 100;
+            // Порядок колонок
+            int index = 0;
+            string[] order = {
+                "client_id", "last_name", "first_name", "patronymic", "phone_number",
+                "status_name", "address_info"
+            };
+            foreach (string colName in order)
+            {
+                if (dataGridViewClients.Columns[colName] != null)
+                    dataGridViewClients.Columns[colName].DisplayIndex = index++;
+            }
 
-                dataGridViewClients.Columns["last_name"].HeaderText = "Фамилия";
-                dataGridViewClients.Columns["last_name"].Width = 120;
+            // Стиль заголовков
+            dataGridViewClients.ColumnHeadersDefaultCellStyle.Font = new Font("Microsoft Sans Serif", 9, FontStyle.Bold);
+            dataGridViewClients.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(52, 73, 94);
+            dataGridViewClients.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
+            dataGridViewClients.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewClients.ColumnHeadersHeight = 40;
 
-                dataGridViewClients.Columns["patronymic"].HeaderText = "Отчество";
-                dataGridViewClients.Columns["patronymic"].Width = 100;
+            // Стиль строк
+            dataGridViewClients.DefaultCellStyle.Font = new Font("Microsoft Sans Serif", 9);
+            dataGridViewClients.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(248, 249, 249);
+            dataGridViewClients.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dataGridViewClients.ReadOnly = true;
+            dataGridViewClients.RowHeadersVisible = false;
+        }
 
-                dataGridViewClients.Columns["phone_number"].HeaderText = "Телефон";
-                dataGridViewClients.Columns["phone_number"].Width = 120;
-
-                dataGridViewClients.Columns["status_name"].HeaderText = "Статус";
-                dataGridViewClients.Columns["status_name"].Width = 100;
-
-                dataGridViewClients.Columns["address_info"].HeaderText = "Адрес";
-                dataGridViewClients.Columns["address_info"].Width = 200;
-
-                string[] hiddenColumns = { "clent_status_id", "address_id", "account_id", "city", "street", "house", "entrance" };
-                foreach (string col in hiddenColumns)
-                {
-                    if (dataGridViewClients.Columns.Contains(col))
-                        dataGridViewClients.Columns[col].Visible = false;
-                }
-
-                dataGridViewClients.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-                dataGridViewClients.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-                dataGridViewClients.ReadOnly = true;
+        // Вспомогательный метод для безопасной настройки колонки
+        private void SetColumn(string columnName, string headerText, int width, bool frozen)
+        {
+            if (dataGridViewClients.Columns[columnName] != null)
+            {
+                dataGridViewClients.Columns[columnName].HeaderText = headerText;
+                dataGridViewClients.Columns[columnName].Width = width;
+                dataGridViewClients.Columns[columnName].Frozen = frozen;
+                dataGridViewClients.Columns[columnName].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
             }
         }
 
+        // ---- остальные методы (без изменений) ----
         private void buttonAdd_Click(object sender, EventArgs e)
         {
             ClearForm();
@@ -147,8 +174,7 @@ namespace TaxiAdminApp
                 textBoxAccountId.Text = newAccountId.ToString();
                 textBoxAccountId.ReadOnly = true;
                 textBoxAccountId.BackColor = Color.LightGreen;
-                MessageBox.Show($"Создан аккаунт с ID: {newAccountId}", "Информация",
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                
             }
             else
             {

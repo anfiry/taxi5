@@ -53,5 +53,27 @@ namespace taxi4
             carForm.Show();
             this.Hide();
         }
+
+        private void AdmButtonTarifs_Click(object sender, EventArgs e)
+        {
+            AdminTariffForm tariffForm = new AdminTariffForm();
+            tariffForm.Show();
+            this.Hide();
+
+        }
+
+        private void AdmButtonOrders_Click(object sender, EventArgs e)
+        {
+            AdminOrderForm orderForm = new AdminOrderForm();
+            orderForm.Show();
+            this.Hide();
+        }
+
+        private void AdmButtonPromotion_Click(object sender, EventArgs e)
+        {
+            AdminPromotionForm promotionForm = new AdminPromotionForm();
+            promotionForm.Show();
+            this.Hide();
+        }
     }
 }

@@ -148,6 +148,27 @@
     <Compile Include="AdminMenu.Designer.cs">
       <DependentUpon>AdminMenu.cs</DependentUpon>
     </Compile>
+    <Compile Include="AdminOrder.cs" />
+    <Compile Include="AdminOrderForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AdminOrderForm.Designer.cs">
+      <DependentUpon>AdminOrderForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="AdminPromotion.cs" />
+    <Compile Include="AdminPromotionForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AdminPromotionForm.Designer.cs">
+      <DependentUpon>AdminPromotionForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="AdminTariff.cs" />
+    <Compile Include="AdminTariffForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AdminTariffForm.Designer.cs">
+      <DependentUpon>AdminTariffForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="ClientMenu.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -184,6 +205,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="AdminMenu.resx">
       <DependentUpon>AdminMenu.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AdminPromotionForm.resx">
+      <DependentUpon>AdminPromotionForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AdminTariffForm.resx">
+      <DependentUpon>AdminTariffForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ClientMenu.resx">
+      <DependentUpon>ClientMenu.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="LoginForm.resx">
       <DependentUpon>LoginForm.cs</DependentUpon>

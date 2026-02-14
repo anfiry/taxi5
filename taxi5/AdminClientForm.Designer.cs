@@ -83,30 +83,40 @@
             this.label8 = new System.Windows.Forms.Label();
             this.buttonSearch = new System.Windows.Forms.Button();
             this.buttonBack = new System.Windows.Forms.Button();
+
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewClients)).BeginInit();
             this.groupBoxClientData.SuspendLayout();
             this.SuspendLayout();
+
             // 
             // dataGridViewClients
             // 
             this.dataGridViewClients.AllowUserToAddRows = false;
             this.dataGridViewClients.AllowUserToDeleteRows = false;
-            this.dataGridViewClients.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.dataGridViewClients.AllowUserToResizeRows = false;
+            this.dataGridViewClients.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.dataGridViewClients.AutoGenerateColumns = true;
+            this.dataGridViewClients.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.None;
+            this.dataGridViewClients.BackgroundColor = System.Drawing.Color.White;
+            this.dataGridViewClients.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.dataGridViewClients.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridViewClients.Location = new System.Drawing.Point(12, 70);
             this.dataGridViewClients.Name = "dataGridViewClients";
             this.dataGridViewClients.ReadOnly = true;
+            this.dataGridViewClients.RowHeadersVisible = false;
             this.dataGridViewClients.RowHeadersWidth = 51;
-            this.dataGridViewClients.Size = new System.Drawing.Size(619, 495);
+            this.dataGridViewClients.Size = new System.Drawing.Size(750, 495);
             this.dataGridViewClients.TabIndex = 0;
             this.dataGridViewClients.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridViewClients_CellDoubleClick);
+
             // 
             // groupBoxClientData
             // 
-            this.groupBoxClientData.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.groupBoxClientData.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBoxClientData.BackColor = System.Drawing.Color.WhiteSmoke;
             this.groupBoxClientData.Controls.Add(this.buttonCancelAddress);
             this.groupBoxClientData.Controls.Add(this.buttonSaveAddress);
             this.groupBoxClientData.Controls.Add(this.buttonNewAddress);
@@ -131,16 +141,18 @@
             this.groupBoxClientData.Controls.Add(this.label2);
             this.groupBoxClientData.Controls.Add(this.textBoxFirstName);
             this.groupBoxClientData.Controls.Add(this.label1);
-            this.groupBoxClientData.Location = new System.Drawing.Point(704, 70);
+            this.groupBoxClientData.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
+            this.groupBoxClientData.Location = new System.Drawing.Point(780, 70);
             this.groupBoxClientData.Name = "groupBoxClientData";
             this.groupBoxClientData.Size = new System.Drawing.Size(390, 495);
             this.groupBoxClientData.TabIndex = 1;
             this.groupBoxClientData.TabStop = false;
             this.groupBoxClientData.Text = "Данные клиента";
+
             // 
             // buttonCancelAddress
             // 
-            this.buttonCancelAddress.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(67)))), ((int)(((byte)(54)))));
+            this.buttonCancelAddress.BackColor = System.Drawing.Color.FromArgb(244, 67, 54);
             this.buttonCancelAddress.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonCancelAddress.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Bold);
             this.buttonCancelAddress.ForeColor = System.Drawing.Color.White;
@@ -155,7 +167,7 @@
             // 
             // buttonSaveAddress
             // 
-            this.buttonSaveAddress.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(76)))), ((int)(((byte)(175)))), ((int)(((byte)(80)))));
+            this.buttonSaveAddress.BackColor = System.Drawing.Color.FromArgb(76, 175, 80);
             this.buttonSaveAddress.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonSaveAddress.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Bold);
             this.buttonSaveAddress.ForeColor = System.Drawing.Color.White;
@@ -170,7 +182,7 @@
             // 
             // buttonNewAddress
             // 
-            this.buttonNewAddress.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(150)))), ((int)(((byte)(243)))));
+            this.buttonNewAddress.BackColor = System.Drawing.Color.FromArgb(33, 150, 243);
             this.buttonNewAddress.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonNewAddress.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Bold);
             this.buttonNewAddress.ForeColor = System.Drawing.Color.White;
@@ -186,7 +198,7 @@
             // 
             this.textBoxNewEntrance.Location = new System.Drawing.Point(210, 350);
             this.textBoxNewEntrance.Name = "textBoxNewEntrance";
-            this.textBoxNewEntrance.Size = new System.Drawing.Size(70, 22);
+            this.textBoxNewEntrance.Size = new System.Drawing.Size(70, 24);
             this.textBoxNewEntrance.TabIndex = 23;
             this.textBoxNewEntrance.Visible = false;
             this.textBoxNewEntrance.Enter += new System.EventHandler(this.textBoxNewEntrance_Enter);
@@ -196,7 +208,7 @@
             // 
             this.textBoxNewHouse.Location = new System.Drawing.Point(120, 350);
             this.textBoxNewHouse.Name = "textBoxNewHouse";
-            this.textBoxNewHouse.Size = new System.Drawing.Size(70, 22);
+            this.textBoxNewHouse.Size = new System.Drawing.Size(70, 24);
             this.textBoxNewHouse.TabIndex = 22;
             this.textBoxNewHouse.Visible = false;
             this.textBoxNewHouse.Enter += new System.EventHandler(this.textBoxNewHouse_Enter);
@@ -206,7 +218,7 @@
             // 
             this.textBoxNewStreet.Location = new System.Drawing.Point(120, 320);
             this.textBoxNewStreet.Name = "textBoxNewStreet";
-            this.textBoxNewStreet.Size = new System.Drawing.Size(160, 22);
+            this.textBoxNewStreet.Size = new System.Drawing.Size(160, 24);
             this.textBoxNewStreet.TabIndex = 21;
             this.textBoxNewStreet.Visible = false;
             this.textBoxNewStreet.Enter += new System.EventHandler(this.textBoxNewStreet_Enter);
@@ -216,7 +228,7 @@
             // 
             this.textBoxNewCity.Location = new System.Drawing.Point(120, 290);
             this.textBoxNewCity.Name = "textBoxNewCity";
-            this.textBoxNewCity.Size = new System.Drawing.Size(160, 22);
+            this.textBoxNewCity.Size = new System.Drawing.Size(160, 24);
             this.textBoxNewCity.TabIndex = 20;
             this.textBoxNewCity.Visible = false;
             this.textBoxNewCity.Enter += new System.EventHandler(this.textBoxNewCity_Enter);
@@ -226,7 +238,7 @@
             // 
             this.textBoxAccountId.Location = new System.Drawing.Point(120, 250);
             this.textBoxAccountId.Name = "textBoxAccountId";
-            this.textBoxAccountId.Size = new System.Drawing.Size(160, 22);
+            this.textBoxAccountId.Size = new System.Drawing.Size(200, 24);
             this.textBoxAccountId.TabIndex = 19;
             this.textBoxAccountId.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textBoxAccountId_KeyPress);
             // 
@@ -235,7 +247,7 @@
             this.label7.AutoSize = true;
             this.label7.Location = new System.Drawing.Point(20, 253);
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(87, 16);
+            this.label7.Size = new System.Drawing.Size(93, 18);
             this.label7.TabIndex = 18;
             this.label7.Text = "ID аккаунта:";
             // 
@@ -244,7 +256,7 @@
             this.textBoxID.Location = new System.Drawing.Point(120, 30);
             this.textBoxID.Name = "textBoxID";
             this.textBoxID.ReadOnly = true;
-            this.textBoxID.Size = new System.Drawing.Size(160, 22);
+            this.textBoxID.Size = new System.Drawing.Size(80, 24);
             this.textBoxID.TabIndex = 17;
             this.textBoxID.Visible = false;
             // 
@@ -253,20 +265,20 @@
             this.label9.AutoSize = true;
             this.label9.Location = new System.Drawing.Point(20, 33);
             this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(23, 16);
+            this.label9.Size = new System.Drawing.Size(25, 18);
             this.label9.TabIndex = 16;
             this.label9.Text = "ID:";
             this.label9.Visible = false;
             // 
             // buttonSave
             // 
-            this.buttonSave.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(76)))), ((int)(((byte)(175)))), ((int)(((byte)(80)))));
+            this.buttonSave.BackColor = System.Drawing.Color.FromArgb(76, 175, 80);
             this.buttonSave.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonSave.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
             this.buttonSave.ForeColor = System.Drawing.Color.White;
-            this.buttonSave.Location = new System.Drawing.Point(20, 380);
+            this.buttonSave.Location = new System.Drawing.Point(20, 450);
             this.buttonSave.Name = "buttonSave";
-            this.buttonSave.Size = new System.Drawing.Size(360, 40);
+            this.buttonSave.Size = new System.Drawing.Size(360, 35);
             this.buttonSave.TabIndex = 15;
             this.buttonSave.Text = "Сохранить";
             this.buttonSave.UseVisualStyleBackColor = false;
@@ -278,7 +290,7 @@
             this.comboBoxAddress.FormattingEnabled = true;
             this.comboBoxAddress.Location = new System.Drawing.Point(120, 290);
             this.comboBoxAddress.Name = "comboBoxAddress";
-            this.comboBoxAddress.Size = new System.Drawing.Size(160, 24);
+            this.comboBoxAddress.Size = new System.Drawing.Size(160, 26);
             this.comboBoxAddress.TabIndex = 12;
             // 
             // label6
@@ -286,7 +298,7 @@
             this.label6.AutoSize = true;
             this.label6.Location = new System.Drawing.Point(20, 293);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(50, 16);
+            this.label6.Size = new System.Drawing.Size(55, 18);
             this.label6.TabIndex = 11;
             this.label6.Text = "Адрес:";
             // 
@@ -294,88 +306,88 @@
             // 
             this.comboBoxStatus.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBoxStatus.FormattingEnabled = true;
-            this.comboBoxStatus.Location = new System.Drawing.Point(120, 210);
+            this.comboBoxStatus.Location = new System.Drawing.Point(120, 190);
             this.comboBoxStatus.Name = "comboBoxStatus";
-            this.comboBoxStatus.Size = new System.Drawing.Size(160, 24);
+            this.comboBoxStatus.Size = new System.Drawing.Size(200, 26);
             this.comboBoxStatus.TabIndex = 10;
             // 
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(20, 213);
+            this.label5.Location = new System.Drawing.Point(20, 193);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(56, 16);
+            this.label5.Size = new System.Drawing.Size(60, 18);
             this.label5.TabIndex = 9;
             this.label5.Text = "Статус:";
             // 
             // textBoxPhone
             // 
-            this.textBoxPhone.Location = new System.Drawing.Point(120, 170);
+            this.textBoxPhone.Location = new System.Drawing.Point(120, 150);
             this.textBoxPhone.Name = "textBoxPhone";
-            this.textBoxPhone.Size = new System.Drawing.Size(160, 22);
+            this.textBoxPhone.Size = new System.Drawing.Size(200, 24);
             this.textBoxPhone.TabIndex = 8;
             this.textBoxPhone.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textBoxPhone_KeyPress);
             // 
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(20, 173);
+            this.label4.Location = new System.Drawing.Point(20, 153);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(70, 16);
+            this.label4.Size = new System.Drawing.Size(73, 18);
             this.label4.TabIndex = 7;
             this.label4.Text = "Телефон:";
             // 
             // textBoxPatronymic
             // 
-            this.textBoxPatronymic.Location = new System.Drawing.Point(120, 130);
+            this.textBoxPatronymic.Location = new System.Drawing.Point(120, 110);
             this.textBoxPatronymic.Name = "textBoxPatronymic";
-            this.textBoxPatronymic.Size = new System.Drawing.Size(160, 22);
+            this.textBoxPatronymic.Size = new System.Drawing.Size(200, 24);
             this.textBoxPatronymic.TabIndex = 6;
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(20, 133);
+            this.label3.Location = new System.Drawing.Point(20, 113);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(73, 16);
+            this.label3.Size = new System.Drawing.Size(77, 18);
             this.label3.TabIndex = 5;
             this.label3.Text = "Отчество:";
             // 
             // textBoxLastName
             // 
-            this.textBoxLastName.Location = new System.Drawing.Point(120, 90);
+            this.textBoxLastName.Location = new System.Drawing.Point(120, 70);
             this.textBoxLastName.Name = "textBoxLastName";
-            this.textBoxLastName.Size = new System.Drawing.Size(160, 22);
+            this.textBoxLastName.Size = new System.Drawing.Size(200, 24);
             this.textBoxLastName.TabIndex = 4;
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(20, 93);
+            this.label2.Location = new System.Drawing.Point(20, 73);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(69, 16);
+            this.label2.Size = new System.Drawing.Size(74, 18);
             this.label2.TabIndex = 3;
             this.label2.Text = "Фамилия:";
             // 
             // textBoxFirstName
             // 
-            this.textBoxFirstName.Location = new System.Drawing.Point(120, 50);
+            this.textBoxFirstName.Location = new System.Drawing.Point(120, 30);
             this.textBoxFirstName.Name = "textBoxFirstName";
-            this.textBoxFirstName.Size = new System.Drawing.Size(160, 22);
+            this.textBoxFirstName.Size = new System.Drawing.Size(200, 24);
             this.textBoxFirstName.TabIndex = 2;
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(20, 53);
+            this.label1.Location = new System.Drawing.Point(20, 33);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(36, 16);
+            this.label1.Size = new System.Drawing.Size(38, 18);
             this.label1.TabIndex = 1;
             this.label1.Text = "Имя:";
             // 
             // buttonAdd
             // 
-            this.buttonAdd.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(150)))), ((int)(((byte)(243)))));
+            this.buttonAdd.BackColor = System.Drawing.Color.FromArgb(33, 150, 243);
             this.buttonAdd.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonAdd.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
             this.buttonAdd.ForeColor = System.Drawing.Color.White;
@@ -389,7 +401,7 @@
             // 
             // buttonEdit
             // 
-            this.buttonEdit.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(193)))), ((int)(((byte)(7)))));
+            this.buttonEdit.BackColor = System.Drawing.Color.FromArgb(255, 193, 7);
             this.buttonEdit.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonEdit.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
             this.buttonEdit.ForeColor = System.Drawing.Color.Black;
@@ -403,7 +415,7 @@
             // 
             // buttonDelete
             // 
-            this.buttonDelete.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(67)))), ((int)(((byte)(54)))));
+            this.buttonDelete.BackColor = System.Drawing.Color.FromArgb(244, 67, 54);
             this.buttonDelete.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonDelete.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
             this.buttonDelete.ForeColor = System.Drawing.Color.White;
@@ -417,7 +429,7 @@
             // 
             // buttonRefresh
             // 
-            this.buttonRefresh.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(156)))), ((int)(((byte)(39)))), ((int)(((byte)(176)))));
+            this.buttonRefresh.BackColor = System.Drawing.Color.FromArgb(156, 39, 176);
             this.buttonRefresh.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonRefresh.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
             this.buttonRefresh.ForeColor = System.Drawing.Color.White;
@@ -431,9 +443,10 @@
             // 
             // textBoxSearch
             // 
+            this.textBoxSearch.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
             this.textBoxSearch.Location = new System.Drawing.Point(630, 30);
             this.textBoxSearch.Name = "textBoxSearch";
-            this.textBoxSearch.Size = new System.Drawing.Size(180, 22);
+            this.textBoxSearch.Size = new System.Drawing.Size(180, 24);
             this.textBoxSearch.TabIndex = 6;
             this.textBoxSearch.KeyDown += new System.Windows.Forms.KeyEventHandler(this.textBoxSearch_KeyDown);
             // 
@@ -449,7 +462,7 @@
             // 
             // buttonSearch
             // 
-            this.buttonSearch.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(150)))), ((int)(((byte)(136)))));
+            this.buttonSearch.BackColor = System.Drawing.Color.FromArgb(0, 150, 136);
             this.buttonSearch.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonSearch.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
             this.buttonSearch.ForeColor = System.Drawing.Color.White;
@@ -463,7 +476,7 @@
             // 
             // buttonBack
             // 
-            this.buttonBack.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(158)))), ((int)(((byte)(158)))), ((int)(((byte)(158)))));
+            this.buttonBack.BackColor = System.Drawing.Color.FromArgb(158, 158, 158);
             this.buttonBack.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonBack.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
             this.buttonBack.ForeColor = System.Drawing.Color.White;
@@ -480,7 +493,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(1106, 577);
+            this.ClientSize = new System.Drawing.Size(1182, 625);
             this.Controls.Add(this.buttonBack);
             this.Controls.Add(this.buttonSearch);
             this.Controls.Add(this.label8);
@@ -492,6 +505,7 @@
             this.Controls.Add(this.groupBoxClientData);
             this.Controls.Add(this.dataGridViewClients);
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F);
+            this.MinimumSize = new System.Drawing.Size(1200, 672);
             this.Name = "AdminClientForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Управление клиентами";
@@ -500,7 +514,6 @@
             this.groupBoxClientData.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
-
         }
     }
 }

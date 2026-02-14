@@ -9,23 +9,12 @@ namespace taxi4
     {
         private string connectionString = "Host=localhost;Port=5432;Database=taxi4;Username=postgres;Password=123";
 
-        // Получение списка автомобилей с информацией о водителе, марке, модели, цвете
+        // ---------- ПОЛУЧЕНИЕ СПИСКА АВТОМОБИЛЕЙ ----------
         public DataTable GetCars()
         {
-            DataTable dt = new DataTable();
+            var dt = new DataTable();
 
-            // Создаём структуру заранее
-            dt.Columns.Add("car_id", typeof(int));
-            dt.Columns.Add("brand_name", typeof(string));
-            dt.Columns.Add("model_name", typeof(string));
-            dt.Columns.Add("color_name", typeof(string));
-            dt.Columns.Add("license_number", typeof(string));
-            dt.Columns.Add("region_code", typeof(string));
-            dt.Columns.Add("year_of_manufacture", typeof(int));
-            dt.Columns.Add("driver_name", typeof(string));
-            dt.Columns.Add("driver_id", typeof(int));
-
-            using (NpgsqlConnection conn = new NpgsqlConnection(connectionString))
+            using (var conn = new NpgsqlConnection(connectionString))
             {
                 try
                 {
@@ -33,13 +22,13 @@ namespace taxi4
                     string query = @"
                         SELECT 
                             c.car_id,
-                            COALESCE(b.name, '') as brand_name,
-                            COALESCE(m.name, '') as model_name,
-                            COALESCE(col.name, '') as color_name,
-                            COALESCE(c.license_number, '') as license_number,
-                            COALESCE(c.region_code, '') as region_code,
+                            COALESCE(b.name, '') AS brand_name,
+                            COALESCE(m.name, '') AS model_name,
+                            COALESCE(col.name, '') AS color_name,
+                            COALESCE(c.license_number, '') AS license_number,
+                            COALESCE(c.region_code, '') AS region_code,
                             c.year_of_manufacture,
-                            COALESCE(d.last_name || ' ' || d.first_name, 'Не назначен') as driver_name,
+                            COALESCE(d.last_name || ' ' || d.first_name, 'Не назначен') AS driver_name,
                             c.driver_id
                         FROM car c
                         LEFT JOIN brand b ON c.brand_id = b.brand_id
@@ -48,113 +37,92 @@ namespace taxi4
                         LEFT JOIN driver d ON c.driver_id = d.driver_id
                         ORDER BY c.car_id";
 
-                    using (NpgsqlCommand cmd = new NpgsqlCommand(query, conn))
-                    using (NpgsqlDataAdapter adapter = new NpgsqlDataAdapter(cmd))
+                    using (var adapter = new NpgsqlDataAdapter(query, conn))
                     {
                         adapter.Fill(dt);
-                    }
-
-                    // Замена DBNull
-                    foreach (DataRow row in dt.Rows)
-                    {
-                        foreach (DataColumn col in dt.Columns)
-                        {
-                            if (row[col] == DBNull.Value)
-                            {
-                                if (col.DataType == typeof(string))
-                                    row[col] = "";
-                                else if (col.DataType == typeof(int))
-                                    row[col] = 0;
-                            }
-                        }
                     }
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Ошибка загрузки автомобилей: {ex.Message}", "Ошибка",
+                    MessageBox.Show($"Ошибка загрузки автомобилей:\n{ex.Message}", "Ошибка",
                         MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
             return dt;
         }
 
-        // Получение списка брендов
+        // ---------- ПОЛУЧЕНИЕ СПРАВОЧНИКОВ ----------
         public DataTable GetBrands()
         {
-            DataTable dt = new DataTable();
-            using (NpgsqlConnection conn = new NpgsqlConnection(connectionString))
+            var dt = new DataTable();
+            using (var conn = new NpgsqlConnection(connectionString))
             {
                 try
                 {
                     conn.Open();
                     string query = "SELECT brand_id, name FROM brand ORDER BY name";
-                    using (NpgsqlCommand cmd = new NpgsqlCommand(query, conn))
-                    using (NpgsqlDataAdapter adapter = new NpgsqlDataAdapter(cmd))
+                    using (var adapter = new NpgsqlDataAdapter(query, conn))
                         adapter.Fill(dt);
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Ошибка загрузки брендов: {ex.Message}", "Ошибка",
+                    MessageBox.Show($"Ошибка загрузки марок:\n{ex.Message}", "Ошибка",
                         MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
             return dt;
         }
 
-        // Получение моделей по ID бренда
         public DataTable GetModelsByBrand(int brandId)
         {
-            DataTable dt = new DataTable();
-            using (NpgsqlConnection conn = new NpgsqlConnection(connectionString))
+            var dt = new DataTable();
+            using (var conn = new NpgsqlConnection(connectionString))
             {
                 try
                 {
                     conn.Open();
                     string query = "SELECT model_id, name FROM model WHERE brand_id = @brandId ORDER BY name";
-                    using (NpgsqlCommand cmd = new NpgsqlCommand(query, conn))
+                    using (var cmd = new NpgsqlCommand(query, conn))
                     {
                         cmd.Parameters.AddWithValue("@brandId", brandId);
-                        using (NpgsqlDataAdapter adapter = new NpgsqlDataAdapter(cmd))
+                        using (var adapter = new NpgsqlDataAdapter(cmd))
                             adapter.Fill(dt);
                     }
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Ошибка загрузки моделей: {ex.Message}", "Ошибка",
+                    MessageBox.Show($"Ошибка загрузки моделей:\n{ex.Message}", "Ошибка",
                         MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
             return dt;
         }
 
-        // Получение списка цветов
         public DataTable GetColors()
         {
-            DataTable dt = new DataTable();
-            using (NpgsqlConnection conn = new NpgsqlConnection(connectionString))
+            var dt = new DataTable();
+            using (var conn = new NpgsqlConnection(connectionString))
             {
                 try
                 {
                     conn.Open();
                     string query = "SELECT color_id, name FROM color ORDER BY name";
-                    using (NpgsqlCommand cmd = new NpgsqlCommand(query, conn))
-                    using (NpgsqlDataAdapter adapter = new NpgsqlDataAdapter(cmd))
+                    using (var adapter = new NpgsqlDataAdapter(query, conn))
                         adapter.Fill(dt);
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Ошибка загрузки цветов: {ex.Message}", "Ошибка",
+                    MessageBox.Show($"Ошибка загрузки цветов:\n{ex.Message}", "Ошибка",
                         MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
             return dt;
         }
 
-        // Получение списка водителей (активных)
         public DataTable GetDrivers()
         {
-            DataTable dt = new DataTable();
-            using (NpgsqlConnection conn = new NpgsqlConnection(connectionString))
+            var dt = new DataTable();
+            using (var conn = new NpgsqlConnection(connectionString))
             {
                 try
                 {
@@ -164,61 +132,57 @@ namespace taxi4
                         FROM driver 
                         WHERE driver_status_id = 1 
                         ORDER BY last_name";
-                    using (NpgsqlCommand cmd = new NpgsqlCommand(query, conn))
-                    using (NpgsqlDataAdapter adapter = new NpgsqlDataAdapter(cmd))
+                    using (var adapter = new NpgsqlDataAdapter(query, conn))
                         adapter.Fill(dt);
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Ошибка загрузки водителей: {ex.Message}", "Ошибка",
+                    MessageBox.Show($"Ошибка загрузки водителей:\n{ex.Message}", "Ошибка",
                         MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
             return dt;
         }
 
-        // Добавление автомобиля
+        // ---------- ДОБАВЛЕНИЕ / ОБНОВЛЕНИЕ / УДАЛЕНИЕ АВТОМОБИЛЯ ----------
         public bool AddCar(int brandId, int modelId, int colorId, string licenseNumber, string regionCode, int year, int? driverId)
         {
-            using (NpgsqlConnection conn = new NpgsqlConnection(connectionString))
+            using (var conn = new NpgsqlConnection(connectionString))
             {
                 try
                 {
                     conn.Open();
                     string query = @"
-                        INSERT INTO car (brand_id, model_id, color_id, license_number, region_code, year_of_manufacture, driver_id)
-                        VALUES (@brandId, @modelId, @colorId, @licenseNumber, @regionCode, @year, @driverId)";
+                        INSERT INTO car 
+                            (brand_id, model_id, color_id, license_number, region_code, year_of_manufacture, driver_id)
+                        VALUES 
+                            (@brandId, @modelId, @colorId, @licenseNumber, @regionCode, @year, @driverId)";
 
-                    using (NpgsqlCommand cmd = new NpgsqlCommand(query, conn))
+                    using (var cmd = new NpgsqlCommand(query, conn))
                     {
                         cmd.Parameters.AddWithValue("@brandId", brandId);
                         cmd.Parameters.AddWithValue("@modelId", modelId);
                         cmd.Parameters.AddWithValue("@colorId", colorId);
-                        cmd.Parameters.AddWithValue("@licenseNumber", licenseNumber);
-                        cmd.Parameters.AddWithValue("@regionCode", regionCode);
+                        cmd.Parameters.AddWithValue("@licenseNumber", licenseNumber ?? "");
+                        cmd.Parameters.AddWithValue("@regionCode", regionCode ?? "");
                         cmd.Parameters.AddWithValue("@year", year);
-                        if (driverId.HasValue)
-                            cmd.Parameters.AddWithValue("@driverId", driverId.Value);
-                        else
-                            cmd.Parameters.AddWithValue("@driverId", DBNull.Value);
+                        cmd.Parameters.AddWithValue("@driverId", driverId.HasValue ? (object)driverId.Value : DBNull.Value);
 
-                        int result = cmd.ExecuteNonQuery();
-                        return result > 0;
+                        return cmd.ExecuteNonQuery() > 0;
                     }
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Ошибка добавления автомобиля: {ex.Message}", "Ошибка",
+                    MessageBox.Show($"Ошибка добавления автомобиля:\n{ex.Message}", "Ошибка",
                         MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return false;
                 }
             }
         }
 
-        // Обновление автомобиля
         public bool UpdateCar(int carId, int brandId, int modelId, int colorId, string licenseNumber, string regionCode, int year, int? driverId)
         {
-            using (NpgsqlConnection conn = new NpgsqlConnection(connectionString))
+            using (var conn = new NpgsqlConnection(connectionString))
             {
                 try
                 {
@@ -234,70 +198,128 @@ namespace taxi4
                             driver_id = @driverId
                         WHERE car_id = @carId";
 
-                    using (NpgsqlCommand cmd = new NpgsqlCommand(query, conn))
+                    using (var cmd = new NpgsqlCommand(query, conn))
                     {
                         cmd.Parameters.AddWithValue("@carId", carId);
                         cmd.Parameters.AddWithValue("@brandId", brandId);
                         cmd.Parameters.AddWithValue("@modelId", modelId);
                         cmd.Parameters.AddWithValue("@colorId", colorId);
-                        cmd.Parameters.AddWithValue("@licenseNumber", licenseNumber);
-                        cmd.Parameters.AddWithValue("@regionCode", regionCode);
+                        cmd.Parameters.AddWithValue("@licenseNumber", licenseNumber ?? "");
+                        cmd.Parameters.AddWithValue("@regionCode", regionCode ?? "");
                         cmd.Parameters.AddWithValue("@year", year);
-                        if (driverId.HasValue)
-                            cmd.Parameters.AddWithValue("@driverId", driverId.Value);
-                        else
-                            cmd.Parameters.AddWithValue("@driverId", DBNull.Value);
+                        cmd.Parameters.AddWithValue("@driverId", driverId.HasValue ? (object)driverId.Value : DBNull.Value);
 
-                        int result = cmd.ExecuteNonQuery();
-                        return result > 0;
+                        return cmd.ExecuteNonQuery() > 0;
                     }
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Ошибка обновления автомобиля: {ex.Message}", "Ошибка",
+                    MessageBox.Show($"Ошибка обновления автомобиля:\n{ex.Message}", "Ошибка",
                         MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return false;
                 }
             }
         }
 
-        // Удаление автомобиля
         public bool DeleteCar(int carId)
         {
-            using (NpgsqlConnection conn = new NpgsqlConnection(connectionString))
+            using (var conn = new NpgsqlConnection(connectionString))
             {
                 try
                 {
                     conn.Open();
                     string query = "DELETE FROM car WHERE car_id = @carId";
-                    using (NpgsqlCommand cmd = new NpgsqlCommand(query, conn))
+                    using (var cmd = new NpgsqlCommand(query, conn))
                     {
                         cmd.Parameters.AddWithValue("@carId", carId);
-                        int result = cmd.ExecuteNonQuery();
-                        return result > 0;
+                        return cmd.ExecuteNonQuery() > 0;
                     }
                 }
-                catch (NpgsqlException ex)
+                catch (NpgsqlException ex) when (ex.Message.Contains("23503") || ex.Message.Contains("foreign key"))
                 {
-                    if (ex.Message.Contains("violates foreign key constraint") ||
-                        ex.Message.Contains("23503") ||
-                        ex.Message.Contains("foreign key"))
-                    {
-                        MessageBox.Show("Невозможно удалить автомобиль: имеются связанные записи",
-                            "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                    else
-                    {
-                        MessageBox.Show($"Ошибка базы данных: {ex.Message}", "Ошибка",
-                            MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
+                    MessageBox.Show("Невозможно удалить автомобиль: имеются связанные записи.",
+                        "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return false;
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Ошибка: {ex.Message}", "Ошибка",
+                    MessageBox.Show($"Ошибка удаления автомобиля:\n{ex.Message}", "Ошибка",
                         MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return false;
+                }
+            }
+        }
+
+        // ---------- ДОБАВЛЕНИЕ НОВЫХ ЗАПИСЕЙ В СПРАВОЧНИКИ (ДЛЯ ФОРМЫ) ----------
+        public int AddBrand(string brandName)
+        {
+            using (var conn = new NpgsqlConnection(connectionString))
+            {
+                try
+                {
+                    conn.Open();
+                    string query = "INSERT INTO brand (name) VALUES (@name) RETURNING brand_id";
+                    using (var cmd = new NpgsqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@name", brandName);
+                        object result = cmd.ExecuteScalar();
+                        return result != null ? Convert.ToInt32(result) : -1;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Ошибка добавления марки:\n{ex.Message}", "Ошибка",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return -1;
+                }
+            }
+        }
+
+        public int AddModel(int brandId, string modelName)
+        {
+            using (var conn = new NpgsqlConnection(connectionString))
+            {
+                try
+                {
+                    conn.Open();
+                    string query = "INSERT INTO model (name, brand_id) VALUES (@name, @brandId) RETURNING model_id";
+                    using (var cmd = new NpgsqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@name", modelName);
+                        cmd.Parameters.AddWithValue("@brandId", brandId);
+                        object result = cmd.ExecuteScalar();
+                        return result != null ? Convert.ToInt32(result) : -1;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Ошибка добавления модели:\n{ex.Message}", "Ошибка",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return -1;
+                }
+            }
+        }
+
+        public int AddColor(string colorName)
+        {
+            using (var conn = new NpgsqlConnection(connectionString))
+            {
+                try
+                {
+                    conn.Open();
+                    string query = "INSERT INTO color (name) VALUES (@name) RETURNING color_id";
+                    using (var cmd = new NpgsqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@name", colorName);
+                        object result = cmd.ExecuteScalar();
+                        return result != null ? Convert.ToInt32(result) : -1;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Ошибка добавления цвета:\n{ex.Message}", "Ошибка",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return -1;
                 }
             }
         }

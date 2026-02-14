@@ -99,6 +99,7 @@
             this.AdmButtonTarifs.TabIndex = 6;
             this.AdmButtonTarifs.Text = "Тарифы";
             this.AdmButtonTarifs.UseVisualStyleBackColor = false;
+            this.AdmButtonTarifs.Click += new System.EventHandler(this.AdmButtonTarifs_Click);
             // 
             // AdmButtonCar
             // 
@@ -130,6 +131,7 @@
             this.AdmButtonOrders.TabIndex = 4;
             this.AdmButtonOrders.Text = "Заказы";
             this.AdmButtonOrders.UseVisualStyleBackColor = false;
+            this.AdmButtonOrders.Click += new System.EventHandler(this.AdmButtonOrders_Click);
             // 
             // AdmButtonPromotion
             // 
@@ -145,6 +147,7 @@
             this.AdmButtonPromotion.TabIndex = 3;
             this.AdmButtonPromotion.Text = "Акции";
             this.AdmButtonPromotion.UseVisualStyleBackColor = false;
+            this.AdmButtonPromotion.Click += new System.EventHandler(this.AdmButtonPromotion_Click);
             // 
             // AdmButtonDrivers
             // 

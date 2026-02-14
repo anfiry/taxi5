@@ -60,3 +60,6 @@ C:\Users\Я\source\repos\taxi5\taxi5\bin\Debug\Telegram.Bot.xml
 C:\Users\Я\source\repos\taxi5\taxi5\obj\Debug\taxi4.AdminMenu.resources
 C:\Users\Я\source\repos\taxi5\taxi5\obj\Debug\TaxiAdminApp.AdminClientForm.resources
 C:\Users\Я\source\repos\taxi5\taxi5\obj\Debug\taxi4.AdminDriverForm.resources
+C:\Users\Я\source\repos\taxi5\taxi5\obj\Debug\taxi4.AdminTariffForm.resources
+C:\Users\Я\source\repos\taxi5\taxi5\obj\Debug\taxi4.AdminPromotionForm.resources
+C:\Users\Я\source\repos\taxi5\taxi5\obj\Debug\taxi4.ClientMenu.resources
