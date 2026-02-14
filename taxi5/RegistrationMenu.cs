@@ -51,11 +51,11 @@ namespace taxi4
 
                 // Генерация кода
                 currentVerificationCode = new Random().Next(100000, 999999).ToString();
-                currentPhoneNumber = phone_number; // Сохраняем с "+"
+                currentPhoneNumber = phone_number;
 
-                // Показываем код (вместо отправки SMS)
-                MessageBox.Show($"Код подтверждения: {currentVerificationCode}\n(В демо-режиме)",
-                    "Код отправлен",
+                // Показываем код подтверждения в MessageBox
+                MessageBox.Show($"Код подтверждения: {currentVerificationCode}\nДля номера: {phone_number}",
+                    "Код подтверждения",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Information);
 
@@ -88,6 +88,10 @@ namespace taxi4
                 txtLogin.Enabled = true;
                 txtPassword.Enabled = true;
                 txtConfirmPassword.Enabled = true;
+                textCity.Enabled = true;
+                textStreet.Enabled = true;
+                textHouse.Enabled = true;
+                textEntrance.Enabled = true;
                 btnRegister.Enabled = true;
 
                 // Фокусируемся на первом поле
@@ -156,6 +160,17 @@ namespace taxi4
                 return;
             }
 
+            // Проверка полей адреса
+            if (string.IsNullOrWhiteSpace(textCity.Text) ||
+                string.IsNullOrWhiteSpace(textStreet.Text) ||
+                string.IsNullOrWhiteSpace(textHouse.Text) ||
+                string.IsNullOrWhiteSpace(textEntrance.Text))
+            {
+                MessageBox.Show("Заполните все поля адреса", "Ошибка",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
             try
             {
                 using (var connection = new NpgsqlConnection(connectionString))
@@ -186,7 +201,6 @@ namespace taxi4
                             }
 
                             // 2. Регистрация в таблице account
-                            // Убираем phone из параметра, так как его нет в таблице account
                             string accountQuery = @"
                                 INSERT INTO account 
                                 (role_id, login, password, confirmation) 
@@ -205,10 +219,30 @@ namespace taxi4
                                 accountId = Convert.ToInt32(cmd.ExecuteScalar());
                             }
 
-                            // 3. Регистрация в таблице client
+                            // 3. СОЗДАНИЕ АДРЕСА (НОВАЯ ЧАСТЬ)
+                            int addressId;
+                            string addressQuery = @"
+                                INSERT INTO address 
+                                (city, street, house, entrance) 
+                                VALUES 
+                                (@city, @street, @house, @entrance) 
+                                RETURNING address_id";
+
+                            using (NpgsqlCommand addressCmd = new NpgsqlCommand(addressQuery, connection))
+                            {
+                                addressCmd.Transaction = transaction;
+                                addressCmd.Parameters.AddWithValue("@city", textCity.Text.Trim());
+                                addressCmd.Parameters.AddWithValue("@street", textStreet.Text.Trim());
+                                addressCmd.Parameters.AddWithValue("@house", textHouse.Text.Trim());
+                                addressCmd.Parameters.AddWithValue("@entrance", textEntrance.Text.Trim());
+
+                                addressId = Convert.ToInt32(addressCmd.ExecuteScalar());
+                            }
+
+                            // 4. Регистрация в таблице client (ИСПРАВЛЕНА ОПЕЧАТКА)
                             string clientQuery = @"
                                 INSERT INTO client 
-                                (account_id, address_id, first_name, last_name, patronymic, phone_number) 
+                                (clent_status_id, account_id, address_id, first_name, last_name, patronymic, phone_number) 
                                 VALUES 
                                 (1, @account_id, @address_id, @first_name, @last_name, @patronymic, @phone_number) 
                                 RETURNING client_id";
@@ -219,7 +253,7 @@ namespace taxi4
                             {
                                 clientCmd.Transaction = transaction;
                                 clientCmd.Parameters.AddWithValue("@account_id", accountId);
-                                clientCmd.Parameters.AddWithValue("@address_id", DBNull.Value);
+                                clientCmd.Parameters.AddWithValue("@address_id", addressId); // Используем созданный адрес
                                 clientCmd.Parameters.AddWithValue("@first_name", txtFirstName.Text);
                                 clientCmd.Parameters.AddWithValue("@last_name", txtLastName.Text);
 
@@ -235,7 +269,7 @@ namespace taxi4
                                 clientId = Convert.ToInt32(clientCmd.ExecuteScalar());
                             }
 
-                            // 4. Фиксируем транзакцию
+                            // 5. Фиксируем транзакцию
                             transaction.Commit();
 
                             MessageBox.Show(
@@ -244,13 +278,15 @@ namespace taxi4
                                 $"Логин: {txtLogin.Text}\n" +
                                 $"Телефон: {currentPhoneNumber}\n" +
                                 $"Имя: {txtFirstName.Text} {txtLastName.Text} " +
-                                (string.IsNullOrWhiteSpace(txtPatronymic.Text) ? "" : " " + txtPatronymic.Text),
+                                (string.IsNullOrWhiteSpace(txtPatronymic.Text) ? "" : " " + txtPatronymic.Text) +
+                                $"\nАдрес: {textCity.Text}, {textStreet.Text}, д.{textHouse.Text}, подъезд {textEntrance.Text}",
                                 "Регистрация завершена",
                                 MessageBoxButtons.OK,
                                 MessageBoxIcon.Information);
 
-                            this.DialogResult = DialogResult.OK;
-                            this.Close();
+                            LoginForm loginForm = new LoginForm();
+                            loginForm.Show();
+                            this.Hide();
                         }
                         catch (Exception ex)
                         {
@@ -265,7 +301,17 @@ namespace taxi4
                                     "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             }
 
-                            throw new Exception($"Ошибка при регистрации: {ex.Message}");
+                            // Проверка на конкретную ошибку
+                            if (ex.Message.Contains("client_status_id"))
+                            {
+                                MessageBox.Show($"Ошибка: столбец 'client_status_id' не найден. Проверьте структуру таблицы 'client' в базе данных.",
+                                    "Ошибка базы данных", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            }
+                            else
+                            {
+                                MessageBox.Show($"Ошибка при регистрации: {ex.Message}", "Ошибка",
+                                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            }
                         }
                     }
                 }
@@ -281,8 +327,8 @@ namespace taxi4
         private void BtnCancel_Click(object sender, EventArgs e)
         {
             LoginForm loginForm = new LoginForm();
-            loginForm.ShowDialog();
-            this.Hide();
+            loginForm.Show();
+            this.Close();
         }
     }
 }
