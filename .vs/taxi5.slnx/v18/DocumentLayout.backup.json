@@ -3,6 +3,10 @@
   "WorkspaceRootPath": "C:\\Users\\\u042F\\source\\repos\\taxi5\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{79E66E86-CA49-4D0D-A7F0-4A3D06C5CE47}|taxi5\\taxi5.csproj|c:\\users\\\u044F\\source\\repos\\taxi5\\taxi5\\clientmenu.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{79E66E86-CA49-4D0D-A7F0-4A3D06C5CE47}|taxi5\\taxi5.csproj|solutionrelative:taxi5\\clientmenu.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{79E66E86-CA49-4D0D-A7F0-4A3D06C5CE47}|taxi5\\taxi5.csproj|C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\adminpromotionform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
       "RelativeMoniker": "D:0:0:{79E66E86-CA49-4D0D-A7F0-4A3D06C5CE47}|taxi5\\taxi5.csproj|solutionrelative:taxi5\\adminpromotionform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
     },
@@ -86,7 +90,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 4,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Bookmark",
@@ -94,12 +98,24 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 0,
+              "Title": "ClientMenu.cs [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]",
+              "DocumentMoniker": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\ClientMenu.cs",
+              "RelativeDocumentMoniker": "taxi5\\ClientMenu.cs",
+              "ToolTip": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\ClientMenu.cs [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]*",
+              "RelativeToolTip": "taxi5\\ClientMenu.cs [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]*",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-14T08:13:36.777Z",
+              "EditorCaption": " [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
               "Title": "AdminPromotionForm.cs",
               "DocumentMoniker": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\AdminPromotionForm.cs",
               "RelativeDocumentMoniker": "taxi5\\AdminPromotionForm.cs",
-              "ToolTip": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\AdminPromotionForm.cs*",
-              "RelativeToolTip": "taxi5\\AdminPromotionForm.cs*",
+              "ToolTip": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\AdminPromotionForm.cs",
+              "RelativeToolTip": "taxi5\\AdminPromotionForm.cs",
               "ViewState": "AgIAADQBAAAAAAAAAAAuwFQBAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-02-13T21:52:55.714Z",
@@ -107,7 +123,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "AdminMenu.cs [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]",
               "DocumentMoniker": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\AdminMenu.cs",
               "RelativeDocumentMoniker": "taxi5\\AdminMenu.cs",
@@ -119,7 +135,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "AdminMenu.cs",
               "DocumentMoniker": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\AdminMenu.cs",
               "RelativeDocumentMoniker": "taxi5\\AdminMenu.cs",
@@ -132,24 +148,24 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "AdminPromotionForm.cs [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]",
               "DocumentMoniker": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\AdminPromotionForm.cs",
               "RelativeDocumentMoniker": "taxi5\\AdminPromotionForm.cs",
-              "ToolTip": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\AdminPromotionForm.cs [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]*",
-              "RelativeToolTip": "taxi5\\AdminPromotionForm.cs [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]*",
+              "ToolTip": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\AdminPromotionForm.cs [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]",
+              "RelativeToolTip": "taxi5\\AdminPromotionForm.cs [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-02-13T21:49:16.457Z",
               "EditorCaption": " [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 4,
               "Title": "AdminPromotionForm.Designer.cs",
               "DocumentMoniker": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\AdminPromotionForm.Designer.cs",
               "RelativeDocumentMoniker": "taxi5\\AdminPromotionForm.Designer.cs",
-              "ToolTip": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\AdminPromotionForm.Designer.cs*",
-              "RelativeToolTip": "taxi5\\AdminPromotionForm.Designer.cs*",
+              "ToolTip": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\AdminPromotionForm.Designer.cs",
+              "RelativeToolTip": "taxi5\\AdminPromotionForm.Designer.cs",
               "ViewState": "AgIAAH8BAAAAAAAAAAAuwJ8BAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-02-13T21:54:12.073Z",
@@ -157,7 +173,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 6,
               "Title": "AdminPromotion.cs",
               "DocumentMoniker": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\AdminPromotion.cs",
               "RelativeDocumentMoniker": "taxi5\\AdminPromotion.cs",
@@ -169,7 +185,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 7,
               "Title": "AdminOrderForm.Designer.cs",
               "DocumentMoniker": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\AdminOrderForm.Designer.cs",
               "RelativeDocumentMoniker": "taxi5\\AdminOrderForm.Designer.cs",
@@ -181,7 +197,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 8,
               "Title": "AdminOrderForm.cs",
               "DocumentMoniker": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\AdminOrderForm.cs",
               "RelativeDocumentMoniker": "taxi5\\AdminOrderForm.cs",
@@ -193,7 +209,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 9,
               "Title": "AdminOrder.cs",
               "DocumentMoniker": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\AdminOrder.cs",
               "RelativeDocumentMoniker": "taxi5\\AdminOrder.cs",
@@ -205,7 +221,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 10,
               "Title": "AdminClientForm.cs",
               "DocumentMoniker": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\AdminClientForm.cs",
               "RelativeDocumentMoniker": "taxi5\\AdminClientForm.cs",
@@ -217,7 +233,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 11,
               "Title": "AdminDriverForm.cs",
               "DocumentMoniker": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\AdminDriverForm.cs",
               "RelativeDocumentMoniker": "taxi5\\AdminDriverForm.cs",
@@ -229,7 +245,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 12,
+              "DocumentIndex": 13,
               "Title": "AdminTariffForm.cs",
               "DocumentMoniker": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\AdminTariffForm.cs",
               "RelativeDocumentMoniker": "taxi5\\AdminTariffForm.cs",
@@ -241,7 +257,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 11,
+              "DocumentIndex": 12,
               "Title": "AdminTariff.cs",
               "DocumentMoniker": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\AdminTariff.cs",
               "RelativeDocumentMoniker": "taxi5\\AdminTariff.cs",
@@ -253,7 +269,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 13,
+              "DocumentIndex": 14,
               "Title": "AdminDriverForm.Designer.cs",
               "DocumentMoniker": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\AdminDriverForm.Designer.cs",
               "RelativeDocumentMoniker": "taxi5\\AdminDriverForm.Designer.cs",
@@ -265,7 +281,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 14,
+              "DocumentIndex": 15,
               "Title": "AdminCarForm.Designer.cs",
               "DocumentMoniker": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\AdminCarForm.Designer.cs",
               "RelativeDocumentMoniker": "taxi5\\AdminCarForm.Designer.cs",
@@ -277,7 +293,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 15,
+              "DocumentIndex": 16,
               "Title": "AdminCarForm.cs",
               "DocumentMoniker": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\AdminCarForm.cs",
               "RelativeDocumentMoniker": "taxi5\\AdminCarForm.cs",
@@ -289,7 +305,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 16,
+              "DocumentIndex": 17,
               "Title": "AdminDriverForm.cs [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]",
               "DocumentMoniker": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\AdminDriverForm.cs",
               "RelativeDocumentMoniker": "taxi5\\AdminDriverForm.cs",
@@ -300,7 +316,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 17,
+              "DocumentIndex": 18,
               "Title": "Program.cs",
               "DocumentMoniker": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\Program.cs",
               "RelativeDocumentMoniker": "taxi5\\Program.cs",
@@ -312,7 +328,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 18,
+              "DocumentIndex": 19,
               "Title": "AdminDriver.cs",
               "DocumentMoniker": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\AdminDriver.cs",
               "RelativeDocumentMoniker": "taxi5\\AdminDriver.cs",
