@@ -73,12 +73,17 @@ namespace TaxiClientApp
             btnProfile.Location = new Point(500, 20);
             btnProfile.Click += BtnProfile_Click;
 
+            // Новая кнопка "Мои акции"
+            var btnPromotions = CreateTileButton("🎁 МОИ АКЦИИ", Color.FromArgb(241, 196, 15));
+            btnPromotions.Location = new Point(20, 120);
+            btnPromotions.Click += BtnPromotions_Click;
+
             // Кнопка "Выйти"
             var btnLogout = CreateTileButton("🚪 ВЫЙТИ", Color.FromArgb(231, 76, 60));
-            btnLogout.Location = new Point(20, 120);
+            btnLogout.Location = new Point(260, 120);
             btnLogout.Click += BtnLogout_Click;
 
-            panelActions.Controls.AddRange(new Control[] { btnNewOrder, btnMyOrders, btnProfile, btnLogout });
+            panelActions.Controls.AddRange(new Control[] { btnNewOrder, btnMyOrders, btnProfile, btnPromotions, btnLogout });
 
             // Блок статистики
             var lblStatsHeader = new Label
@@ -123,7 +128,12 @@ namespace TaxiClientApp
                 Cursor = Cursors.Hand
             };
         }
-
+        // Обработчик для новой кнопки
+        private void BtnPromotions_Click(object sender, EventArgs e)
+        {
+            using (var form = new PromotionsForm(currentClientId, connectionString))
+                form.ShowDialog();
+        }
         private async void LoadClientData()
         {
             try
