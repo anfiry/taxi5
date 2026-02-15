@@ -83,22 +83,18 @@
             this.label8 = new System.Windows.Forms.Label();
             this.buttonSearch = new System.Windows.Forms.Button();
             this.buttonBack = new System.Windows.Forms.Button();
-
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewClients)).BeginInit();
             this.groupBoxClientData.SuspendLayout();
             this.SuspendLayout();
-
             // 
             // dataGridViewClients
             // 
             this.dataGridViewClients.AllowUserToAddRows = false;
             this.dataGridViewClients.AllowUserToDeleteRows = false;
             this.dataGridViewClients.AllowUserToResizeRows = false;
-            this.dataGridViewClients.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
+            this.dataGridViewClients.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.dataGridViewClients.AutoGenerateColumns = true;
-            this.dataGridViewClients.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.None;
             this.dataGridViewClients.BackgroundColor = System.Drawing.Color.White;
             this.dataGridViewClients.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.dataGridViewClients.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
@@ -110,11 +106,10 @@
             this.dataGridViewClients.Size = new System.Drawing.Size(750, 495);
             this.dataGridViewClients.TabIndex = 0;
             this.dataGridViewClients.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridViewClients_CellDoubleClick);
-
             // 
             // groupBoxClientData
             // 
-            this.groupBoxClientData.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            this.groupBoxClientData.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBoxClientData.BackColor = System.Drawing.Color.WhiteSmoke;
             this.groupBoxClientData.Controls.Add(this.buttonCancelAddress);
@@ -148,14 +143,13 @@
             this.groupBoxClientData.TabIndex = 1;
             this.groupBoxClientData.TabStop = false;
             this.groupBoxClientData.Text = "Данные клиента";
-
             // 
             // buttonCancelAddress
             // 
-            this.buttonCancelAddress.BackColor = System.Drawing.Color.FromArgb(244, 67, 54);
+            this.buttonCancelAddress.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(227)))), ((int)(((byte)(227)))));
             this.buttonCancelAddress.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonCancelAddress.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Bold);
-            this.buttonCancelAddress.ForeColor = System.Drawing.Color.White;
+            this.buttonCancelAddress.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(4)))), ((int)(((byte)(0)))), ((int)(((byte)(66)))));
             this.buttonCancelAddress.Location = new System.Drawing.Point(290, 350);
             this.buttonCancelAddress.Name = "buttonCancelAddress";
             this.buttonCancelAddress.Size = new System.Drawing.Size(90, 25);
@@ -167,10 +161,10 @@
             // 
             // buttonSaveAddress
             // 
-            this.buttonSaveAddress.BackColor = System.Drawing.Color.FromArgb(76, 175, 80);
+            this.buttonSaveAddress.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(251)))), ((int)(((byte)(228)))), ((int)(((byte)(255)))));
             this.buttonSaveAddress.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonSaveAddress.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Bold);
-            this.buttonSaveAddress.ForeColor = System.Drawing.Color.White;
+            this.buttonSaveAddress.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(4)))), ((int)(((byte)(0)))), ((int)(((byte)(66)))));
             this.buttonSaveAddress.Location = new System.Drawing.Point(290, 320);
             this.buttonSaveAddress.Name = "buttonSaveAddress";
             this.buttonSaveAddress.Size = new System.Drawing.Size(90, 25);
@@ -182,10 +176,10 @@
             // 
             // buttonNewAddress
             // 
-            this.buttonNewAddress.BackColor = System.Drawing.Color.FromArgb(33, 150, 243);
+            this.buttonNewAddress.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(227)))), ((int)(((byte)(255)))));
             this.buttonNewAddress.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonNewAddress.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Bold);
-            this.buttonNewAddress.ForeColor = System.Drawing.Color.White;
+            this.buttonNewAddress.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(4)))), ((int)(((byte)(0)))), ((int)(((byte)(66)))));
             this.buttonNewAddress.Location = new System.Drawing.Point(290, 285);
             this.buttonNewAddress.Name = "buttonNewAddress";
             this.buttonNewAddress.Size = new System.Drawing.Size(90, 25);
@@ -247,7 +241,7 @@
             this.label7.AutoSize = true;
             this.label7.Location = new System.Drawing.Point(20, 253);
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(93, 18);
+            this.label7.Size = new System.Drawing.Size(92, 18);
             this.label7.TabIndex = 18;
             this.label7.Text = "ID аккаунта:";
             // 
@@ -265,17 +259,17 @@
             this.label9.AutoSize = true;
             this.label9.Location = new System.Drawing.Point(20, 33);
             this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(25, 18);
+            this.label9.Size = new System.Drawing.Size(26, 18);
             this.label9.TabIndex = 16;
             this.label9.Text = "ID:";
             this.label9.Visible = false;
             // 
             // buttonSave
             // 
-            this.buttonSave.BackColor = System.Drawing.Color.FromArgb(76, 175, 80);
+            this.buttonSave.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(218)))), ((int)(((byte)(52)))), ((int)(((byte)(247)))));
             this.buttonSave.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonSave.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
-            this.buttonSave.ForeColor = System.Drawing.Color.White;
+            this.buttonSave.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(4)))), ((int)(((byte)(0)))), ((int)(((byte)(66)))));
             this.buttonSave.Location = new System.Drawing.Point(20, 450);
             this.buttonSave.Name = "buttonSave";
             this.buttonSave.Size = new System.Drawing.Size(360, 35);
@@ -298,7 +292,7 @@
             this.label6.AutoSize = true;
             this.label6.Location = new System.Drawing.Point(20, 293);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(55, 18);
+            this.label6.Size = new System.Drawing.Size(54, 18);
             this.label6.TabIndex = 11;
             this.label6.Text = "Адрес:";
             // 
@@ -333,7 +327,7 @@
             this.label4.AutoSize = true;
             this.label4.Location = new System.Drawing.Point(20, 153);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(73, 18);
+            this.label4.Size = new System.Drawing.Size(76, 18);
             this.label4.TabIndex = 7;
             this.label4.Text = "Телефон:";
             // 
@@ -349,7 +343,7 @@
             this.label3.AutoSize = true;
             this.label3.Location = new System.Drawing.Point(20, 113);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(77, 18);
+            this.label3.Size = new System.Drawing.Size(79, 18);
             this.label3.TabIndex = 5;
             this.label3.Text = "Отчество:";
             // 
@@ -365,7 +359,7 @@
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(20, 73);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(74, 18);
+            this.label2.Size = new System.Drawing.Size(77, 18);
             this.label2.TabIndex = 3;
             this.label2.Text = "Фамилия:";
             // 
@@ -381,16 +375,16 @@
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(20, 33);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(38, 18);
+            this.label1.Size = new System.Drawing.Size(42, 18);
             this.label1.TabIndex = 1;
             this.label1.Text = "Имя:";
             // 
             // buttonAdd
             // 
-            this.buttonAdd.BackColor = System.Drawing.Color.FromArgb(33, 150, 243);
+            this.buttonAdd.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(251)))), ((int)(((byte)(228)))), ((int)(((byte)(255)))));
             this.buttonAdd.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonAdd.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
-            this.buttonAdd.ForeColor = System.Drawing.Color.White;
+            this.buttonAdd.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(4)))), ((int)(((byte)(0)))), ((int)(((byte)(66)))));
             this.buttonAdd.Location = new System.Drawing.Point(12, 20);
             this.buttonAdd.Name = "buttonAdd";
             this.buttonAdd.Size = new System.Drawing.Size(120, 40);
@@ -401,13 +395,13 @@
             // 
             // buttonEdit
             // 
-            this.buttonEdit.BackColor = System.Drawing.Color.FromArgb(255, 193, 7);
+            this.buttonEdit.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(227)))), ((int)(((byte)(255)))));
             this.buttonEdit.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonEdit.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
-            this.buttonEdit.ForeColor = System.Drawing.Color.Black;
+            this.buttonEdit.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(4)))), ((int)(((byte)(0)))), ((int)(((byte)(66)))));
             this.buttonEdit.Location = new System.Drawing.Point(142, 20);
             this.buttonEdit.Name = "buttonEdit";
-            this.buttonEdit.Size = new System.Drawing.Size(120, 40);
+            this.buttonEdit.Size = new System.Drawing.Size(159, 40);
             this.buttonEdit.TabIndex = 3;
             this.buttonEdit.Text = "Редактировать";
             this.buttonEdit.UseVisualStyleBackColor = false;
@@ -415,11 +409,11 @@
             // 
             // buttonDelete
             // 
-            this.buttonDelete.BackColor = System.Drawing.Color.FromArgb(244, 67, 54);
+            this.buttonDelete.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(227)))), ((int)(((byte)(227)))));
             this.buttonDelete.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonDelete.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
-            this.buttonDelete.ForeColor = System.Drawing.Color.White;
-            this.buttonDelete.Location = new System.Drawing.Point(272, 20);
+            this.buttonDelete.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(4)))), ((int)(((byte)(0)))), ((int)(((byte)(66)))));
+            this.buttonDelete.Location = new System.Drawing.Point(320, 20);
             this.buttonDelete.Name = "buttonDelete";
             this.buttonDelete.Size = new System.Drawing.Size(120, 40);
             this.buttonDelete.TabIndex = 4;
@@ -429,11 +423,11 @@
             // 
             // buttonRefresh
             // 
-            this.buttonRefresh.BackColor = System.Drawing.Color.FromArgb(156, 39, 176);
+            this.buttonRefresh.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(251)))), ((int)(((byte)(228)))), ((int)(((byte)(255)))));
             this.buttonRefresh.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonRefresh.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
-            this.buttonRefresh.ForeColor = System.Drawing.Color.White;
-            this.buttonRefresh.Location = new System.Drawing.Point(402, 20);
+            this.buttonRefresh.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(4)))), ((int)(((byte)(0)))), ((int)(((byte)(66)))));
+            this.buttonRefresh.Location = new System.Drawing.Point(458, 20);
             this.buttonRefresh.Name = "buttonRefresh";
             this.buttonRefresh.Size = new System.Drawing.Size(120, 40);
             this.buttonRefresh.TabIndex = 5;
@@ -444,7 +438,7 @@
             // textBoxSearch
             // 
             this.textBoxSearch.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
-            this.textBoxSearch.Location = new System.Drawing.Point(630, 30);
+            this.textBoxSearch.Location = new System.Drawing.Point(680, 30);
             this.textBoxSearch.Name = "textBoxSearch";
             this.textBoxSearch.Size = new System.Drawing.Size(180, 24);
             this.textBoxSearch.TabIndex = 6;
@@ -454,7 +448,7 @@
             // 
             this.label8.AutoSize = true;
             this.label8.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
-            this.label8.Location = new System.Drawing.Point(540, 33);
+            this.label8.Location = new System.Drawing.Point(596, 36);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(62, 18);
             this.label8.TabIndex = 7;
@@ -462,11 +456,11 @@
             // 
             // buttonSearch
             // 
-            this.buttonSearch.BackColor = System.Drawing.Color.FromArgb(0, 150, 136);
+            this.buttonSearch.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(227)))), ((int)(((byte)(255)))));
             this.buttonSearch.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonSearch.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
-            this.buttonSearch.ForeColor = System.Drawing.Color.White;
-            this.buttonSearch.Location = new System.Drawing.Point(820, 20);
+            this.buttonSearch.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(4)))), ((int)(((byte)(0)))), ((int)(((byte)(66)))));
+            this.buttonSearch.Location = new System.Drawing.Point(880, 20);
             this.buttonSearch.Name = "buttonSearch";
             this.buttonSearch.Size = new System.Drawing.Size(90, 40);
             this.buttonSearch.TabIndex = 8;
@@ -476,11 +470,11 @@
             // 
             // buttonBack
             // 
-            this.buttonBack.BackColor = System.Drawing.Color.FromArgb(158, 158, 158);
+            this.buttonBack.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(227)))), ((int)(((byte)(227)))));
             this.buttonBack.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonBack.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
-            this.buttonBack.ForeColor = System.Drawing.Color.White;
-            this.buttonBack.Location = new System.Drawing.Point(920, 20);
+            this.buttonBack.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(4)))), ((int)(((byte)(0)))), ((int)(((byte)(66)))));
+            this.buttonBack.Location = new System.Drawing.Point(1005, 20);
             this.buttonBack.Name = "buttonBack";
             this.buttonBack.Size = new System.Drawing.Size(120, 40);
             this.buttonBack.TabIndex = 9;
@@ -514,6 +508,7 @@
             this.groupBoxClientData.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
+
         }
     }
 }
