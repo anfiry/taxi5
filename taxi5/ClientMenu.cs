@@ -10,6 +10,10 @@ namespace TaxiClientApp
         private string connectionString = "Host=localhost;Port=5432;Database=taxi5;Username=postgres;Password=135246";
         private int currentClientId = 1;
 
+        public string Role { get; set; }
+        public int AccountId { get; set; }
+        public string UserLogin { get; set; }
+
         public MainForm()
         {
             InitializeComponent(); // Вызов из Designer.cs

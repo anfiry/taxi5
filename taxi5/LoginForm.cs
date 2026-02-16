@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using TaxiClientApp;
 
 namespace taxi4
 {
@@ -66,7 +67,7 @@ namespace taxi4
                             }
                             else if (role.ToString() == "2")
                             {
-                                ClientMenu clientMenu = new ClientMenu();
+                                MainForm clientMenu = new MainForm();
                                 clientMenu.Role = "Клиент";
                                 clientMenu.Closed += (s, args) => Close();
                                 clientMenu.Show();
