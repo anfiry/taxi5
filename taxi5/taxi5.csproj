@@ -175,6 +175,13 @@
     <Compile Include="ClientMenu.Designer.cs">
       <DependentUpon>ClientMenu.cs</DependentUpon>
     </Compile>
+    <Compile Include="ClientOrderData.cs" />
+    <Compile Include="ClientOrderForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ClientOrderForm.Designer.cs">
+      <DependentUpon>ClientOrderForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="DriverMenu.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -197,6 +204,9 @@
       <DependentUpon>RegistrationMenu.cs</DependentUpon>
     </Compile>
     <Compile Include="Services\SimpleTelegramService.cs" />
+    <EmbeddedResource Include="AdminCarForm.resx">
+      <DependentUpon>AdminCarForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="AdminClientForm.resx">
       <DependentUpon>AdminClientForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -205,6 +215,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="AdminMenu.resx">
       <DependentUpon>AdminMenu.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AdminOrderForm.resx">
+      <DependentUpon>AdminOrderForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="AdminPromotionForm.resx">
       <DependentUpon>AdminPromotionForm.cs</DependentUpon>

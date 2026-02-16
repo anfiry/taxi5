@@ -63,3 +63,5 @@ C:\Users\Я\source\repos\taxi5\taxi5\obj\Debug\taxi4.AdminDriverForm.resources
 C:\Users\Я\source\repos\taxi5\taxi5\obj\Debug\taxi4.AdminTariffForm.resources
 C:\Users\Я\source\repos\taxi5\taxi5\obj\Debug\taxi4.AdminPromotionForm.resources
 C:\Users\Я\source\repos\taxi5\taxi5\obj\Debug\taxi4.ClientMenu.resources
+C:\Users\Я\source\repos\taxi5\taxi5\obj\Debug\taxi4.AdminCarForm.resources
+C:\Users\Я\source\repos\taxi5\taxi5\obj\Debug\taxi4.AdminOrderForm.resources
