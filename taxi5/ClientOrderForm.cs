@@ -131,7 +131,7 @@ namespace taxi4
             buttonAddNewPoint.Enabled = false;
         }
 
-        private void buttonSaveNewPoint_Click(object sender, EventArgs e)
+        private async void buttonSaveNewPoint_Click(object sender, EventArgs e)
         {
             string city = GetRealText(textBoxCity);
             string street = GetRealText(textBoxStreet);
@@ -148,18 +148,26 @@ namespace taxi4
 
             try
             {
-                int newPointId = orderData.AddPoint(clientId, city, street, house, entrance, type);
-                MessageBox.Show("Адрес успешно добавлен!", "Информация",
-                                MessageBoxButtons.OK, MessageBoxIcon.Information);
-                panelNewAddress.Visible = false;
-                buttonAddNewPoint.Enabled = true;
-                LoadClientPoints(); // обновить списки
-                cmbStartPoint.SelectedValue = newPointId;
+                buttonSaveNewPoint.Enabled = false; // Блокируем на время запроса
+                int newPointId = await orderData.AddPointWithGeocodingAsync(clientId, city, street, house, entrance, type);
+                if (newPointId != -1)
+                {
+                    MessageBox.Show("Адрес успешно добавлен с координатами!", "Информация",
+                                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    panelNewAddress.Visible = false;
+                    buttonAddNewPoint.Enabled = true;
+                    LoadClientPoints(); // обновить списки
+                    cmbStartPoint.SelectedValue = newPointId;
+                }
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Ошибка добавления адреса: {ex.Message}", "Ошибка",
                                 MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                buttonSaveNewPoint.Enabled = true;
             }
         }
 

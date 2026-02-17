@@ -1,14 +1,18 @@
 ﻿using Npgsql;
 using System;
 using System.Data;
+using System.Net.Http;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using Newtonsoft.Json.Linq;
 
 namespace taxi4
 {
     public class ClientOrderData
     {
         private string connectionString = "Host=localhost;Port=5432;Database=taxi4;Username=postgres;Password=123";
+        private static readonly HttpClient httpClient = new HttpClient();
 
-        /// <summary>Получить данные клиента по account_id</summary>
         public DataRow GetClientInfo(int accountId)
         {
             using (var conn = new NpgsqlConnection(connectionString))
@@ -28,17 +32,16 @@ namespace taxi4
             }
         }
 
-        /// <summary>Получить сохранённые точки клиента</summary>
         public DataTable GetClientPoints(int clientId)
         {
             var dt = new DataTable();
             using (var conn = new NpgsqlConnection(connectionString))
             {
                 conn.Open();
-                string query = @"SELECT point_id, address, type, notes 
+                string query = @"SELECT point_id, name AS address, type 
                                FROM point 
                                WHERE client_id = @clientId 
-                               ORDER BY type, address";
+                               ORDER BY type, name";
                 using (var cmd = new NpgsqlCommand(query, conn))
                 {
                     cmd.Parameters.AddWithValue("@clientId", clientId);
@@ -51,19 +54,19 @@ namespace taxi4
             return dt;
         }
 
-        /// <summary>Получить доступные промоакции (ещё не использованные клиентом)</summary>
         public DataTable GetAvailablePromotions(int clientId)
         {
             var dt = new DataTable();
             using (var conn = new NpgsqlConnection(connectionString))
             {
                 conn.Open();
+                // Исключаем промоакции, которые уже были использованы (есть запись в clent_promotion)
                 string query = @"SELECT p.promotion_id, p.name, p.discont_percent 
                                FROM promotion p
                                WHERE p.end_date >= CURRENT_DATE 
                                AND p.promotion_id NOT IN (
                                    SELECT promotion_id FROM clent_promotion 
-                                   WHERE clent_id = @clientId AND used = true
+                                   WHERE clent_id = @clientId
                                )";
                 using (var cmd = new NpgsqlCommand(query, conn))
                 {
@@ -77,31 +80,70 @@ namespace taxi4
             return dt;
         }
 
-        /// <summary>Добавить новую точку (адрес) клиента</summary>
-        public int AddPoint(int clientId, string city, string street, string house, string entrance, string type)
+        public async Task<int> AddPointWithGeocodingAsync(int clientId, string city, string street, string house, string entrance, string type)
         {
+            string fullAddress = $"{city}, {street}, {house}";
+            if (!string.IsNullOrEmpty(entrance))
+                fullAddress += $", подъезд {entrance}";
+
+            var (latitude, longitude) = await GeocodeAddressAsync(fullAddress);
+            if (latitude == null || longitude == null)
+            {
+                MessageBox.Show("Не удалось определить координаты адреса. Проверьте правильность ввода или попробуйте позже.",
+                                "Ошибка геокодирования", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return -1;
+            }
+
             using (var conn = new NpgsqlConnection(connectionString))
             {
-                conn.Open();
-                string address = $"{city}, {street}, д.{house}";
-                if (!string.IsNullOrEmpty(entrance))
-                    address += $", под.{entrance}";
-
-                string query = @"INSERT INTO point (address, type, notes, client_id)
-                               VALUES (@address, @type, @notes, @clientId)
+                await conn.OpenAsync();
+                string query = @"INSERT INTO point (name, type, client_id, latitude, longitude)
+                               VALUES (@name, @type, @clientId, @latitude, @longitude)
                                RETURNING point_id";
                 using (var cmd = new NpgsqlCommand(query, conn))
                 {
-                    cmd.Parameters.AddWithValue("@address", address);
+                    cmd.Parameters.AddWithValue("@name", fullAddress);
                     cmd.Parameters.AddWithValue("@type", string.IsNullOrEmpty(type) ? (object)DBNull.Value : type);
-                    cmd.Parameters.AddWithValue("@notes", DBNull.Value);
                     cmd.Parameters.AddWithValue("@clientId", clientId);
-                    return Convert.ToInt32(cmd.ExecuteScalar());
+                    cmd.Parameters.AddWithValue("@latitude", latitude.Value);
+                    cmd.Parameters.AddWithValue("@longitude", longitude.Value);
+
+                    object result = await cmd.ExecuteScalarAsync();
+                    return result != null ? Convert.ToInt32(result) : -1;
                 }
             }
         }
 
-        /// <summary>Создать новый заказ и при необходимости применить промоакцию</summary>
+        private async Task<(double? lat, double? lon)> GeocodeAddressAsync(string address)
+        {
+            try
+            {
+                string encodedAddress = Uri.EscapeDataString(address);
+                string url = $"https://nominatim.openstreetmap.org/search?q={encodedAddress}&format=json&limit=1";
+
+                using (var request = new HttpRequestMessage(HttpMethod.Get, url))
+                {
+                    request.Headers.Add("User-Agent", "Taxi4Client/1.0");
+                    HttpResponseMessage response = await httpClient.SendAsync(request);
+                    response.EnsureSuccessStatusCode();
+
+                    string json = await response.Content.ReadAsStringAsync();
+                    JArray array = JArray.Parse(json);
+                    if (array.Count > 0)
+                    {
+                        double lat = array[0]["lat"].Value<double>();
+                        double lon = array[0]["lon"].Value<double>();
+                        return (lat, lon);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка геокодирования: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            return (null, null);
+        }
+
         public int CreateOrder(int clientId, int startPointId, int endPointId, decimal price, int? promotionId)
         {
             using (var conn = new NpgsqlConnection(connectionString))
@@ -132,9 +174,10 @@ namespace taxi4
                             if (promotionId.HasValue)
                             {
                                 int discountPercent = GetPromotionDiscount(promotionId.Value);
+                                // Вставляем запись об использовании промоакции (без поля used)
                                 string promoQuery = @"INSERT INTO clent_promotion 
-                                    (clent_id, promotion_id, assigned_percent, used)
-                                    VALUES (@clientId, @promoId, @percent, true)";
+                                    (clent_id, promotion_id, assigned_percent)
+                                    VALUES (@clientId, @promoId, @percent)";
                                 using (var promoCmd = new NpgsqlCommand(promoQuery, conn, transaction))
                                 {
                                     promoCmd.Parameters.AddWithValue("@clientId", clientId);

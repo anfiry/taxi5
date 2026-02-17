@@ -184,9 +184,9 @@
             // textBoxPrice
             this.textBoxPrice.Location = new System.Drawing.Point(120, 77);
             this.textBoxPrice.Name = "textBoxPrice";
+            this.textBoxPrice.ReadOnly = true;
             this.textBoxPrice.Size = new System.Drawing.Size(150, 24);
             this.textBoxPrice.TabIndex = 4;
-            this.textBoxPrice.ReadOnly = true; // обычно цена рассчитывается, но можно оставить редактируемым
             this.textBoxPrice.Text = "0.00";
 
             // labelPayment

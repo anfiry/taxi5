@@ -65,3 +65,5 @@ C:\Users\Я\source\repos\taxi5\taxi5\obj\Debug\taxi4.AdminPromotionForm.resource
 C:\Users\Я\source\repos\taxi5\taxi5\obj\Debug\taxi4.ClientMenu.resources
 C:\Users\Я\source\repos\taxi5\taxi5\obj\Debug\taxi4.AdminCarForm.resources
 C:\Users\Я\source\repos\taxi5\taxi5\obj\Debug\taxi4.AdminOrderForm.resources
+C:\Users\Я\source\repos\taxi5\taxi5\bin\Debug\Newtonsoft.Json.dll
+C:\Users\Я\source\repos\taxi5\taxi5\bin\Debug\Newtonsoft.Json.xml
