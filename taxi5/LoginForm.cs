@@ -33,7 +33,6 @@ namespace taxi4
                 {
                     connection.Open();
 
-                    // Запрос теперь возвращает и роль, и ID аккаунта
                     string query = @"
                         SELECT role_id, account_id 
                         FROM account 
@@ -65,9 +64,9 @@ namespace taxi4
                                 }
                                 else if (roleId == 2) // клиент
                                 {
-                                    ClientMenu clientMenu = new ClientMenu();
+                                    // Передаём accountId в конструктор
+                                    ClientMenu clientMenu = new ClientMenu(accountId);
                                     clientMenu.Role = "Клиент";
-                                    clientMenu.AccountId = accountId;
                                     clientMenu.UserLogin = login;
                                     clientMenu.Closed += (s, args) => Close();
                                     clientMenu.Show();

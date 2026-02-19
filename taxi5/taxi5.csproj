@@ -185,6 +185,20 @@
     <Compile Include="ClientOrderForm.Designer.cs">
       <DependentUpon>ClientOrderForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="ClientOrderHistoryData.cs" />
+    <Compile Include="ClientOrderHistoryForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ClientOrderHistoryForm.Designer.cs">
+      <DependentUpon>ClientOrderHistoryForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ClientPoint.cs" />
+    <Compile Include="ClientPointForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ClientPointForm.Designer.cs">
+      <DependentUpon>ClientPointForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="DriverMenu.cs">
       <SubType>Form</SubType>
     </Compile>
