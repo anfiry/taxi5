@@ -3,48 +3,20 @@
   "WorkspaceRootPath": "C:\\Users\\\u042F\\source\\repos\\taxi5\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{79E66E86-CA49-4D0D-A7F0-4A3D06C5CE47}|taxi5\\taxi5.csproj|c:\\users\\\u044F\\source\\repos\\taxi5\\taxi5\\clientpointform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{79E66E86-CA49-4D0D-A7F0-4A3D06C5CE47}|taxi5\\taxi5.csproj|solutionrelative:taxi5\\clientpointform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{79E66E86-CA49-4D0D-A7F0-4A3D06C5CE47}|taxi5\\taxi5.csproj|C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\drivermenu.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{79E66E86-CA49-4D0D-A7F0-4A3D06C5CE47}|taxi5\\taxi5.csproj|solutionrelative:taxi5\\drivermenu.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{79E66E86-CA49-4D0D-A7F0-4A3D06C5CE47}|taxi5\\taxi5.csproj|C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\clientorderhistoryform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{79E66E86-CA49-4D0D-A7F0-4A3D06C5CE47}|taxi5\\taxi5.csproj|solutionrelative:taxi5\\clientorderhistoryform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{79E66E86-CA49-4D0D-A7F0-4A3D06C5CE47}|taxi5\\taxi5.csproj|C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\clientorderform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{79E66E86-CA49-4D0D-A7F0-4A3D06C5CE47}|taxi5\\taxi5.csproj|solutionrelative:taxi5\\clientorderform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{79E66E86-CA49-4D0D-A7F0-4A3D06C5CE47}|taxi5\\taxi5.csproj|C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\drivermenu.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{79E66E86-CA49-4D0D-A7F0-4A3D06C5CE47}|taxi5\\taxi5.csproj|solutionrelative:taxi5\\drivermenu.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
     },
     {
       "AbsoluteMoniker": "D:0:0:{79E66E86-CA49-4D0D-A7F0-4A3D06C5CE47}|taxi5\\taxi5.csproj|C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\clientmenu.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{79E66E86-CA49-4D0D-A7F0-4A3D06C5CE47}|taxi5\\taxi5.csproj|solutionrelative:taxi5\\clientmenu.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{79E66E86-CA49-4D0D-A7F0-4A3D06C5CE47}|taxi5\\taxi5.csproj|C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\clientorderform.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{79E66E86-CA49-4D0D-A7F0-4A3D06C5CE47}|taxi5\\taxi5.csproj|solutionrelative:taxi5\\clientorderform.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{79E66E86-CA49-4D0D-A7F0-4A3D06C5CE47}|taxi5\\taxi5.csproj|C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\clientorderform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
-      "RelativeMoniker": "D:0:0:{79E66E86-CA49-4D0D-A7F0-4A3D06C5CE47}|taxi5\\taxi5.csproj|solutionrelative:taxi5\\clientorderform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{79E66E86-CA49-4D0D-A7F0-4A3D06C5CE47}|taxi5\\taxi5.csproj|C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\clientorderhistoryform.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{79E66E86-CA49-4D0D-A7F0-4A3D06C5CE47}|taxi5\\taxi5.csproj|solutionrelative:taxi5\\clientorderhistoryform.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{79E66E86-CA49-4D0D-A7F0-4A3D06C5CE47}|taxi5\\taxi5.csproj|C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\clientorderhistoryform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
-      "RelativeMoniker": "D:0:0:{79E66E86-CA49-4D0D-A7F0-4A3D06C5CE47}|taxi5\\taxi5.csproj|solutionrelative:taxi5\\clientorderhistoryform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{79E66E86-CA49-4D0D-A7F0-4A3D06C5CE47}|taxi5\\taxi5.csproj|C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\clientorderhistorydata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{79E66E86-CA49-4D0D-A7F0-4A3D06C5CE47}|taxi5\\taxi5.csproj|solutionrelative:taxi5\\clientorderhistorydata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{79E66E86-CA49-4D0D-A7F0-4A3D06C5CE47}|taxi5\\taxi5.csproj|C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\clientmenu.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
       "RelativeMoniker": "D:0:0:{79E66E86-CA49-4D0D-A7F0-4A3D06C5CE47}|taxi5\\taxi5.csproj|solutionrelative:taxi5\\clientmenu.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{79E66E86-CA49-4D0D-A7F0-4A3D06C5CE47}|taxi5\\taxi5.csproj|C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\clientorderdata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{79E66E86-CA49-4D0D-A7F0-4A3D06C5CE47}|taxi5\\taxi5.csproj|solutionrelative:taxi5\\clientorderdata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{79E66E86-CA49-4D0D-A7F0-4A3D06C5CE47}|taxi5\\taxi5.csproj|C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\loginform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -67,136 +39,53 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "ClientPointForm.cs",
-              "DocumentMoniker": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\ClientPointForm.cs",
-              "RelativeDocumentMoniker": "taxi5\\ClientPointForm.cs",
-              "ToolTip": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\ClientPointForm.cs",
-              "RelativeToolTip": "taxi5\\ClientPointForm.cs",
-              "ViewState": "AgIAAKwBAAAAAAAAAAAowMoBAAABAAAAAAAAAA==",
+              "Title": "DriverMenu.Designer.cs",
+              "DocumentMoniker": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\DriverMenu.Designer.cs",
+              "RelativeDocumentMoniker": "taxi5\\DriverMenu.Designer.cs",
+              "ToolTip": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\DriverMenu.Designer.cs",
+              "RelativeToolTip": "taxi5\\DriverMenu.Designer.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-19T12:38:53.908Z",
+              "WhenOpened": "2026-02-19T15:36:20.886Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "ClientOrderForm.cs",
-              "DocumentMoniker": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\ClientOrderForm.cs",
-              "RelativeDocumentMoniker": "taxi5\\ClientOrderForm.cs",
-              "ToolTip": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\ClientOrderForm.cs",
-              "RelativeToolTip": "taxi5\\ClientOrderForm.cs",
-              "ViewState": "AgIAADEBAAAAAAAAAAAowE8BAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-19T12:38:03.233Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "ClientOrderForm.cs [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]",
-              "DocumentMoniker": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\ClientOrderForm.cs",
-              "RelativeDocumentMoniker": "taxi5\\ClientOrderForm.cs",
-              "ToolTip": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\ClientOrderForm.cs [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]",
-              "RelativeToolTip": "taxi5\\ClientOrderForm.cs [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-19T12:19:37.206Z"
-            },
-            {
-              "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "ClientOrderHistoryForm.cs",
-              "DocumentMoniker": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\ClientOrderHistoryForm.cs",
-              "RelativeDocumentMoniker": "taxi5\\ClientOrderHistoryForm.cs",
-              "ToolTip": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\ClientOrderHistoryForm.cs",
-              "RelativeToolTip": "taxi5\\ClientOrderHistoryForm.cs",
-              "ViewState": "AgIAAG0AAAAAAAAAAAAqwIoAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-19T12:10:54.762Z"
+              "Title": "DriverMenu.cs [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]",
+              "DocumentMoniker": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\DriverMenu.cs",
+              "RelativeDocumentMoniker": "taxi5\\DriverMenu.cs",
+              "ToolTip": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\DriverMenu.cs [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]",
+              "RelativeToolTip": "taxi5\\DriverMenu.cs [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003525|",
+              "WhenOpened": "2026-02-19T15:36:20.889Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "ClientOrderForm.Designer.cs",
-              "DocumentMoniker": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\ClientOrderForm.Designer.cs",
-              "RelativeDocumentMoniker": "taxi5\\ClientOrderForm.Designer.cs",
-              "ToolTip": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\ClientOrderForm.Designer.cs",
-              "RelativeToolTip": "taxi5\\ClientOrderForm.Designer.cs",
-              "ViewState": "AgIAAMkBAAAAAAAAAAAowOcBAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-16T16:44:05.421Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 2,
               "Title": "ClientMenu.cs",
               "DocumentMoniker": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\ClientMenu.cs",
               "RelativeDocumentMoniker": "taxi5\\ClientMenu.cs",
               "ToolTip": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\ClientMenu.cs",
               "RelativeToolTip": "taxi5\\ClientMenu.cs",
-              "ViewState": "AgIAAD4AAAAAAAAAAAAUwFEAAAAJAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-17T22:52:53.813Z"
+              "ViewState": "AgIAABcAAAAAAAAAAAAAABcAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003525|",
+              "WhenOpened": "2026-02-19T15:36:20.89Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "ClientOrderHistoryForm.Designer.cs",
-              "DocumentMoniker": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\ClientOrderHistoryForm.Designer.cs",
-              "RelativeDocumentMoniker": "taxi5\\ClientOrderHistoryForm.Designer.cs",
-              "ToolTip": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\ClientOrderHistoryForm.Designer.cs",
-              "RelativeToolTip": "taxi5\\ClientOrderHistoryForm.Designer.cs",
-              "ViewState": "AgIAADsAAAAAAAAAAAAowFkAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-19T12:11:09.289Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "ClientOrderHistoryForm.cs [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]",
-              "DocumentMoniker": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\ClientOrderHistoryForm.cs",
-              "RelativeDocumentMoniker": "taxi5\\ClientOrderHistoryForm.cs",
-              "ToolTip": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\ClientOrderHistoryForm.cs [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]",
-              "RelativeToolTip": "taxi5\\ClientOrderHistoryForm.cs [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-19T12:10:45.678Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "ClientOrderHistoryData.cs",
-              "DocumentMoniker": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\ClientOrderHistoryData.cs",
-              "RelativeDocumentMoniker": "taxi5\\ClientOrderHistoryData.cs",
-              "ToolTip": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\ClientOrderHistoryData.cs",
-              "RelativeToolTip": "taxi5\\ClientOrderHistoryData.cs",
-              "ViewState": "AgIAAEUAAAAAAAAAAAAowGMAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-19T12:10:20.065Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 3,
               "Title": "ClientMenu.cs [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]",
               "DocumentMoniker": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\ClientMenu.cs",
               "RelativeDocumentMoniker": "taxi5\\ClientMenu.cs",
               "ToolTip": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\ClientMenu.cs [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]",
               "RelativeToolTip": "taxi5\\ClientMenu.cs [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-19T12:07:35.998Z"
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003525|",
+              "WhenOpened": "2026-02-19T15:36:20.891Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
-              "Title": "ClientOrderData.cs",
-              "DocumentMoniker": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\ClientOrderData.cs",
-              "RelativeDocumentMoniker": "taxi5\\ClientOrderData.cs",
-              "ToolTip": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\ClientOrderData.cs",
-              "RelativeToolTip": "taxi5\\ClientOrderData.cs",
-              "ViewState": "AgIAAPgAAAAAAAAAAAAowBYBAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-17T23:03:22.496Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 11,
+              "DocumentIndex": 4,
               "Title": "LoginForm.cs",
               "DocumentMoniker": "C:\\Users\\\u042F\\source\\repos\\taxi5\\taxi5\\LoginForm.cs",
               "RelativeDocumentMoniker": "taxi5\\LoginForm.cs",
@@ -204,7 +93,7 @@
               "RelativeToolTip": "taxi5\\LoginForm.cs",
               "ViewState": "AgIAAFAAAAAAAAAAAAAowG4AAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-17T22:49:28.024Z"
+              "WhenOpened": "2026-02-19T15:36:20.892Z"
             }
           ]
         }
