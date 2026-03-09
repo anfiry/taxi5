@@ -52,7 +52,15 @@ namespace taxi4
 
         private void btnTrackOrder_Click(object sender, EventArgs e)
         {
-            // TODO: открыть форму отслеживания поездки
+            if (ClientId == 0)
+            {
+                MessageBox.Show("Не удалось определить ID клиента", "Ошибка");
+                return;
+            }
+            ClientTrackOrderForm trackForm = new ClientTrackOrderForm(this.ClientId);
+            trackForm.Closed += (s, args) => this.Show();
+            trackForm.Show();
+            this.Hide();
         }
 
         private void btnHistory_Click(object sender, EventArgs e)
@@ -83,7 +91,15 @@ namespace taxi4
 
         private void btnPromotions_Click(object sender, EventArgs e)
         {
-            // TODO: открыть форму промоакций и скидок
+            if (ClientId == 0)
+            {
+                MessageBox.Show("Не удалось определить ID клиента", "Ошибка");
+                return;
+            }
+            ClientPromotionForm promoForm = new ClientPromotionForm(this.ClientId);
+            promoForm.Closed += (s, args) => this.Show();
+            promoForm.Show();
+            this.Hide();
         }
 
         private void btnBack_Click(object sender, EventArgs e)

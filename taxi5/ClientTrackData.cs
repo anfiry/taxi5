@@ -1,18 +1,22 @@
 ﻿using Npgsql;
 using System;
+using System.Collections.Generic;
 using System.Data;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace taxi4
 {
-    public class ClientOrderHistoryData
+    public class ClientTrackData
     {
         private string connectionString = "Host=localhost;Port=5432;Database=taxi4;Username=postgres;Password=123";
 
         /// <summary>
-        /// Получить список заказов для конкретного клиента с информацией об акции
+        /// Получить активные заказы клиента (не завершённые)
         /// </summary>
-        public DataTable GetClientOrders(int clientId)
+        public DataTable GetActiveOrders(int clientId)
         {
             var dt = new DataTable();
             using (var conn = new NpgsqlConnection(connectionString))
@@ -28,21 +32,16 @@ namespace taxi4
                             CONCAT(a_to.city, ', ', a_to.street, ', д. ', a_to.house) AS address_to,
                             t.name AS tariff_name,
                             os.name AS order_status,
-                            pm.method_name AS payment_method,
-                            o.final_cost,
                             CONCAT(d.last_name, ' ', d.first_name) AS driver_name,
-                            op.promotion_name,
-                            op.promotion_percent,
-                            op.promotion_amount
+                            d.phone_number AS driver_phone
                         FROM ""Order"" o
                         LEFT JOIN address a_from ON o.address_from = a_from.address_id
                         LEFT JOIN address a_to ON o.address_to = a_to.address_id
                         LEFT JOIN tariff t ON o.tariff_id = t.tariff_id
                         LEFT JOIN order_status os ON o.order_status = os.order_status_id
-                        LEFT JOIN payment_method pm ON o.payment_method = pm.method_id
                         LEFT JOIN driver d ON o.driver_id = d.driver_id
-                        LEFT JOIN order_promotion op ON o.order_id = op.order_id
                         WHERE o.client_id = @clientId
+                          AND os.name IN ('Создан', 'В процессе')
                         ORDER BY o.order_datetime DESC";
 
                     using (var cmd = new NpgsqlCommand(query, conn))
@@ -56,7 +55,7 @@ namespace taxi4
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Ошибка загрузки истории заказов:\n{ex.Message}", "Ошибка",
+                    MessageBox.Show($"Ошибка загрузки активных заказов:\n{ex.Message}", "Ошибка",
                         MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
@@ -64,7 +63,7 @@ namespace taxi4
         }
 
         /// <summary>
-        /// Получить детальную информацию о конкретном заказе (опционально)
+        /// Получить детали конкретного заказа
         /// </summary>
         public DataRow GetOrderDetails(int orderId)
         {
@@ -79,20 +78,14 @@ namespace taxi4
                         CONCAT(a_to.city, ', ', a_to.street, ', д. ', a_to.house) AS address_to_full,
                         t.name AS tariff_name,
                         os.name AS status_name,
-                        pm.method_name AS payment_name,
-                        o.final_cost,
                         CONCAT(d.last_name, ' ', d.first_name) AS driver_full_name,
-                        op.promotion_name,
-                        op.promotion_percent,
-                        op.promotion_amount
+                        d.phone_number AS driver_phone
                     FROM ""Order"" o
                     LEFT JOIN address a_from ON o.address_from = a_from.address_id
                     LEFT JOIN address a_to ON o.address_to = a_to.address_id
                     LEFT JOIN tariff t ON o.tariff_id = t.tariff_id
                     LEFT JOIN order_status os ON o.order_status = os.order_status_id
-                    LEFT JOIN payment_method pm ON o.payment_method = pm.method_id
                     LEFT JOIN driver d ON o.driver_id = d.driver_id
-                    LEFT JOIN order_promotion op ON o.order_id = op.order_id
                     WHERE o.order_id = @orderId";
                 using (var cmd = new NpgsqlCommand(query, conn))
                 {

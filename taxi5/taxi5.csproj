@@ -199,6 +199,20 @@
     <Compile Include="ClientPointForm.Designer.cs">
       <DependentUpon>ClientPointForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="ClientPromotionData.cs" />
+    <Compile Include="ClientPromotionForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ClientPromotionForm.Designer.cs">
+      <DependentUpon>ClientPromotionForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ClientTrackData.cs" />
+    <Compile Include="ClientTrackOrderForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ClientTrackOrderForm.Designer.cs">
+      <DependentUpon>ClientTrackOrderForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="DriverMenu.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -244,6 +258,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="ClientMenu.resx">
       <DependentUpon>ClientMenu.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ClientOrderForm.resx">
+      <DependentUpon>ClientOrderForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ClientOrderHistoryForm.resx">
+      <DependentUpon>ClientOrderHistoryForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ClientPromotionForm.resx">
+      <DependentUpon>ClientPromotionForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="LoginForm.resx">
       <DependentUpon>LoginForm.cs</DependentUpon>

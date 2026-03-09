@@ -27,8 +27,9 @@
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.SuspendLayout();
-
+            // 
             // panel1
+            // 
             this.panel1.Controls.Add(this.btnBack);
             this.panel1.Controls.Add(this.btnMyAddresses);
             this.panel1.Controls.Add(this.btnPromotions);
@@ -42,12 +43,13 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(1072, 608);
             this.panel1.TabIndex = 0;
-
+            // 
             // btnBack
-            this.btnBack.BackColor = System.Drawing.Color.FromArgb(230, 227, 255);
+            // 
+            this.btnBack.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(227)))), ((int)(((byte)(255)))));
             this.btnBack.FlatAppearance.BorderSize = 0;
-            this.btnBack.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(227, 255, 233);
-            this.btnBack.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(251, 228, 255);
+            this.btnBack.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(227)))), ((int)(((byte)(255)))), ((int)(((byte)(233)))));
+            this.btnBack.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(251)))), ((int)(((byte)(228)))), ((int)(((byte)(255)))));
             this.btnBack.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnBack.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.btnBack.Location = new System.Drawing.Point(445, 470);
@@ -57,12 +59,13 @@
             this.btnBack.Text = "Назад";
             this.btnBack.UseVisualStyleBackColor = false;
             this.btnBack.Click += new System.EventHandler(this.btnBack_Click);
-
+            // 
             // btnMyAddresses
-            this.btnMyAddresses.BackColor = System.Drawing.Color.FromArgb(251, 228, 255);
+            // 
+            this.btnMyAddresses.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(251)))), ((int)(((byte)(228)))), ((int)(((byte)(255)))));
             this.btnMyAddresses.FlatAppearance.BorderSize = 0;
-            this.btnMyAddresses.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(227, 255, 233);
-            this.btnMyAddresses.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(230, 227, 255);
+            this.btnMyAddresses.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(227)))), ((int)(((byte)(255)))), ((int)(((byte)(233)))));
+            this.btnMyAddresses.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(227)))), ((int)(((byte)(255)))));
             this.btnMyAddresses.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnMyAddresses.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.btnMyAddresses.Location = new System.Drawing.Point(425, 307);
@@ -72,27 +75,29 @@
             this.btnMyAddresses.Text = "Мои адреса";
             this.btnMyAddresses.UseVisualStyleBackColor = false;
             this.btnMyAddresses.Click += new System.EventHandler(this.btnMyAddresses_Click);
-
+            // 
             // btnPromotions
-            this.btnPromotions.BackColor = System.Drawing.Color.FromArgb(251, 228, 255);
+            // 
+            this.btnPromotions.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(251)))), ((int)(((byte)(228)))), ((int)(((byte)(255)))));
             this.btnPromotions.FlatAppearance.BorderSize = 0;
-            this.btnPromotions.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(227, 255, 233);
-            this.btnPromotions.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(230, 227, 255);
+            this.btnPromotions.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(227)))), ((int)(((byte)(255)))), ((int)(((byte)(233)))));
+            this.btnPromotions.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(227)))), ((int)(((byte)(255)))));
             this.btnPromotions.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnPromotions.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.btnPromotions.Location = new System.Drawing.Point(87, 307);
             this.btnPromotions.Name = "btnPromotions";
             this.btnPromotions.Size = new System.Drawing.Size(222, 67);
             this.btnPromotions.TabIndex = 4;
-            this.btnPromotions.Text = "Промоакции и скидки";
+            this.btnPromotions.Text = "Акции и скидки";
             this.btnPromotions.UseVisualStyleBackColor = false;
             this.btnPromotions.Click += new System.EventHandler(this.btnPromotions_Click);
-
+            // 
             // btnHistory
-            this.btnHistory.BackColor = System.Drawing.Color.FromArgb(251, 228, 255);
+            // 
+            this.btnHistory.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(251)))), ((int)(((byte)(228)))), ((int)(((byte)(255)))));
             this.btnHistory.FlatAppearance.BorderSize = 0;
-            this.btnHistory.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(227, 255, 233);
-            this.btnHistory.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(230, 227, 255);
+            this.btnHistory.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(227)))), ((int)(((byte)(255)))), ((int)(((byte)(233)))));
+            this.btnHistory.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(227)))), ((int)(((byte)(255)))));
             this.btnHistory.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnHistory.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.btnHistory.Location = new System.Drawing.Point(425, 138);
@@ -102,12 +107,13 @@
             this.btnHistory.Text = "История поездок";
             this.btnHistory.UseVisualStyleBackColor = false;
             this.btnHistory.Click += new System.EventHandler(this.btnHistory_Click);
-
+            // 
             // btnTrackOrder
-            this.btnTrackOrder.BackColor = System.Drawing.Color.FromArgb(251, 228, 255);
+            // 
+            this.btnTrackOrder.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(251)))), ((int)(((byte)(228)))), ((int)(((byte)(255)))));
             this.btnTrackOrder.FlatAppearance.BorderSize = 0;
-            this.btnTrackOrder.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(227, 255, 233);
-            this.btnTrackOrder.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(230, 227, 255);
+            this.btnTrackOrder.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(227)))), ((int)(((byte)(255)))), ((int)(((byte)(233)))));
+            this.btnTrackOrder.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(227)))), ((int)(((byte)(255)))));
             this.btnTrackOrder.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnTrackOrder.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.btnTrackOrder.Location = new System.Drawing.Point(763, 138);
@@ -117,12 +123,13 @@
             this.btnTrackOrder.Text = "Отслеживание поездки";
             this.btnTrackOrder.UseVisualStyleBackColor = false;
             this.btnTrackOrder.Click += new System.EventHandler(this.btnTrackOrder_Click);
-
+            // 
             // btnNewOrder
-            this.btnNewOrder.BackColor = System.Drawing.Color.FromArgb(251, 228, 255);
+            // 
+            this.btnNewOrder.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(251)))), ((int)(((byte)(228)))), ((int)(((byte)(255)))));
             this.btnNewOrder.FlatAppearance.BorderSize = 0;
-            this.btnNewOrder.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(227, 255, 233);
-            this.btnNewOrder.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(230, 227, 255);
+            this.btnNewOrder.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(227)))), ((int)(((byte)(255)))), ((int)(((byte)(233)))));
+            this.btnNewOrder.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(227)))), ((int)(((byte)(255)))));
             this.btnNewOrder.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnNewOrder.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.btnNewOrder.Location = new System.Drawing.Point(87, 138);
@@ -132,27 +139,30 @@
             this.btnNewOrder.Text = "Заказ такси";
             this.btnNewOrder.UseVisualStyleBackColor = false;
             this.btnNewOrder.Click += new System.EventHandler(this.btnNewOrder_Click);
-
+            // 
             // panel2
-            this.panel2.BackColor = System.Drawing.Color.FromArgb(218, 52, 247);
+            // 
+            this.panel2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(218)))), ((int)(((byte)(52)))), ((int)(((byte)(247)))));
             this.panel2.Controls.Add(this.label1);
             this.panel2.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel2.Location = new System.Drawing.Point(0, 0);
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(1072, 92);
             this.panel2.TabIndex = 0;
-
+            // 
             // label1
+            // 
             this.label1.Font = new System.Drawing.Font("Noto Sans Georgian Bold", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.ForeColor = System.Drawing.Color.FromArgb(4, 0, 66);
+            this.label1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(4)))), ((int)(((byte)(0)))), ((int)(((byte)(66)))));
             this.label1.Location = new System.Drawing.Point(335, 18);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(427, 62);
             this.label1.TabIndex = 0;
             this.label1.Text = "Меню клиента";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-
+            // 
             // ClientMenu
+            // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1072, 608);
@@ -162,6 +172,7 @@
             this.panel1.ResumeLayout(false);
             this.panel2.ResumeLayout(false);
             this.ResumeLayout(false);
+
         }
 
         private System.Windows.Forms.Panel panel1;

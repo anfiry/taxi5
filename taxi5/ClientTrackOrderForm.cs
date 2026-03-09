@@ -5,40 +5,48 @@ using System.Windows.Forms;
 
 namespace taxi4
 {
-    public partial class ClientOrderHistoryForm : Form
+    public partial class ClientTrackOrderForm : Form
     {
-        private ClientOrderHistoryData historyData;
+        private ClientTrackData trackData;
         private int clientId;
+        private Timer refreshTimer;
 
-        // Конструктор для дизайнера (без параметров)
-        public ClientOrderHistoryForm()
+        // Конструктор для дизайнера
+        public ClientTrackOrderForm()
         {
             InitializeComponent();
         }
 
-        // Основной конструктор, используемый в коде
-        public ClientOrderHistoryForm(int clientId) : this()
+        // Основной конструктор
+        public ClientTrackOrderForm(int clientId) : this()
         {
             this.clientId = clientId;
 
             if (!DesignMode)
             {
-                historyData = new ClientOrderHistoryData();
-                LoadOrders();
+                trackData = new ClientTrackData();
+                LoadActiveOrders();
                 ConfigureDataGridView();
+
+                // Настраиваем таймер для автоматического обновления каждые 30 секунд
+                refreshTimer = new Timer();
+                refreshTimer.Interval = 30000; // 30 секунд
+                refreshTimer.Tick += (s, e) => LoadActiveOrders();
+                refreshTimer.Start();
             }
         }
 
-        private void LoadOrders()
+        private void LoadActiveOrders()
         {
             try
             {
-                DataTable dt = historyData.GetClientOrders(clientId);
+                DataTable dt = trackData.GetActiveOrders(clientId);
                 dataGridViewOrders.DataSource = dt;
+                labelCount.Text = $"Активных заказов: {dt.Rows.Count}";
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка загрузки заказов: {ex.Message}", "Ошибка",
+                MessageBox.Show($"Ошибка загрузки активных заказов: {ex.Message}", "Ошибка",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -49,38 +57,28 @@ namespace taxi4
 
             dataGridViewOrders.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
 
-            // Настройка колонок (включая информацию об акции)
             SetColumn("order_id", "№", 50, true);
             SetColumn("order_datetime", "Дата и время", 130, false);
             SetColumn("address_from", "Откуда", 200, false);
             SetColumn("address_to", "Куда", 200, false);
             SetColumn("tariff_name", "Тариф", 100, false);
             SetColumn("order_status", "Статус", 100, false);
-            SetColumn("payment_method", "Оплата", 100, false);
-            SetColumn("final_cost", "Стоимость", 80, false);
             SetColumn("driver_name", "Водитель", 150, false);
-            SetColumn("promotion_name", "Акция", 150, false);
-            SetColumn("promotion_percent", "Скидка, %", 70, false);
-            SetColumn("promotion_amount", "Сумма скидки", 80, false);
+            SetColumn("driver_phone", "Телефон водителя", 120, false);
 
-            // Форматирование столбцов
+            // Форматирование даты
             if (dataGridViewOrders.Columns["order_datetime"] != null)
                 dataGridViewOrders.Columns["order_datetime"].DefaultCellStyle.Format = "dd.MM.yyyy HH:mm";
-            if (dataGridViewOrders.Columns["final_cost"] != null)
-                dataGridViewOrders.Columns["final_cost"].DefaultCellStyle.Format = "F2";
-            if (dataGridViewOrders.Columns["promotion_amount"] != null)
-                dataGridViewOrders.Columns["promotion_amount"].DefaultCellStyle.Format = "F2";
 
             // Порядок колонок
             int index = 0;
             string[] order = { "order_id", "order_datetime", "address_from", "address_to", "tariff_name",
-                               "order_status", "payment_method", "final_cost", "driver_name",
-                               "promotion_name", "promotion_percent", "promotion_amount" };
+                               "order_status", "driver_name", "driver_phone" };
             foreach (string colName in order)
                 if (dataGridViewOrders.Columns[colName] != null)
                     dataGridViewOrders.Columns[colName].DisplayIndex = index++;
 
-            // Стиль заголовков
+            // Стиль заголовков (как в других формах)
             dataGridViewOrders.ColumnHeadersDefaultCellStyle.Font = new Font("Microsoft Sans Serif", 9, FontStyle.Bold);
             dataGridViewOrders.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(52, 73, 94);
             dataGridViewOrders.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
@@ -110,14 +108,15 @@ namespace taxi4
             }
         }
 
-        private void buttonBack_Click(object sender, EventArgs e)
-        {
-            this.Close();
-        }
-
         private void buttonRefresh_Click(object sender, EventArgs e)
         {
-            LoadOrders();
+            LoadActiveOrders();
+        }
+
+        private void buttonBack_Click(object sender, EventArgs e)
+        {
+            refreshTimer?.Stop();
+            this.Close();
         }
 
         private void dataGridViewOrders_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
@@ -131,7 +130,7 @@ namespace taxi4
 
         private void ShowOrderDetails(int orderId)
         {
-            DataRow details = historyData.GetOrderDetails(orderId);
+            DataRow details = trackData.GetOrderDetails(orderId);
             if (details != null)
             {
                 string message = $"Заказ №{details["order_id"]}\n" +
@@ -140,19 +139,17 @@ namespace taxi4
                                  $"Куда: {details["address_to_full"]}\n" +
                                  $"Тариф: {details["tariff_name"]}\n" +
                                  $"Статус: {details["status_name"]}\n" +
-                                 $"Оплата: {details["payment_name"]}\n" +
-                                 $"Стоимость: {Convert.ToDecimal(details["final_cost"]):F2}\n" +
-                                 $"Водитель: {details["driver_full_name"]}\n" +
-                                 (details["promotion_name"] != DBNull.Value
-                                    ? $"Акция: {details["promotion_name"]} ({details["promotion_percent"]}%) – скидка {Convert.ToDecimal(details["promotion_amount"]):F2}"
-                                    : "Акция: не применялась");
+                                 (details["driver_full_name"] != DBNull.Value
+                                    ? $"Водитель: {details["driver_full_name"]}\nТелефон: {details["driver_phone"]}"
+                                    : "Водитель ещё не назначен");
                 MessageBox.Show(message, "Детали заказа", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-            else
-            {
-                MessageBox.Show("Не удалось загрузить детали заказа.", "Ошибка",
-                                MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+        }
+
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            refreshTimer?.Stop();
+            base.OnFormClosing(e);
         }
     }
 }
