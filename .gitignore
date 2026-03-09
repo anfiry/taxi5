@@ -5,3 +5,7 @@
 /.vs/taxi5.slnx
 /taxi5/bin/
 /taxi5/obj/
+/.vs/taxi5.slnx/v18/DocumentLayout.backup.json
+/.vs/taxi5.slnx/v18/DocumentLayout.json
+/taxi5/obj/Debug/taxi5.csproj.AssemblyReference.cache
+/taxi5/obj/Debug/taxi5.csproj.GenerateResource.cache
