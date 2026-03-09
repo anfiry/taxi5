@@ -63,6 +63,9 @@
     <Reference Include="Microsoft.Extensions.Primitives, Version=8.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Extensions.Primitives.8.0.0\lib\net462\Microsoft.Extensions.Primitives.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="Npgsql, Version=8.0.6.0, Culture=neutral, PublicKeyToken=5d8b90d52f46fda7, processorArchitecture=MSIL">
       <HintPath>..\packages\Npgsql.8.0.6\lib\netstandard2.0\Npgsql.dll</HintPath>
     </Reference>
@@ -175,6 +178,41 @@
     <Compile Include="ClientMenu.Designer.cs">
       <DependentUpon>ClientMenu.cs</DependentUpon>
     </Compile>
+    <Compile Include="ClientOrderData.cs" />
+    <Compile Include="ClientOrderForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ClientOrderForm.Designer.cs">
+      <DependentUpon>ClientOrderForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ClientOrderHistoryData.cs" />
+    <Compile Include="ClientOrderHistoryForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ClientOrderHistoryForm.Designer.cs">
+      <DependentUpon>ClientOrderHistoryForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ClientPoint.cs" />
+    <Compile Include="ClientPointForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ClientPointForm.Designer.cs">
+      <DependentUpon>ClientPointForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ClientPromotionData.cs" />
+    <Compile Include="ClientPromotionForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ClientPromotionForm.Designer.cs">
+      <DependentUpon>ClientPromotionForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ClientTrackData.cs" />
+    <Compile Include="ClientTrackOrderForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ClientTrackOrderForm.Designer.cs">
+      <DependentUpon>ClientTrackOrderForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="DriverMenu.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -197,6 +235,9 @@
       <DependentUpon>RegistrationMenu.cs</DependentUpon>
     </Compile>
     <Compile Include="Services\SimpleTelegramService.cs" />
+    <EmbeddedResource Include="AdminCarForm.resx">
+      <DependentUpon>AdminCarForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="AdminClientForm.resx">
       <DependentUpon>AdminClientForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -206,6 +247,9 @@
     <EmbeddedResource Include="AdminMenu.resx">
       <DependentUpon>AdminMenu.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="AdminOrderForm.resx">
+      <DependentUpon>AdminOrderForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="AdminPromotionForm.resx">
       <DependentUpon>AdminPromotionForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -214,6 +258,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="ClientMenu.resx">
       <DependentUpon>ClientMenu.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ClientOrderForm.resx">
+      <DependentUpon>ClientOrderForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ClientOrderHistoryForm.resx">
+      <DependentUpon>ClientOrderHistoryForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ClientPromotionForm.resx">
+      <DependentUpon>ClientPromotionForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="LoginForm.resx">
       <DependentUpon>LoginForm.cs</DependentUpon>
