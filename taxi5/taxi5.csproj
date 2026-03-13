@@ -63,6 +63,7 @@
     <Reference Include="Microsoft.Extensions.Primitives, Version=8.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Extensions.Primitives.8.0.0\lib\net462\Microsoft.Extensions.Primitives.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="Npgsql, Version=8.0.6.0, Culture=neutral, PublicKeyToken=5d8b90d52f46fda7, processorArchitecture=MSIL">
       <HintPath>..\packages\Npgsql.8.0.6\lib\netstandard2.0\Npgsql.dll</HintPath>
     </Reference>
@@ -175,6 +176,41 @@
     <Compile Include="ClientMenu.Designer.cs">
       <DependentUpon>ClientMenu.cs</DependentUpon>
     </Compile>
+    <Compile Include="ClientOrderData.cs" />
+    <Compile Include="ClientOrderForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ClientOrderForm.Designer.cs">
+      <DependentUpon>ClientOrderForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ClientOrderHistoryData.cs" />
+    <Compile Include="ClientOrderHistoryForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ClientOrderHistoryForm.Designer.cs">
+      <DependentUpon>ClientOrderHistoryForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ClientPoint.cs" />
+    <Compile Include="ClientPointForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ClientPointForm.Designer.cs">
+      <DependentUpon>ClientPointForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ClientPromotionData.cs" />
+    <Compile Include="ClientPromotionForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ClientPromotionForm.Designer.cs">
+      <DependentUpon>ClientPromotionForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ClientTrackData.cs" />
+    <Compile Include="ClientTrackOrderForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ClientTrackOrderForm.Designer.cs">
+      <DependentUpon>ClientTrackOrderForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="DriverMenu.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -188,17 +224,17 @@
       <DependentUpon>LoginForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Models\TelegramSettings.cs" />
-    <Compile Include="OrderDetailsForm.cs">
+    <Compile Include="DriverOrderDetailsForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="OrderDetailsForm.Designer.cs">
-      <DependentUpon>OrderDetailsForm.cs</DependentUpon>
+    <Compile Include="DriverOrderDetailsForm.Designer.cs">
+      <DependentUpon>DriverOrderDetailsForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Orders.cs">
+    <Compile Include="DriverOrdersForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Orders.Designer.cs">
-      <DependentUpon>Orders.cs</DependentUpon>
+    <Compile Include="DriverOrdersForm.Designer.cs">
+      <DependentUpon>DriverOrdersForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -209,18 +245,21 @@
       <DependentUpon>RegistrationMenu.cs</DependentUpon>
     </Compile>
     <Compile Include="Services\SimpleTelegramService.cs" />
-    <Compile Include="ShiftsForm.cs">
+    <Compile Include="DriverShiftsForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="ShiftsForm.Designer.cs">
-      <DependentUpon>ShiftsForm.cs</DependentUpon>
+    <Compile Include="DriverShiftsForm.Designer.cs">
+      <DependentUpon>DriverShiftsForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="StatisticsRatingForm.cs">
+    <Compile Include="DriverStatisticsRatingForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="StatisticsRatingForm.Designer.cs">
-      <DependentUpon>StatisticsRatingForm.cs</DependentUpon>
+    <Compile Include="DriverStatisticsRatingForm.Designer.cs">
+      <DependentUpon>DriverStatisticsRatingForm.cs</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="AdminCarForm.resx">
+      <DependentUpon>AdminCarForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="AdminClientForm.resx">
       <DependentUpon>AdminClientForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -239,14 +278,23 @@
     <EmbeddedResource Include="ClientMenu.resx">
       <DependentUpon>ClientMenu.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="ClientOrderForm.resx">
+      <DependentUpon>ClientOrderForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ClientOrderHistoryForm.resx">
+      <DependentUpon>ClientOrderHistoryForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ClientPromotionForm.resx">
+      <DependentUpon>ClientPromotionForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="DriverMenu.resx">
       <DependentUpon>DriverMenu.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="LoginForm.resx">
       <DependentUpon>LoginForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Orders.resx">
-      <DependentUpon>Orders.cs</DependentUpon>
+    <EmbeddedResource Include="DriverOrdersForm.resx">
+      <DependentUpon>DriverOrdersForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

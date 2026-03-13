@@ -6,14 +6,14 @@ using Npgsql;
 
 namespace taxi4
 {
-    public partial class ShiftsForm : Form
+    public partial class DriverShiftsForm : Form
     {
         private int driverId;
         private string connectionString;
         private DataGridView dgvHistory;
 
         // Конструктор с двумя параметрами
-        public ShiftsForm(int driverId, string connString)
+        public DriverShiftsForm(int driverId, string connString)
         {
             this.driverId = driverId;
             this.connectionString = connString;

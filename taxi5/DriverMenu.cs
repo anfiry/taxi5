@@ -1,49 +1,93 @@
-﻿using System;
+﻿using Npgsql;
+using System;
 using System.Drawing;
 using System.Windows.Forms;
-using Npgsql;
 using Microsoft.VisualBasic;
 
 namespace taxi4
 {
-    public partial class меню_водителя : Form
+    public partial class DriverMenu : Form
     {
-        // Строка подключения к БД
-        private string connectionString = "Server=localhost;Port=5432;Database=taxi;User Id=postgres;Password=123";
+        public string Role { get; set; }
+        public int AccountId { get; private set; }
+        public string UserLogin { get; set; }
 
-        // ID текущего водителя
-        private int currentDriverId = 1;
-
-        // Данные активной смены
+        private string connectionString = "Server=localhost;Port=5432;Database=taxi4;User Id=postgres;Password=123";
+        private int currentDriverId = 0;
+        private string driverName = ""; // имя водителя для приветствия
         private int? currentWorkScheduleId = null;
         private DateTime shiftStartTime;
 
-        // Поля для перетаскивания формы
+        // Поля для перетаскивания формы (если FormBorderStyle = None)
         Point lastPoint;
         Point lastPoint1;
 
-        public меню_водителя()
+        // Конструктор с параметром accountId (используется при входе)
+        public DriverMenu(int accountId)
         {
             InitializeComponent();
-
-            // При загрузке проверяем активную смену и устанавливаем состояние кнопок
-            this.Load += меню_водителя_Load;
+            AccountId = accountId;
+            LoadDriverData(); // загружаем driverId и имя
+            this.Load += DriverMenu_Load;
         }
 
-        private void меню_водителя_Load(object sender, EventArgs e)
+        // Конструктор для дизайнера (без параметров)
+        public DriverMenu()
         {
-            CheckActiveShiftOnStart();
-            // [!] Устанавливаем начальное состояние кнопки "Заказы"
-            UpdateOrdersButtonState();
+            InitializeComponent();
         }
 
-        // ---------- ВАШИ МЕТОДЫ ----------
-        private void button1_Click(object sender, EventArgs e) { }
-        private void panel1_Paint(object sender, PaintEventArgs e) { }
-        private void textBox1_TextChanged(object sender, EventArgs e) { }
+        // Загружаем driverId и имя водителя
+        private void LoadDriverData()
+        {
+            try
+            {
+                using (var conn = new NpgsqlConnection(connectionString))
+                {
+                    conn.Open();
+                    string query = "SELECT driver_id, first_name, last_name FROM driver WHERE account_id = @accountId";
+                    using (var cmd = new NpgsqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@accountId", AccountId);
+                        using (var reader = cmd.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                currentDriverId = reader.GetInt32(0);
+                                string firstName = reader.GetString(1);
+                                string lastName = reader.GetString(2);
+                                driverName = $"{firstName} {lastName}".Trim();
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка загрузки данных водителя: {ex.Message}", "Ошибка",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
 
-        // Перемещение формы
-        private void меню_водителя_MouseMove(object sender, MouseEventArgs e)
+        private void DriverMenu_Load(object sender, EventArgs e)
+        {
+            if (currentDriverId == 0)
+            {
+                MessageBox.Show("Не удалось определить водителя для данного аккаунта.", "Ошибка",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                this.Close();
+                return;
+            }
+
+            CheckActiveShiftOnStart();
+            UpdateOrdersButtonState();
+
+            // Приветствие с именем водителя
+            labelWelcome.Text = $"Добро пожаловать, {driverName}!";
+        }
+
+        // ---------- Перемещение формы (если FormBorderStyle = None) ----------
+        private void DriverMenu_MouseMove(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
             {
@@ -51,7 +95,7 @@ namespace taxi4
                 this.Top += e.Y - lastPoint.Y;
             }
         }
-        private void меню_водителя_MouseDown(object sender, MouseEventArgs e)
+        private void DriverMenu_MouseDown(object sender, MouseEventArgs e)
         {
             lastPoint = new Point(e.X, e.Y);
         }
@@ -69,18 +113,16 @@ namespace taxi4
             lastPoint1 = new Point(e.X, e.Y);
         }
 
-        // Выход / смена пользователя
-        private void button4_Click(object sender, EventArgs e)
+        // ---------- Кнопки ----------
+        private void button4_Click(object sender, EventArgs e) // Выход
         {
             this.Close();
             LoginForm авторизация = new LoginForm();
             авторизация.Show();
         }
 
-        // Переход к заказам
         private void Orders_Click(object sender, EventArgs e)
         {
-            // [!] Проверка: если смена не активна – не открывать (на всякий случай, но кнопка должна быть неактивна)
             if (!IsShiftActive())
             {
                 MessageBox.Show("Сначала начните смену!", "Доступ запрещён",
@@ -88,26 +130,48 @@ namespace taxi4
                 return;
             }
 
-            Orders ordersForm = new Orders(currentDriverId, connectionString);
-            ordersForm.ShowDialog();
+            if (currentDriverId == 0)
+            {
+                MessageBox.Show("Не удалось определить ID водителя", "Ошибка");
+                return;
+            }
+
+            // Замените на реальную форму заказов (например, DriverOrdersForm)
+            DriverOrdersForm ordersForm = new DriverOrdersForm(currentDriverId, connectionString);
+            ordersForm.Closed += (s, args) => this.Show();
+            ordersForm.Show();
+            this.Hide();
         }
 
-        // Статистика и рейтинг
         private void Statistics_Click(object sender, EventArgs e)
         {
-            StatisticsRatingForm statsForm = new StatisticsRatingForm(currentDriverId, connectionString);
-            statsForm.ShowDialog();
+            if (currentDriverId == 0)
+            {
+                MessageBox.Show("Не удалось определить ID водителя", "Ошибка");
+                return;
+            }
+
+            DriverStatisticsRatingForm statsForm = new DriverStatisticsRatingForm(currentDriverId, connectionString);
+            statsForm.Closed += (s, args) => this.Show();
+            statsForm.Show();
+            this.Hide();
         }
 
-        // История смен
         private void Shifts_Click(object sender, EventArgs e)
         {
-            ShiftsForm shiftForm = new ShiftsForm(currentDriverId, connectionString);
-            shiftForm.ShowDialog();
+            if (currentDriverId == 0)
+            {
+                MessageBox.Show("Не удалось определить ID водителя", "Ошибка");
+                return;
+            }
+
+            DriverShiftsForm shiftsForm = new DriverShiftsForm(currentDriverId, connectionString);
+            shiftsForm.Closed += (s, args) => this.Show();
+            shiftsForm.Show();
+            this.Hide();
         }
 
-        // ---------- РАБОТА СО СМЕНАМИ ----------
-
+        // ---------- Работа со сменами ----------
         private bool IsShiftActive()
         {
             using (var conn = new NpgsqlConnection(connectionString))
@@ -161,7 +225,6 @@ namespace taxi4
                                 EndShif.BackColor = Color.LightCoral;
                                 EndShif.ForeColor = Color.DarkRed;
 
-                                // [!] Активируем кнопку "Заказы"
                                 Orders.Enabled = true;
                             }
                         }
@@ -175,7 +238,6 @@ namespace taxi4
             }
         }
 
-        // [!] Метод для обновления состояния кнопки "Заказы" по состоянию смены
         private void UpdateOrdersButtonState()
         {
             Orders.Enabled = IsShiftActive();
@@ -230,7 +292,6 @@ namespace taxi4
                     EndShif.BackColor = Color.LightCoral;
                     EndShif.ForeColor = Color.DarkRed;
 
-                    // [!] Активируем кнопку "Заказы"
                     Orders.Enabled = true;
 
                     MessageBox.Show($"Смена начата в {shiftStartTime:HH:mm}",
@@ -304,7 +365,6 @@ namespace taxi4
                     EndShif.BackColor = SystemColors.Control;
                     EndShif.ForeColor = SystemColors.ControlText;
 
-                    // [!] Деактивируем кнопку "Заказы"
                     Orders.Enabled = false;
 
                     MessageBox.Show($"Смена завершена!\n\n" +
@@ -322,5 +382,10 @@ namespace taxi4
                 }
             }
         }
+
+        // Пустые обработчики для дизайнера (если нужны)
+        private void button1_Click(object sender, EventArgs e) { }
+        private void panel1_Paint(object sender, PaintEventArgs e) { }
+        private void textBox1_TextChanged(object sender, EventArgs e) { }
     }
 }

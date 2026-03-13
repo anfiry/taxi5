@@ -7,7 +7,7 @@ using Npgsql;
 
 namespace taxi4
 {
-    public partial class StatisticsRatingForm : Form
+    public partial class DriverStatisticsRatingForm : Form
     {
         // Параметры подключения и водителя
         private int driverId;
@@ -33,14 +33,14 @@ namespace taxi4
         private Label lblClean;           // чистота
         private Label lblPunctual;        // пунктуальность
 
-        public StatisticsRatingForm()
+        public DriverStatisticsRatingForm()
         {
             InitializeComponent();
             throw new Exception("Используйте конструктор с параметрами driverId и connectionString");
         }
 
         // Основной конструктор – вызывается из меню водителя
-        public StatisticsRatingForm(int driverId, string connectionString)
+        public DriverStatisticsRatingForm(int driverId, string connectionString)
         {
             this.driverId = driverId;
             this.connectionString = connectionString;

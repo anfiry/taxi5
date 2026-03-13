@@ -6,9 +6,8 @@ using Npgsql;
 
 namespace taxi4
 {
-    public partial class OrderDetailsForm : Form
+    public partial class DriverOrderDetailsForm : Form
     {
-        private WebBrowser webBrowser1;
         private int orderId;
         private string startAddress;
         private string endAddress;
@@ -16,22 +15,14 @@ namespace taxi4
         private string passengers;
         private int driverId;
         private string connectionString;
-
-        // Элементы управления
-        private Button btnAction1;      // Принять / Начать поездку
-        private Button btnAction2;      // Завершить поездку
-        private Button btnDecline;      // ❌ Отказаться (только для свободных заказов)
-        private Panel actionPanel;
-        private Label lblStatus;
-
         private string currentStatus;
 
-        public OrderDetailsForm()
+        public DriverOrderDetailsForm()
         {
             InitializeComponent();
         }
 
-        public OrderDetailsForm(int orderId, string from, string to, string price, string passengers, int driverId, string connectionString)
+        public DriverOrderDetailsForm(int orderId, string from, string to, string price, string passengers, int driverId, string connectionString)
         {
             this.orderId = orderId;
             this.startAddress = from;
@@ -44,7 +35,6 @@ namespace taxi4
             InitializeComponent();
             InitializeOrderDetailsForm();
 
-            // Загружаем статус и настраиваем интерфейс
             LoadOrderStatus();
         }
 
@@ -54,7 +44,7 @@ namespace taxi4
             {
                 conn.Open();
                 string query = @"
-                    SELECT os.name, o.driver_id, o.start_trip_time, o.end_trip_time
+                    SELECT os.name, o.driver_id
                     FROM ""Order"" o
                     JOIN order_status os ON o.order_status = os.order_status_id
                     WHERE o.order_id = @order_id";
@@ -67,26 +57,22 @@ namespace taxi4
                         {
                             currentStatus = reader.GetString(0);
                             int? assignedDriver = reader.IsDBNull(1) ? (int?)null : reader.GetInt32(1);
-                            bool isStarted = !reader.IsDBNull(2);
-                            bool isEnded = !reader.IsDBNull(3);
 
-                            ConfigureUIForStatus(currentStatus, assignedDriver, isStarted, isEnded);
+                            ConfigureUIForStatus(currentStatus, assignedDriver);
                         }
                     }
                 }
             }
         }
 
-        private void ConfigureUIForStatus(string status, int? assignedDriver, bool isStarted, bool isEnded)
+        private void ConfigureUIForStatus(string status, int? assignedDriver)
         {
-            // Скрываем все кнопки, потом покажем нужные
             btnAction1.Visible = false;
             btnAction2.Visible = false;
             btnDecline.Visible = false;
 
             if (assignedDriver == driverId)
             {
-                // Заказ назначен текущему водителю
                 if (status == "Завершён")
                 {
                     MessageBox.Show("Этот заказ уже завершён.", "Информация");
@@ -95,30 +81,17 @@ namespace taxi4
                 }
                 else if (status == "В процессе")
                 {
-                    if (!isStarted)
-                    {
-                        // Принят, но не начат – показываем "Начать поездку"
-                        btnAction1.Visible = true;
-                        btnAction1.Text = "🚀 Начать поездку";
-                        btnAction1.BackColor = Color.FromArgb(52, 152, 219);
-                        btnAction1.Click -= BtnAccept_Click;
-                        btnAction1.Click += BtnStartTrip_Click;
-                        lblStatus.Text = "Статус: принят, ожидает начала";
-                    }
-                    else if (!isEnded)
-                    {
-                        // Поездка начата – показываем "Завершить поездку"
-                        btnAction2.Visible = true;
-                        btnAction2.Text = "🏁 Завершить поездку";
-                        btnAction2.BackColor = Color.FromArgb(46, 204, 113);
-                        btnAction2.Click += BtnEndTrip_Click;
-                        lblStatus.Text = "Статус: поездка начата";
-                    }
+                    // Заказ принят – можно завершить
+                    btnAction2.Visible = true;
+                    btnAction2.Text = "🏁 Завершить поездку";
+                    btnAction2.BackColor = Color.FromArgb(46, 204, 113);
+                    btnAction2.Click += BtnEndTrip_Click;
+                    lblStatus.Text = "Статус: принят, можно завершить";
                 }
             }
             else if (assignedDriver == null)
             {
-                // Заказ свободен – показываем "Принять" и "Отказаться"
+                // Заказ свободен
                 btnAction1.Visible = true;
                 btnAction1.Text = "✅ ПРИНЯТЬ ЗАКАЗ";
                 btnAction1.BackColor = Color.FromArgb(46, 204, 113);
@@ -133,7 +106,6 @@ namespace taxi4
             }
             else
             {
-                // Заказ занят другим водителем
                 MessageBox.Show("Этот заказ уже принят другим водителем.", "Информация");
                 this.Close();
             }
@@ -141,19 +113,13 @@ namespace taxi4
 
         private void InitializeOrderDetailsForm()
         {
-            // Настройка формы – убираем лишние скроллы
             this.Text = $"Детали заказа #{orderId}";
             this.Size = new Size(1000, 750);
-            this.StartPosition = FormStartPosition.CenterScreen;
             this.BackColor = Color.FromArgb(241, 59, 198);
-            this.AutoScroll = false;               // отключаем скролл формы
-            this.FormBorderStyle = FormBorderStyle.FixedDialog; // запрещаем изменение размера
-            this.MaximizeBox = false;
 
             Panel mainPanel = new Panel();
             mainPanel.Dock = DockStyle.Fill;
             mainPanel.Padding = new Padding(10);
-            mainPanel.AutoScroll = false;          // отключаем скролл панели
 
             // Информационная панель
             Panel infoPanel = new Panel();
@@ -198,64 +164,16 @@ namespace taxi4
 
             detailsPanel.Controls.AddRange(new Control[] { lblPrice, lblPassengers, lblTime });
 
-            lblStatus = new Label();
-            lblStatus.Text = "Статус: загрузка...";
-            lblStatus.Font = new Font("Arial", 10, FontStyle.Bold);
-            lblStatus.ForeColor = Color.White;
-            lblStatus.Location = new Point(15, 115);
-            lblStatus.Size = new Size(300, 25);
-
             infoPanel.Controls.AddRange(new Control[] { lblTitle, lblRoute, detailsPanel, lblStatus });
 
             // Панель карты
             Panel mapPanel = new Panel();
             mapPanel.Dock = DockStyle.Fill;
             mapPanel.Padding = new Padding(0, 10, 0, 0);
-            mapPanel.AutoScroll = false;           // отключаем скролл панели карты
 
-            webBrowser1 = new WebBrowser();
             webBrowser1.Dock = DockStyle.Fill;
-            webBrowser1.ScriptErrorsSuppressed = true;
-            webBrowser1.ScrollBarsEnabled = true;  // скролл внутри браузера (один, нормальный)
 
-            // Панель действий (кнопки)
-            actionPanel = new Panel();
-            actionPanel.Dock = DockStyle.Bottom;
-            actionPanel.Height = 70;
-            actionPanel.BackColor = Color.FromArgb(245, 245, 245);
-            actionPanel.BorderStyle = BorderStyle.FixedSingle;
-
-            // Кнопка 1 (Принять / Начать поездку)
-            btnAction1 = new Button();
-            btnAction1.Size = new Size(180, 45);
-            btnAction1.Location = new Point(20, 12);
-            btnAction1.ForeColor = Color.White;
-            btnAction1.Font = new Font("Arial", 11, FontStyle.Bold);
-            btnAction1.FlatStyle = FlatStyle.Flat;
-            btnAction1.FlatAppearance.BorderSize = 0;
-            btnAction1.Cursor = Cursors.Hand;
-
-            // Кнопка 2 (Завершить поездку) – изначально скрыта
-            btnAction2 = new Button();
-            btnAction2.Size = new Size(180, 45);
-            btnAction2.Location = new Point(210, 12);
-            btnAction2.ForeColor = Color.White;
-            btnAction2.Font = new Font("Arial", 11, FontStyle.Bold);
-            btnAction2.FlatStyle = FlatStyle.Flat;
-            btnAction2.FlatAppearance.BorderSize = 0;
-            btnAction2.Cursor = Cursors.Hand;
-            btnAction2.Visible = false;
-
-            // Кнопка 3 (Отказаться) – для свободных заказов
-            btnDecline = new Button();
-            btnDecline.Size = new Size(180, 45);
-            btnDecline.Location = new Point(400, 12); // смещаем, чтобы не пересекалось
-            btnDecline.ForeColor = Color.White;
-            btnDecline.Font = new Font("Arial", 11, FontStyle.Bold);
-            btnDecline.FlatStyle = FlatStyle.Flat;
-            btnDecline.FlatAppearance.BorderSize = 0;
-            btnDecline.Cursor = Cursors.Hand;
-            btnDecline.Visible = false;
+            mapPanel.Controls.Add(webBrowser1);
 
             // Кнопка "Открыть в Яндекс.Картах"
             Button btnOpenInYandex = new Button();
@@ -270,9 +188,8 @@ namespace taxi4
             btnOpenInYandex.Cursor = Cursors.Hand;
             btnOpenInYandex.Click += BtnOpenInYandex_Click;
 
-            actionPanel.Controls.AddRange(new Control[] { btnAction1, btnAction2, btnDecline, btnOpenInYandex });
+            actionPanel.Controls.Add(btnOpenInYandex);
 
-            mapPanel.Controls.Add(webBrowser1);
             mainPanel.Controls.AddRange(new Control[] { infoPanel, mapPanel, actionPanel });
             this.Controls.Add(mainPanel);
 
@@ -295,7 +212,6 @@ namespace taxi4
             }
         }
 
-        // Принять заказ
         private void BtnAccept_Click(object sender, EventArgs e)
         {
             DialogResult result = MessageBox.Show(
@@ -341,7 +257,6 @@ namespace taxi4
             }
         }
 
-        // Отказаться от заказа (только для свободных)
         private void BtnDecline_Click(object sender, EventArgs e)
         {
             DialogResult result = MessageBox.Show(
@@ -352,45 +267,11 @@ namespace taxi4
 
             if (result == DialogResult.Yes)
             {
-                // Ничего не меняем в БД, просто закрываем форму
                 this.DialogResult = DialogResult.Cancel;
                 this.Close();
             }
         }
 
-        // Начать поездку
-        private void BtnStartTrip_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                using (var conn = new NpgsqlConnection(connectionString))
-                {
-                    conn.Open();
-                    string updateQuery = @"
-                        UPDATE ""Order""
-                        SET start_trip_time = @start_time
-                        WHERE order_id = @order_id";
-                    using (var cmd = new NpgsqlCommand(updateQuery, conn))
-                    {
-                        cmd.Parameters.AddWithValue("@start_time", DateTime.Now);
-                        cmd.Parameters.AddWithValue("@order_id", orderId);
-                        cmd.ExecuteNonQuery();
-                    }
-                }
-
-                MessageBox.Show("Поездка начата! Счастливого пути!", "Старт",
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                LoadOrderStatus();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ошибка при начале поездки: {ex.Message}", "Ошибка",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        // Завершить поездку
         private void BtnEndTrip_Click(object sender, EventArgs e)
         {
             DialogResult result = MessageBox.Show(
@@ -411,12 +292,10 @@ namespace taxi4
 
                         string updateQuery = @"
                             UPDATE ""Order""
-                            SET end_trip_time = @end_time,
-                                order_status = @status_id
+                            SET order_status = @status_id
                             WHERE order_id = @order_id";
                         using (var cmd = new NpgsqlCommand(updateQuery, conn))
                         {
-                            cmd.Parameters.AddWithValue("@end_time", DateTime.Now);
                             cmd.Parameters.AddWithValue("@status_id", completedStatusId);
                             cmd.Parameters.AddWithValue("@order_id", orderId);
                             cmd.ExecuteNonQuery();
@@ -456,5 +335,9 @@ namespace taxi4
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
+        // Обработчики-заглушки для событий, которые могут быть вызваны дизайнером
+        private void BtnAction1_Click(object sender, EventArgs e) { }
+        private void BtnAction2_Click(object sender, EventArgs e) { }
     }
 }
