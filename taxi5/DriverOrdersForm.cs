@@ -68,7 +68,7 @@ namespace taxi4
 
             Label lblMessage = new Label
             {
-                Text = "Выполняется активный заказ.\n\nПожалуйста, завершите его через форму заказа.",
+                Text = "Выполняется активный заказ.\n",
                 Font = new Font("Arial", 12, FontStyle.Italic),
                 ForeColor = Color.Gray,
                 AutoSize = true,
