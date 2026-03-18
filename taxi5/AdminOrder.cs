@@ -13,13 +13,11 @@ namespace taxi4
         public DataTable GetOrders(string statusFilter = null, DateTime? dateFrom = null, DateTime? dateTo = null)
         {
             var dt = new DataTable();
-
             using (var conn = new NpgsqlConnection(connectionString))
             {
                 try
                 {
                     conn.Open();
-
                     string query = @"
                         SELECT 
                             o.order_id,
@@ -59,11 +57,10 @@ namespace taxi4
                     if (dateTo.HasValue)
                     {
                         query += " AND o.order_datetime <= @dateTo";
-                        cmd.Parameters.AddWithValue("@dateTo", dateTo.Value.AddDays(1).AddSeconds(-1)); // конец дня
+                        cmd.Parameters.AddWithValue("@dateTo", dateTo.Value.AddDays(1).AddSeconds(-1));
                     }
 
                     query += " ORDER BY o.order_datetime DESC";
-
                     cmd.CommandText = query;
 
                     using (var adapter = new NpgsqlDataAdapter(cmd))
@@ -100,6 +97,26 @@ namespace taxi4
                 }
             }
             return dt;
+        }
+
+        // ---------- ПОЛУЧЕНИЕ ОТЗЫВА ПО ЗАКАЗУ ----------
+        public DataRow GetReview(int orderId)
+        {
+            using (var conn = new NpgsqlConnection(connectionString))
+            {
+                conn.Open();
+                string query = "SELECT rating, comment FROM review WHERE orber_id = @orderId";
+                using (var cmd = new NpgsqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@orderId", orderId);
+                    using (var adapter = new NpgsqlDataAdapter(cmd))
+                    {
+                        DataTable dt = new DataTable();
+                        adapter.Fill(dt);
+                        return dt.Rows.Count > 0 ? dt.Rows[0] : null;
+                    }
+                }
+            }
         }
     }
 }

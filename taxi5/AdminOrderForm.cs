@@ -9,7 +9,7 @@ namespace taxi4
     {
         private AdminOrder adminOrder;
         private DataTable ordersData;
-        private string currentStatusFilter = null; // для отслеживания применённого статуса
+        private string currentStatusFilter = null;
 
         public AdminOrderForm()
         {
@@ -18,6 +18,7 @@ namespace taxi4
             LoadOrderStatuses();
             LoadOrders();
             ConfigureDataGridView();
+            dataGridViewOrders.CellClick += DataGridViewOrders_CellClick;
         }
 
         // ---------- ЗАГРУЗКА СТАТУСОВ ДЛЯ ФИЛЬТРА ----------
@@ -47,7 +48,6 @@ namespace taxi4
         {
             try
             {
-                // Получаем выбранный статус из комбобокса (если не "Все статусы")
                 string selectedStatus = comboBoxStatusFilter.SelectedIndex > 0
                     ? comboBoxStatusFilter.SelectedValue.ToString()
                     : null;
@@ -66,6 +66,12 @@ namespace taxi4
         // ---------- НАСТРОЙКА ТАБЛИЦЫ ----------
         private void ConfigureDataGridView()
         {
+            // Удаляем старые колонки кнопок, если они есть
+            if (dataGridViewOrders.Columns.Contains("ReviewButton"))
+                dataGridViewOrders.Columns.Remove("ReviewButton");
+            if (dataGridViewOrders.Columns.Contains("RouteButton"))
+                dataGridViewOrders.Columns.Remove("RouteButton");
+
             if (dataGridViewOrders.Columns.Count == 0) return;
 
             dataGridViewOrders.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
@@ -108,6 +114,24 @@ namespace taxi4
                     dataGridViewOrders.Columns[colName].DisplayIndex = index++;
             }
 
+            // Добавляем кнопку "Отзыв"
+            DataGridViewButtonColumn reviewButton = new DataGridViewButtonColumn();
+            reviewButton.Name = "ReviewButton";
+            reviewButton.HeaderText = "Отзыв";
+            reviewButton.Text = "Просмотр";
+            reviewButton.UseColumnTextForButtonValue = true;
+            reviewButton.Width = 80;
+            dataGridViewOrders.Columns.Add(reviewButton);
+
+            // Добавляем кнопку "Маршрут"
+            DataGridViewButtonColumn routeButton = new DataGridViewButtonColumn();
+            routeButton.Name = "RouteButton";
+            routeButton.HeaderText = "Маршрут";
+            routeButton.Text = "На карте";
+            routeButton.UseColumnTextForButtonValue = true;
+            routeButton.Width = 80;
+            dataGridViewOrders.Columns.Add(routeButton);
+
             dataGridViewOrders.ColumnHeadersDefaultCellStyle.Font = new Font("Microsoft Sans Serif", 9, FontStyle.Bold);
             dataGridViewOrders.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(52, 73, 94);
             dataGridViewOrders.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
@@ -139,14 +163,13 @@ namespace taxi4
         // ---------- ОБРАБОТЧИКИ ----------
         private void buttonRefresh_Click(object sender, EventArgs e)
         {
-            LoadOrders(); // перезагружает с текущим выбранным статусом
+            LoadOrders();
             MessageBox.Show("Данные обновлены", "Информация",
                 MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void buttonApplyFilter_Click(object sender, EventArgs e)
         {
-            // Применяем фильтр по статусу – просто перезагружаем данные с выбранным статусом
             LoadOrders();
         }
 
@@ -155,12 +178,10 @@ namespace taxi4
             string search = textBoxSearch.Text.Trim().ToLower();
             if (string.IsNullOrEmpty(search))
             {
-                // Если поиск пуст, возвращаем исходные данные (текущий статус)
                 LoadOrders();
                 return;
             }
 
-            // Фильтруем уже загруженные данные по тексту
             DataView dv = new DataView(ordersData);
             dv.RowFilter = $"client_name LIKE '%{search}%' OR driver_name LIKE '%{search}%' OR " +
                            $"address_from_text LIKE '%{search}%' OR address_to_text LIKE '%{search}%'";
@@ -178,6 +199,37 @@ namespace taxi4
         {
             if (e.KeyCode == Keys.Enter)
                 buttonSearch_Click(sender, e);
+        }
+
+        // ---------- ОБРАБОТЧИК КЛИКА ПО КНОПКАМ В ТАБЛИЦЕ ----------
+        private void DataGridViewOrders_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0) return;
+
+            string columnName = dataGridViewOrders.Columns[e.ColumnIndex].Name;
+
+            if (columnName == "RouteButton")
+            {
+                string from = dataGridViewOrders.Rows[e.RowIndex].Cells["address_from_text"].Value.ToString();
+                string to = dataGridViewOrders.Rows[e.RowIndex].Cells["address_to_text"].Value.ToString();
+                RouteViewForm routeForm = new RouteViewForm(from, to);
+                routeForm.ShowDialog();
+            }
+            else if (columnName == "ReviewButton")
+            {
+                int orderId = Convert.ToInt32(dataGridViewOrders.Rows[e.RowIndex].Cells["order_id"].Value);
+                DataRow review = adminOrder.GetReview(orderId);
+                if (review != null)
+                {
+                    MessageBox.Show($"Оценка: {review["rating"]}\nКомментарий: {review["comment"]}", "Отзыв",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                {
+                    MessageBox.Show("Отзыв по данному заказу отсутствует.", "Информация",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
         }
     }
 }

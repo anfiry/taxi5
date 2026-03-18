@@ -10,13 +10,11 @@ namespace taxi4
         private ClientOrderHistoryData historyData;
         private int clientId;
 
-        // Конструктор для дизайнера (без параметров)
         public ClientOrderHistoryForm()
         {
             InitializeComponent();
         }
 
-        // Основной конструктор, используемый в коде
         public ClientOrderHistoryForm(int clientId) : this()
         {
             this.clientId = clientId;
@@ -26,6 +24,10 @@ namespace taxi4
                 historyData = new ClientOrderHistoryData();
                 LoadOrders();
                 ConfigureDataGridView();
+
+                // Подписка на события
+                dataGridViewOrders.CellClick += DataGridViewOrders_CellClick;
+                dataGridViewOrders.CellFormatting += DataGridViewOrders_CellFormatting;
             }
         }
 
@@ -49,7 +51,11 @@ namespace taxi4
 
             dataGridViewOrders.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
 
-            // Настройка колонок (включая информацию об акции)
+            // Скрываем служебную колонку has_review
+            if (dataGridViewOrders.Columns["has_review"] != null)
+                dataGridViewOrders.Columns["has_review"].Visible = false;
+
+            // Настройка основных колонок
             SetColumn("order_id", "№", 50, true);
             SetColumn("order_datetime", "Дата и время", 130, false);
             SetColumn("address_from", "Откуда", 200, false);
@@ -79,6 +85,23 @@ namespace taxi4
             foreach (string colName in order)
                 if (dataGridViewOrders.Columns[colName] != null)
                     dataGridViewOrders.Columns[colName].DisplayIndex = index++;
+
+            // Добавляем кнопку "Отзыв"
+            DataGridViewButtonColumn reviewButton = new DataGridViewButtonColumn();
+            reviewButton.Name = "ReviewButton";
+            reviewButton.HeaderText = "Отзыв";
+            reviewButton.UseColumnTextForButtonValue = false;
+            reviewButton.Width = 100;
+            dataGridViewOrders.Columns.Add(reviewButton);
+
+            // Добавляем кнопку "Маршрут"
+            DataGridViewButtonColumn routeButton = new DataGridViewButtonColumn();
+            routeButton.Name = "RouteButton";
+            routeButton.HeaderText = "Маршрут";
+            routeButton.Text = "Показать на карте";
+            routeButton.UseColumnTextForButtonValue = true; // всегда один текст
+            routeButton.Width = 100;
+            dataGridViewOrders.Columns.Add(routeButton);
 
             // Стиль заголовков
             dataGridViewOrders.ColumnHeadersDefaultCellStyle.Font = new Font("Microsoft Sans Serif", 9, FontStyle.Bold);
@@ -110,6 +133,68 @@ namespace taxi4
             }
         }
 
+        private void DataGridViewOrders_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
+        {
+            if (dataGridViewOrders.Columns[e.ColumnIndex].Name == "ReviewButton")
+            {
+                DataGridViewRow row = dataGridViewOrders.Rows[e.RowIndex];
+                bool hasReview = Convert.ToBoolean(row.Cells["has_review"].Value);
+                e.Value = hasReview ? "Посмотреть отзыв" : "Оставить отзыв";
+                e.FormattingApplied = true;
+            }
+        }
+
+        private void DataGridViewOrders_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0) return;
+
+            string columnName = dataGridViewOrders.Columns[e.ColumnIndex].Name;
+
+            if (columnName == "ReviewButton")
+            {
+                int orderId = Convert.ToInt32(dataGridViewOrders.Rows[e.RowIndex].Cells["order_id"].Value);
+                bool hasReview = Convert.ToBoolean(dataGridViewOrders.Rows[e.RowIndex].Cells["has_review"].Value);
+
+                if (hasReview)
+                {
+                    DataRow review = historyData.GetReview(orderId);
+                    if (review != null)
+                    {
+                        MessageBox.Show($"Оценка: {review["rating"]}\nКомментарий: {review["comment"]}", "Отзыв",
+                            MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Не удалось загрузить отзыв", "Ошибка");
+                    }
+                }
+                else
+                {
+                    DataRow details = historyData.GetOrderDetails(orderId);
+                    if (details != null)
+                    {
+                        int driverId = Convert.ToInt32(details["driver_id"]);
+                        ClientReviewForm reviewForm = new ClientReviewForm(orderId, clientId, driverId);
+                        if (reviewForm.ShowDialog() == DialogResult.OK)
+                        {
+                            LoadOrders(); // обновляем список
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("Не удалось загрузить данные заказа", "Ошибка");
+                    }
+                }
+            }
+            else if (columnName == "RouteButton")
+            {
+                string from = dataGridViewOrders.Rows[e.RowIndex].Cells["address_from"].Value.ToString();
+                string to = dataGridViewOrders.Rows[e.RowIndex].Cells["address_to"].Value.ToString();
+                RouteViewForm routeForm = new RouteViewForm(from, to);
+                routeForm.ShowDialog();
+            }
+        }
+
         private void buttonBack_Click(object sender, EventArgs e)
         {
             this.Close();
@@ -122,6 +207,7 @@ namespace taxi4
 
         private void dataGridViewOrders_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
+            // Оставляем как есть для детального просмотра
             if (e.RowIndex >= 0)
             {
                 int orderId = Convert.ToInt32(dataGridViewOrders.Rows[e.RowIndex].Cells["order_id"].Value);

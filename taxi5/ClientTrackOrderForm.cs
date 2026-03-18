@@ -11,13 +11,11 @@ namespace taxi4
         private int clientId;
         private Timer refreshTimer;
 
-        // Конструктор для дизайнера
         public ClientTrackOrderForm()
         {
             InitializeComponent();
         }
 
-        // Основной конструктор
         public ClientTrackOrderForm(int clientId) : this()
         {
             this.clientId = clientId;
@@ -28,11 +26,13 @@ namespace taxi4
                 LoadActiveOrders();
                 ConfigureDataGridView();
 
-                // Настраиваем таймер для автоматического обновления каждые 30 секунд
                 refreshTimer = new Timer();
-                refreshTimer.Interval = 30000; // 30 секунд
+                refreshTimer.Interval = 30000;
                 refreshTimer.Tick += (s, e) => LoadActiveOrders();
                 refreshTimer.Start();
+
+                // Подписываемся на событие клика по ячейкам таблицы
+                dataGridViewOrders.CellClick += DataGridViewOrders_CellClick;
             }
         }
 
@@ -78,7 +78,16 @@ namespace taxi4
                 if (dataGridViewOrders.Columns[colName] != null)
                     dataGridViewOrders.Columns[colName].DisplayIndex = index++;
 
-            // Стиль заголовков (как в других формах)
+            // Добавляем колонку с кнопкой "Маршрут"
+            DataGridViewButtonColumn routeButton = new DataGridViewButtonColumn();
+            routeButton.Name = "RouteButton";
+            routeButton.HeaderText = "";
+            routeButton.Text = "🗺️ Маршрут";
+            routeButton.UseColumnTextForButtonValue = true; // одинаковый текст для всех кнопок
+            routeButton.Width = 80;
+            dataGridViewOrders.Columns.Add(routeButton);
+
+            // Стиль заголовков
             dataGridViewOrders.ColumnHeadersDefaultCellStyle.Font = new Font("Microsoft Sans Serif", 9, FontStyle.Bold);
             dataGridViewOrders.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(52, 73, 94);
             dataGridViewOrders.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
@@ -105,6 +114,20 @@ namespace taxi4
                 dataGridViewOrders.Columns[columnName].Width = width;
                 dataGridViewOrders.Columns[columnName].Frozen = frozen;
                 dataGridViewOrders.Columns[columnName].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            }
+        }
+
+        // Обработчик клика по ячейке
+        private void DataGridViewOrders_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0) return;
+
+            if (dataGridViewOrders.Columns[e.ColumnIndex].Name == "RouteButton")
+            {
+                string from = dataGridViewOrders.Rows[e.RowIndex].Cells["address_from"].Value.ToString();
+                string to = dataGridViewOrders.Rows[e.RowIndex].Cells["address_to"].Value.ToString();
+                RouteViewForm routeForm = new RouteViewForm(from, to);
+                routeForm.ShowDialog();
             }
         }
 

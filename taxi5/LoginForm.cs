@@ -65,9 +65,8 @@ namespace taxi4
                                 }
                                 else if (roleId == 2) // клиент
                                 {
-                                    ClientMenu clientMenu = new ClientMenu();
+                                    ClientMenu clientMenu = new ClientMenu(accountId); // ← передаём accountId в конструктор
                                     clientMenu.Role = "Клиент";
-                                    clientMenu.AccountId = accountId;
                                     clientMenu.UserLogin = login;
                                     clientMenu.Closed += (s, args) => Close();
                                     clientMenu.Show();
