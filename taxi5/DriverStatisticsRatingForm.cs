@@ -477,10 +477,10 @@ namespace taxi4
 
                         // ---- 3. Время онлайн ----
                         string onlineTimeQuery = @"
-                            SELECT COALESCE(SUM(EXTRACT(EPOCH FROM (end_time - start_time)) / 3600), 0)
-                            FROM work_schedule
-                            WHERE driver_id = @driver_id
-                              AND end_time IS NOT NULL";
+                        SELECT COALESCE(SUM(EXTRACT(EPOCH FROM (end_datetime - start_datetime)) / 3600), 0)
+                        FROM work_schedule
+                        WHERE driver_id = @driver_id
+                          AND end_datetime IS NOT NULL";
 
                         using (var cmd = new NpgsqlCommand(onlineTimeQuery, conn))
                         {

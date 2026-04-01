@@ -1,4 +1,6 @@
-﻿namespace taxi4
+﻿using System.Windows.Forms;
+
+namespace taxi4
 {
     partial class LoginForm
     {
@@ -29,8 +31,8 @@
         private void InitializeComponent()
         {
             this.MainPanel = new System.Windows.Forms.Panel();
-            this.button1 = new System.Windows.Forms.Button();
-            this.CloseButton = new System.Windows.Forms.Button();
+            this.RegButton = new System.Windows.Forms.Button();
+            this.InButton = new System.Windows.Forms.Button();
             this.PassField = new System.Windows.Forms.TextBox();
             this.pictureBox3 = new System.Windows.Forms.PictureBox();
             this.LoginField = new System.Windows.Forms.TextBox();
@@ -46,8 +48,8 @@
             // MainPanel
             // 
             this.MainPanel.BackColor = System.Drawing.Color.White;
-            this.MainPanel.Controls.Add(this.button1);
-            this.MainPanel.Controls.Add(this.CloseButton);
+            this.MainPanel.Controls.Add(this.RegButton);
+            this.MainPanel.Controls.Add(this.InButton);
             this.MainPanel.Controls.Add(this.PassField);
             this.MainPanel.Controls.Add(this.pictureBox3);
             this.MainPanel.Controls.Add(this.LoginField);
@@ -56,55 +58,60 @@
             this.MainPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.MainPanel.Location = new System.Drawing.Point(0, 0);
             this.MainPanel.Name = "MainPanel";
-            this.MainPanel.Size = new System.Drawing.Size(1051, 673);
+            this.MainPanel.Size = new System.Drawing.Size(1119, 732);
             this.MainPanel.TabIndex = 0;
             // 
-            // button1
+            // RegButton
             // 
-            this.button1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.button1.Font = new System.Drawing.Font("Nirmala Text", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button1.ForeColor = System.Drawing.Color.Violet;
-            this.button1.Location = new System.Drawing.Point(242, 448);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(195, 41);
-            this.button1.TabIndex = 8;
-            this.button1.Text = "Регистрация";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.RegButton.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.RegButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.RegButton.Font = new System.Drawing.Font("Nirmala Text", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.RegButton.ForeColor = System.Drawing.Color.Violet;
+            this.RegButton.Location = new System.Drawing.Point(448, 598);
+            this.RegButton.Name = "RegButton";
+            this.RegButton.Size = new System.Drawing.Size(195, 41);
+            this.RegButton.TabIndex = 8;
+            this.RegButton.Text = "Регистрация";
+            this.RegButton.UseVisualStyleBackColor = true;
+            this.RegButton.Click += new System.EventHandler(this.RegButton_Click);
             // 
-            // CloseButton
+            // InButton
             // 
-            this.CloseButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(219)))), ((int)(((byte)(52)))), ((int)(((byte)(247)))));
-            this.CloseButton.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.CloseButton.FlatAppearance.BorderSize = 0;
-            this.CloseButton.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(133)))), ((int)(((byte)(132)))), ((int)(((byte)(255)))));
-            this.CloseButton.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(181)))), ((int)(((byte)(140)))), ((int)(((byte)(255)))));
-            this.CloseButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.CloseButton.Font = new System.Drawing.Font("Noto Sans Georgian", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.CloseButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(5)))), ((int)(((byte)(0)))), ((int)(((byte)(67)))));
-            this.CloseButton.Location = new System.Drawing.Point(224, 365);
-            this.CloseButton.Name = "CloseButton";
-            this.CloseButton.Size = new System.Drawing.Size(225, 47);
-            this.CloseButton.TabIndex = 7;
-            this.CloseButton.Text = "Войти";
-            this.CloseButton.UseVisualStyleBackColor = false;
-            this.CloseButton.Click += new System.EventHandler(this.CloseButton_Click);
+            this.InButton.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.InButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(219)))), ((int)(((byte)(52)))), ((int)(((byte)(247)))));
+            this.InButton.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.InButton.FlatAppearance.BorderSize = 0;
+            this.InButton.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(133)))), ((int)(((byte)(132)))), ((int)(((byte)(255)))));
+            this.InButton.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(181)))), ((int)(((byte)(140)))), ((int)(((byte)(255)))));
+            this.InButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.InButton.Font = new System.Drawing.Font("Noto Sans Georgian", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.InButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(5)))), ((int)(((byte)(0)))), ((int)(((byte)(67)))));
+            this.InButton.Location = new System.Drawing.Point(432, 441);
+            this.InButton.Name = "InButton";
+            this.InButton.Size = new System.Drawing.Size(225, 47);
+            this.InButton.TabIndex = 7;
+            this.InButton.Text = "Войти";
+            this.InButton.UseVisualStyleBackColor = false;
+            this.InButton.Click += new System.EventHandler(this.InButton_Click);
             // 
             // PassField
             // 
+            this.PassField.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.PassField.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(251)))), ((int)(((byte)(228)))), ((int)(((byte)(255)))));
             this.PassField.Font = new System.Drawing.Font("Noto Sans Georgian", 16.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.PassField.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(5)))), ((int)(((byte)(0)))), ((int)(((byte)(67)))));
-            this.PassField.Location = new System.Drawing.Point(181, 246);
+            this.PassField.Location = new System.Drawing.Point(388, 329);
             this.PassField.Name = "PassField";
+            this.PassField.PasswordChar = '.';
             this.PassField.Size = new System.Drawing.Size(301, 44);
             this.PassField.TabIndex = 6;
             this.PassField.UseSystemPasswordChar = true;
             // 
             // pictureBox3
             // 
+            this.pictureBox3.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.pictureBox3.Image = global::taxi4.Properties.Resources._lock;
-            this.pictureBox3.Location = new System.Drawing.Point(81, 246);
+            this.pictureBox3.Location = new System.Drawing.Point(288, 329);
             this.pictureBox3.Name = "pictureBox3";
             this.pictureBox3.Size = new System.Drawing.Size(54, 54);
             this.pictureBox3.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
@@ -113,10 +120,11 @@
             // 
             // LoginField
             // 
+            this.LoginField.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.LoginField.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(251)))), ((int)(((byte)(228)))), ((int)(((byte)(255)))));
             this.LoginField.Font = new System.Drawing.Font("Noto Sans Georgian", 16.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.LoginField.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(5)))), ((int)(((byte)(0)))), ((int)(((byte)(67)))));
-            this.LoginField.Location = new System.Drawing.Point(181, 146);
+            this.LoginField.Location = new System.Drawing.Point(388, 229);
             this.LoginField.Multiline = true;
             this.LoginField.Name = "LoginField";
             this.LoginField.Size = new System.Drawing.Size(301, 54);
@@ -124,8 +132,9 @@
             // 
             // pictureBox1
             // 
+            this.pictureBox1.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.pictureBox1.Image = global::taxi4.Properties.Resources.user;
-            this.pictureBox1.Location = new System.Drawing.Point(81, 146);
+            this.pictureBox1.Location = new System.Drawing.Point(288, 229);
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.Size = new System.Drawing.Size(54, 54);
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
@@ -139,7 +148,7 @@
             this.panel2.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel2.Location = new System.Drawing.Point(0, 0);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(1051, 104);
+            this.panel2.Size = new System.Drawing.Size(1119, 104);
             this.panel2.TabIndex = 0;
             // 
             // label1
@@ -149,7 +158,7 @@
             this.label1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(5)))), ((int)(((byte)(0)))), ((int)(((byte)(67)))));
             this.label1.Location = new System.Drawing.Point(0, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(1051, 104);
+            this.label1.Size = new System.Drawing.Size(1119, 104);
             this.label1.TabIndex = 0;
             this.label1.Text = "Авторизация";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -158,10 +167,12 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1051, 673);
+            this.ClientSize = new System.Drawing.Size(1119, 732);
             this.Controls.Add(this.MainPanel);
             this.Name = "LoginForm";
-            this.Text = "LoginForm";
+            this.Text = "Авторизация";
+            this.TopMost = true;
+            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.MainPanel.ResumeLayout(false);
             this.MainPanel.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).EndInit();
@@ -180,7 +191,7 @@
         private System.Windows.Forms.TextBox LoginField;
         private System.Windows.Forms.TextBox PassField;
         private System.Windows.Forms.PictureBox pictureBox3;
-        private System.Windows.Forms.Button CloseButton;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button InButton;
+        private System.Windows.Forms.Button RegButton;
     }
 }

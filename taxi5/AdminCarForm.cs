@@ -18,6 +18,10 @@ namespace taxi4
             LoadComboBoxData();
             ClearForm();
             SetupPlaceholderTexts();
+
+            labelCarId.Visible = false;
+            textBoxCarId.Visible = false;
+
         }
 
         // ---------- ПЛЕЙСХОЛДЕРЫ (КАК В КЛИЕНТАХ) ----------
@@ -202,8 +206,8 @@ namespace taxi4
             DataGridViewRow row = dataGridViewCars.SelectedRows[0];
             LoadCarToForm(row);
             groupBoxCarData.Text = "Редактирование автомобиля";
-            textBoxCarId.Visible = true;
-            labelCarId.Visible = true;
+            textBoxCarId.Visible = false;
+            labelCarId.Visible = false;
         }
 
         private void LoadCarToForm(DataGridViewRow row)

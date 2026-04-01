@@ -109,6 +109,8 @@ namespace taxi4
             groupBoxTariffData.Text = "Добавление нового тарифа";
             textBoxTariffId.Visible = false;
             labelTariffId.Visible = false;
+
+            
         }
 
         private void buttonEdit_Click(object sender, EventArgs e)
@@ -118,13 +120,15 @@ namespace taxi4
                 MessageBox.Show("Выберите тариф для редактирования", "Информация",
                     MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
+
+
             }
 
             DataGridViewRow row = dataGridViewTariffs.SelectedRows[0];
             LoadTariffToForm(row);
             groupBoxTariffData.Text = "Редактирование тарифа";
-            textBoxTariffId.Visible = true;
-            labelTariffId.Visible = true;
+            textBoxTariffId.Visible = false;
+            labelTariffId.Visible = false;
         }
 
         private void LoadTariffToForm(DataGridViewRow row)

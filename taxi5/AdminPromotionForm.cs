@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.Drawing;
+using System.Reflection.Emit;
 using System.Windows.Forms;
 
 namespace taxi4
@@ -16,6 +17,9 @@ namespace taxi4
             adminPromotion = new AdminPromotion();
             LoadPromotions();
             ClearForm();
+
+            labelPromotionId.Visible = false;
+            textBoxPromotionId.Visible = false;
         }
 
         // ---------- ЗАГРУЗКА АКЦИЙ ----------
@@ -106,12 +110,18 @@ namespace taxi4
         {
             ClearForm();
             groupBoxPromotionData.Text = "Добавление новой акции";
-            textBoxPromotionId.Visible = false;
+          
             labelPromotionId.Visible = false;
+            textBoxPromotionId.Visible = false;
         }
 
         private void buttonEdit_Click(object sender, EventArgs e)
         {
+
+
+            labelPromotionId.Visible = false;
+            textBoxPromotionId.Visible = false;
+
             if (dataGridViewPromotions.SelectedRows.Count == 0)
             {
                 MessageBox.Show("Выберите акцию для редактирования", "Информация",
@@ -124,6 +134,9 @@ namespace taxi4
             groupBoxPromotionData.Text = "Редактирование акции";
             textBoxPromotionId.Visible = true;
             labelPromotionId.Visible = true;
+
+            labelPromotionId.Visible = false;
+            textBoxPromotionId.Visible = false;
         }
 
         private void LoadPromotionToForm(DataGridViewRow row)
@@ -203,6 +216,9 @@ namespace taxi4
 
         private void buttonDelete_Click(object sender, EventArgs e)
         {
+            labelPromotionId.Visible = false;
+            textBoxPromotionId.Visible = false;
+
             if (dataGridViewPromotions.SelectedRows.Count == 0)
             {
                 MessageBox.Show("Выберите акцию для удаления", "Информация",
@@ -234,6 +250,9 @@ namespace taxi4
 
         private void buttonRefresh_Click(object sender, EventArgs e)
         {
+            labelPromotionId.Visible = false;
+            textBoxPromotionId.Visible = false;
+
             LoadPromotions();
             ClearForm();
             MessageBox.Show("Данные обновлены", "Информация",

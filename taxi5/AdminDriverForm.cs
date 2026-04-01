@@ -2,6 +2,7 @@
 using System.Data;
 using System.Drawing;
 using System.Windows.Forms;
+using taxi4;
 
 namespace taxi4
 {
@@ -62,7 +63,6 @@ namespace taxi4
             if (dataGridViewDrivers.Columns["account_id"] != null)
                 dataGridViewDrivers.Columns["account_id"].Visible = false;
 
-            // Настройка отображаемых колонок
             SetColumn("driver_id", "ID", 50, true);
             SetColumn("last_name", "Фамилия", 120, true);
             SetColumn("first_name", "Имя", 100, true);
@@ -74,26 +74,21 @@ namespace taxi4
             SetColumn("license_number", "Номер прав", 110, false);
             SetColumn("login", "Логин", 130, false);
 
-            // Порядок колонок
             int index = 0;
             string[] order = {
                 "driver_id", "last_name", "first_name", "patronymic", "phone_number",
                 "status_name", "work_experience", "license_series", "license_number", "login"
             };
             foreach (string colName in order)
-            {
                 if (dataGridViewDrivers.Columns[colName] != null)
                     dataGridViewDrivers.Columns[colName].DisplayIndex = index++;
-            }
 
-            // Стиль заголовков
             dataGridViewDrivers.ColumnHeadersDefaultCellStyle.Font = new Font("Microsoft Sans Serif", 9, FontStyle.Bold);
             dataGridViewDrivers.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(52, 73, 94);
             dataGridViewDrivers.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
             dataGridViewDrivers.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
             dataGridViewDrivers.ColumnHeadersHeight = 40;
 
-            // Стиль строк
             dataGridViewDrivers.DefaultCellStyle.Font = new Font("Microsoft Sans Serif", 9);
             dataGridViewDrivers.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(248, 249, 249);
             dataGridViewDrivers.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
@@ -123,7 +118,6 @@ namespace taxi4
                 textBoxAccountId.Text = newAccountId.ToString();
                 textBoxAccountId.ReadOnly = true;
                 textBoxAccountId.BackColor = Color.LightGreen;
-      
             }
             else
             {
@@ -236,6 +230,105 @@ namespace taxi4
             }
         }
 
+        // ---------- БЛОКИРОВКА/РАЗБЛОКИРОВКА ----------
+        private void buttonBlock_Click(object sender, EventArgs e)
+        {
+            if (dataGridViewDrivers.SelectedRows.Count == 0)
+            {
+                MessageBox.Show("Выберите водителя для блокировки", "Информация",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            DataGridViewRow row = dataGridViewDrivers.SelectedRows[0];
+            int driverId = Convert.ToInt32(row.Cells["driver_id"].Value);
+            string driverName = $"{row.Cells["last_name"].Value} {row.Cells["first_name"].Value}";
+
+            if (adminDriver.IsDriverBlocked(driverId))
+            {
+                MessageBox.Show("Водитель уже заблокирован", "Информация",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            DataTable reasons = adminDriver.GetBlockReasons();
+            if (reasons.Rows.Count == 0)
+            {
+                MessageBox.Show("Нет доступных причин для блокировки", "Ошибка",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            using (var blockDialog = new BlockUserDialog(reasons))
+            {
+                if (blockDialog.ShowDialog() == DialogResult.OK)
+                {
+                    try
+                    {
+                        bool success = adminDriver.BlockDriver(
+                            driverId,
+                            blockDialog.SelectedReasonId,
+                            blockDialog.StartDate,
+                            blockDialog.EndDate
+                        );
+                        if (success)
+                        {
+                            MessageBox.Show($"Водитель {driverName} заблокирован", "Успех",
+                                MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            LoadDrivers();
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Ошибка блокировки: {ex.Message}", "Ошибка",
+                            MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+            }
+        }
+
+        private void buttonUnblock_Click(object sender, EventArgs e)
+        {
+            if (dataGridViewDrivers.SelectedRows.Count == 0)
+            {
+                MessageBox.Show("Выберите водителя для разблокировки", "Информация",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            DataGridViewRow row = dataGridViewDrivers.SelectedRows[0];
+            int driverId = Convert.ToInt32(row.Cells["driver_id"].Value);
+            string driverName = $"{row.Cells["last_name"].Value} {row.Cells["first_name"].Value}";
+
+            if (!adminDriver.IsDriverBlocked(driverId))
+            {
+                MessageBox.Show("Водитель не заблокирован", "Информация",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            DialogResult result = MessageBox.Show($"Разблокировать водителя {driverName}?", "Подтверждение",
+                MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (result == DialogResult.Yes)
+            {
+                try
+                {
+                    bool success = adminDriver.UnblockDriver(driverId);
+                    if (success)
+                    {
+                        MessageBox.Show("Водитель разблокирован", "Успех",
+                            MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        LoadDrivers();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Ошибка разблокировки: {ex.Message}", "Ошибка",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+
         private void buttonDelete_Click(object sender, EventArgs e)
         {
             if (dataGridViewDrivers.SelectedRows.Count == 0)
@@ -293,6 +386,40 @@ namespace taxi4
                 DataGridViewRow row = dataGridViewDrivers.Rows[e.RowIndex];
                 LoadDriverToForm(row);
                 groupBoxDriverData.Text = "Редактирование водителя";
+            }
+        }
+
+        // ---------- ПРОСМОТР АВТОМОБИЛЕЙ ----------
+        private void buttonViewCars_Click(object sender, EventArgs e)
+        {
+            if (dataGridViewDrivers.SelectedRows.Count == 0 && string.IsNullOrEmpty(textBoxID.Text))
+            {
+                MessageBox.Show("Выберите водителя для просмотра автомобилей", "Информация",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            int driverId;
+            if (!string.IsNullOrEmpty(textBoxID.Text))
+                driverId = Convert.ToInt32(textBoxID.Text);
+            else
+                driverId = Convert.ToInt32(dataGridViewDrivers.SelectedRows[0].Cells["driver_id"].Value);
+
+            DataTable cars = adminDriver.GetCarsForDriver(driverId);
+            if (cars.Rows.Count == 0)
+            {
+                MessageBox.Show("У водителя нет привязанных автомобилей", "Информация",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else
+            {
+                string msg = "Автомобили водителя:\n\n";
+                foreach (DataRow row in cars.Rows)
+                {
+                    msg += $"{row["brand_name"]} {row["model_name"]}, {row["color_name"]}\n";
+                    msg += $"Госномер: {row["license_number"]} {row["region_code"]}, {row["year_of_manufacture"]} г.\n\n";
+                }
+                MessageBox.Show(msg, "Автомобили", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 
@@ -369,40 +496,6 @@ namespace taxi4
 
             groupBoxDriverData.Text = "Данные водителя";
             dataGridViewDrivers.DataSource = driversData;
-        }
-
-        // ---------- ПРОСМОТР АВТОМОБИЛЕЙ ----------
-        private void buttonViewCars_Click(object sender, EventArgs e)
-        {
-            if (dataGridViewDrivers.SelectedRows.Count == 0 && string.IsNullOrEmpty(textBoxID.Text))
-            {
-                MessageBox.Show("Выберите водителя для просмотра автомобилей", "Информация",
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
-
-            int driverId;
-            if (!string.IsNullOrEmpty(textBoxID.Text))
-                driverId = Convert.ToInt32(textBoxID.Text);
-            else
-                driverId = Convert.ToInt32(dataGridViewDrivers.SelectedRows[0].Cells["driver_id"].Value);
-
-            DataTable cars = adminDriver.GetCarsForDriver(driverId);
-            if (cars.Rows.Count == 0)
-            {
-                MessageBox.Show("У водителя нет привязанных автомобилей", "Информация",
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-            else
-            {
-                string msg = "Автомобили водителя:\n\n";
-                foreach (DataRow row in cars.Rows)
-                {
-                    msg += $"{row["brand_name"]} {row["model_name"]}, {row["color_name"]}\n";
-                    msg += $"Госномер: {row["license_number"]} {row["region_code"]}, {row["year_of_manufacture"]} г.\n\n";
-                }
-                MessageBox.Show(msg, "Автомобили", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
         }
 
         // ---------- НАЗАД ----------

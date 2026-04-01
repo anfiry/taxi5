@@ -14,7 +14,7 @@ namespace taxi4
 
         private string connectionString = "Server=localhost;Port=5432;Database=taxi4;User Id=postgres;Password=123";
         private int currentDriverId = 0;
-        private string driverName = ""; // имя водителя для приветствия
+        private string driverName = "";
         private int? currentWorkScheduleId = null;
         private DateTime shiftStartTime;
 
@@ -22,22 +22,19 @@ namespace taxi4
         Point lastPoint;
         Point lastPoint1;
 
-        // Конструктор с параметром accountId (используется при входе)
         public DriverMenu(int accountId)
         {
             InitializeComponent();
             AccountId = accountId;
-            LoadDriverData(); // загружаем driverId и имя
+            LoadDriverData();
             this.Load += DriverMenu_Load;
         }
 
-        // Конструктор для дизайнера (без параметров)
         public DriverMenu()
         {
             InitializeComponent();
         }
 
-        // Загружаем driverId и имя водителя
         private void LoadDriverData()
         {
             try
@@ -82,11 +79,10 @@ namespace taxi4
             CheckActiveShiftOnStart();
             UpdateOrdersButtonState();
 
-            // Приветствие с именем водителя
             labelWelcome.Text = $"Добро пожаловать, {driverName}!";
         }
 
-        // ---------- Перемещение формы (если FormBorderStyle = None) ----------
+        // ---------- Перемещение формы ----------
         private void DriverMenu_MouseMove(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
@@ -114,7 +110,7 @@ namespace taxi4
         }
 
         // ---------- Кнопки ----------
-        private void button4_Click(object sender, EventArgs e) // Выход
+        private void button4_Click(object sender, EventArgs e)
         {
             this.Close();
             LoginForm авторизация = new LoginForm();
@@ -136,7 +132,6 @@ namespace taxi4
                 return;
             }
 
-            // Замените на реальную форму заказов (например, DriverOrdersForm)
             DriverOrdersForm ordersForm = new DriverOrdersForm(currentDriverId, connectionString);
             ordersForm.Closed += (s, args) => this.Show();
             ordersForm.Show();
@@ -180,7 +175,7 @@ namespace taxi4
                 string query = @"
                     SELECT COUNT(*) FROM work_schedule
                     WHERE driver_id = @driver_id
-                      AND end_time IS NULL;";
+                      AND end_datetime IS NULL;";
                 using (var cmd = new NpgsqlCommand(query, conn))
                 {
                     cmd.Parameters.AddWithValue("@driver_id", currentDriverId);
@@ -198,10 +193,10 @@ namespace taxi4
                 {
                     conn.Open();
                     string query = @"
-                        SELECT work_schedule, start_time, shift_date
+                        SELECT work_schedule, start_datetime
                         FROM work_schedule
                         WHERE driver_id = @driver_id
-                          AND end_time IS NULL
+                          AND end_datetime IS NULL
                         LIMIT 1;";
                     using (var cmd = new NpgsqlCommand(query, conn))
                     {
@@ -211,9 +206,7 @@ namespace taxi4
                             if (reader.Read())
                             {
                                 currentWorkScheduleId = reader.GetInt32(0);
-                                TimeSpan startTime = reader.GetTimeSpan(1);
-                                DateTime shiftDate = reader.GetDateTime(2);
-                                shiftStartTime = shiftDate.Add(startTime);
+                                shiftStartTime = reader.GetDateTime(1);
 
                                 // Обновляем интерфейс
                                 Startingshifts.Enabled = false;
@@ -262,9 +255,9 @@ namespace taxi4
                 {
                     string insertQuery = @"
                         INSERT INTO work_schedule 
-                            (driver_id, shift_status_id, shift_date, start_time)
+                            (driver_id, shift_status_id, start_datetime)
                         VALUES 
-                            (@driver_id, @status_id, @date, @start_time)
+                            (@driver_id, @status_id, @start_datetime)
                         RETURNING work_schedule;";
 
                     using (var conn = new NpgsqlConnection(connectionString))
@@ -274,8 +267,7 @@ namespace taxi4
                         {
                             cmd.Parameters.AddWithValue("@driver_id", currentDriverId);
                             cmd.Parameters.AddWithValue("@status_id", 1);
-                            cmd.Parameters.AddWithValue("@date", DateTime.Today);
-                            cmd.Parameters.AddWithValue("@start_time", DateTime.Now.TimeOfDay);
+                            cmd.Parameters.AddWithValue("@start_datetime", DateTime.Now);
 
                             currentWorkScheduleId = (int)cmd.ExecuteScalar();
                             shiftStartTime = DateTime.Now;
@@ -296,13 +288,6 @@ namespace taxi4
 
                     MessageBox.Show($"Смена начата в {shiftStartTime:HH:mm}",
                         "Смена", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-                catch (PostgresException pgEx) when (pgEx.SqlState == "23502")
-                {
-                    MessageBox.Show("Ошибка базы данных: столбец 'end_time' не должен быть пустым.\n\n" +
-                                    "Выполните в pgAdmin команду:\n" +
-                                    "ALTER TABLE work_schedule ALTER COLUMN end_time DROP NOT NULL;",
-                                    "Ошибка БД", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 catch (Exception ex)
                 {
@@ -339,7 +324,7 @@ namespace taxi4
 
                     string updateQuery = @"
                         UPDATE work_schedule 
-                        SET end_time = @end_time
+                        SET end_datetime = @end_datetime
                         WHERE work_schedule = @id;";
 
                     using (var conn = new NpgsqlConnection(connectionString))
@@ -347,7 +332,7 @@ namespace taxi4
                         conn.Open();
                         using (var cmd = new NpgsqlCommand(updateQuery, conn))
                         {
-                            cmd.Parameters.AddWithValue("@end_time", DateTime.Now.TimeOfDay);
+                            cmd.Parameters.AddWithValue("@end_datetime", DateTime.Now);
                             cmd.Parameters.AddWithValue("@id", currentWorkScheduleId.Value);
                             cmd.ExecuteNonQuery();
                         }

@@ -1,7 +1,11 @@
-﻿using Npgsql;
+﻿using Newtonsoft.Json.Linq;
+using Npgsql;
 using System;
 using System.Data;
+using System.Net.Http;
+using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Configuration; // для чтения ключа из App.config
 
 namespace taxi4
 {
@@ -28,9 +32,6 @@ namespace taxi4
             }
         }
 
-        /// <summary>
-        /// Получение сохранённых точек клиента с полным адресом (как в ClientPointForm)
-        /// </summary>
         public DataTable GetClientPoints(int clientId)
         {
             var dt = new DataTable();
@@ -38,18 +39,18 @@ namespace taxi4
             {
                 conn.Open();
                 string query = @"
-                    SELECT 
-                        p.point_id,
-                        CONCAT(a.city, ', ', a.street, ', д. ', a.house,
-                               CASE WHEN a.entrance IS NOT NULL AND a.entrance != '' 
-                                    THEN ', подъезд ' || a.entrance ELSE '' END) AS full_address,
-                        pt.name AS type_name
-                    FROM point p
-                    JOIN clent_point cp ON p.point_id = cp.point_id
-                    JOIN address a ON p.address_id = a.address_id
-                    JOIN point_tupe pt ON p.type_id = pt.point_tupe
-                    WHERE cp.clent_id = @clientId
-                    ORDER BY pt.name, p.name";
+            SELECT 
+                p.point_id,
+                CONCAT(a.city, ', ', a.street, ', д.', a.house,
+                       CASE WHEN a.entrance IS NOT NULL AND a.entrance != '' 
+                            THEN ', подъезд ' || a.entrance ELSE '' END) AS full_address,
+                pt.name AS type_name
+            FROM point p
+            JOIN clent_point cp ON p.point_id = cp.point_id
+            JOIN address a ON p.address_id = a.address_id
+            JOIN point_tupe pt ON p.type_id = pt.point_tupe
+            WHERE cp.clent_id = @clientId
+            ORDER BY pt.name, p.name";
                 using (var cmd = new NpgsqlCommand(query, conn))
                 {
                     cmd.Parameters.AddWithValue("@clientId", clientId);
@@ -62,9 +63,6 @@ namespace taxi4
             return dt;
         }
 
-        /// <summary>
-        /// Получение доступных промоакций (ещё не использованных клиентом)
-        /// </summary>
         public DataTable GetAvailablePromotions(int clientId)
         {
             var dt = new DataTable();
@@ -91,9 +89,6 @@ namespace taxi4
             return dt;
         }
 
-        /// <summary>
-        /// Получение активных тарифов
-        /// </summary>
         public DataTable GetActiveTariffs()
         {
             var dt = new DataTable();
@@ -112,9 +107,6 @@ namespace taxi4
             return dt;
         }
 
-        /// <summary>
-        /// Получение всех типов точек (для комбобокса в панели добавления)
-        /// </summary>
         public DataTable GetPointTypes()
         {
             var dt = new DataTable();
@@ -130,9 +122,6 @@ namespace taxi4
             return dt;
         }
 
-        /// <summary>
-        /// Добавление новой точки (аналог ClientPointForm.AddPoint)
-        /// </summary>
         public int AddPoint(int clientId, string pointName, int typeId,
                             string city, string street, string house, string entrance)
         {
@@ -143,7 +132,6 @@ namespace taxi4
                 {
                     try
                     {
-                        // 1. Добавляем адрес
                         string addressQuery = @"
                             INSERT INTO address (city, street, house, entrance)
                             VALUES (@city, @street, @house, @entrance)
@@ -158,7 +146,6 @@ namespace taxi4
                             addressId = Convert.ToInt32(addrCmd.ExecuteScalar());
                         }
 
-                        // 2. Добавляем точку
                         string pointQuery = @"
                             INSERT INTO point (name, type_id, address_id)
                             VALUES (@name, @typeId, @addressId)
@@ -172,7 +159,6 @@ namespace taxi4
                             pointId = Convert.ToInt32(pointCmd.ExecuteScalar());
                         }
 
-                        // 3. Связываем с клиентом
                         string linkQuery = @"
                             INSERT INTO clent_point (clent_id, point_id, added_date)
                             VALUES (@clientId, @pointId, @addedDate)";
@@ -199,9 +185,9 @@ namespace taxi4
         }
 
         /// <summary>
-        /// Создание заказа
+        /// Создание заказа с произвольными адресами (без использования point)
         /// </summary>
-        public int CreateOrder(int clientId, int startPointId, int endPointId, decimal price, int? promotionId, int tariffId)
+        public int CreateOrderWithAddresses(int clientId, string fromAddress, string toAddress, decimal price, int? promotionId, int tariffId)
         {
             using (var conn = new NpgsqlConnection(connectionString))
             {
@@ -210,14 +196,17 @@ namespace taxi4
                 {
                     try
                     {
+                        // Получаем или создаём address_id для каждого адреса
+                        int fromAddressId = GetOrCreateAddress(conn, transaction, fromAddress);
+                        int toAddressId = GetOrCreateAddress(conn, transaction, toAddress);
+
                         string orderQuery = @"
                             INSERT INTO ""Order"" 
                                 (client_id, driver_id, tariff_id, order_status, payment_method, 
                                  address_from, address_to, order_datetime, final_cost)
                             VALUES 
                                 (@clientId, NULL, @tariffId, @statusId, @paymentId,
-                                 (SELECT address_id FROM point WHERE point_id = @startPointId),
-                                 (SELECT address_id FROM point WHERE point_id = @endPointId),
+                                 @fromAddressId, @toAddressId,
                                  @orderDate, @price)
                             RETURNING order_id";
 
@@ -225,10 +214,10 @@ namespace taxi4
                         {
                             cmd.Parameters.AddWithValue("@clientId", clientId);
                             cmd.Parameters.AddWithValue("@tariffId", tariffId);
-                            cmd.Parameters.AddWithValue("@statusId", 1); // "Создан" (должен быть в order_status)
-                            cmd.Parameters.AddWithValue("@paymentId", 1); // "Наличные" (должен быть в payment_method)
-                            cmd.Parameters.AddWithValue("@startPointId", startPointId);
-                            cmd.Parameters.AddWithValue("@endPointId", endPointId);
+                            cmd.Parameters.AddWithValue("@statusId", 1); // "Создан"
+                            cmd.Parameters.AddWithValue("@paymentId", 1); // "Наличные"
+                            cmd.Parameters.AddWithValue("@fromAddressId", fromAddressId);
+                            cmd.Parameters.AddWithValue("@toAddressId", toAddressId);
                             cmd.Parameters.AddWithValue("@orderDate", DateTime.Now);
                             cmd.Parameters.AddWithValue("@price", price);
 
@@ -262,6 +251,55 @@ namespace taxi4
             }
         }
 
+        private int GetOrCreateAddress(NpgsqlConnection conn, NpgsqlTransaction transaction, string addressText)
+        {
+            // Проверяем, существует ли уже такой адрес в таблице address
+            string checkQuery = "SELECT address_id FROM address WHERE city || ', ' || street || ', ' || house = @addressText";
+            using (var checkCmd = new NpgsqlCommand(checkQuery, conn, transaction))
+            {
+                checkCmd.Parameters.AddWithValue("@addressText", addressText);
+                var existingId = checkCmd.ExecuteScalar();
+                if (existingId != null)
+                    return Convert.ToInt32(existingId);
+            }
+
+            // Разбираем адрес на части (простой парсинг)
+            // Предполагаемый формат: "Город, Улица, Номер"
+            string city = "Воронеж"; // по умолчанию
+            string street = "";
+            string house = "";
+
+            string[] parts = addressText.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length >= 1)
+                city = parts[0].Trim();
+            if (parts.Length >= 2)
+                street = parts[1].Trim();
+            if (parts.Length >= 3)
+            {
+                string housePart = parts[2].Trim();
+            
+            }
+
+            // Если не удалось разобрать, сохраняем как есть (хотя бы для уникальности)
+            if (string.IsNullOrEmpty(street))
+                street = "Неизвестная улица";
+            if (string.IsNullOrEmpty(house))
+                house = "0";
+
+            string insertQuery = @"
+                INSERT INTO address (city, street, house, entrance)
+                VALUES (@city, @street, @house, @entrance)
+                RETURNING address_id";
+            using (var insertCmd = new NpgsqlCommand(insertQuery, conn, transaction))
+            {
+                insertCmd.Parameters.AddWithValue("@city", city);
+                insertCmd.Parameters.AddWithValue("@street", street);
+                insertCmd.Parameters.AddWithValue("@house", house);
+                insertCmd.Parameters.AddWithValue("@entrance", DBNull.Value);
+                return Convert.ToInt32(insertCmd.ExecuteScalar());
+            }
+        }
+
         private int GetPromotionDiscount(int promotionId)
         {
             using (var conn = new NpgsqlConnection(connectionString))
@@ -275,5 +313,92 @@ namespace taxi4
                 }
             }
         }
+
+        /// <summary>
+        /// Получить координаты адреса через Яндекс.Геокодер
+        /// </summary>
+        public async Task<(double? lat, double? lon)> GeocodeAddressYandex(string address, string apiKey)
+        {
+            try
+            {
+                // Кодируем адрес, чтобы он безопасно вставился в URL
+                string encodedAddress = Uri.EscapeDataString(address);
+                // Формируем адрес запроса
+                string url = $"https://geocode-maps.yandex.ru/1.x/?apikey={apiKey}&geocode={encodedAddress}&format=json";
+
+                using (var client = new HttpClient())
+                {
+                    // Отправляем запрос и получаем ответ
+                    var response = await client.GetAsync(url);
+                    if (!response.IsSuccessStatusCode) return (null, null); // ошибка
+
+                    // Читаем ответ как строку
+                    string json = await response.Content.ReadAsStringAsync();
+                    // Преобразуем JSON в удобный для чтения объект
+                    var obj = Newtonsoft.Json.Linq.JObject.Parse(json);
+                    // Достаём координаты из ответа
+                    var point = obj["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]["Point"]["pos"]?.ToString();
+                    if (!string.IsNullOrEmpty(point))
+                    {
+                        // Координаты приходят в формате "долгота широта" (через пробел)
+                        var parts = point.Split(' ');
+                        double lon = double.Parse(parts[0], System.Globalization.CultureInfo.InvariantCulture);
+                        double lat = double.Parse(parts[1], System.Globalization.CultureInfo.InvariantCulture);
+                        return (lat, lon);
+                    }
+                }
+            }
+            catch
+            {
+                // Если что-то пошло не так, возвращаем null
+            }
+            return (null, null);
+        }
+
+
+/// Получить расстояние (в км) между двумя точками через Яндекс.Маршрутизатор
+
+public async Task<double?> GetDistanceByCoords(double lat1, double lon1, double lat2, double lon2, string apiKey)
+        {
+            try
+            {
+                // Формируем строку с координатами в формате "долгота,широта"
+                string waypoints = $"{lon1},{lat1}|{lon2},{lat2}";
+                string url = $"https://api.routing.yandex.net/v2/route?apikey={apiKey}&waypoints={waypoints}&mode=driving";
+
+                using (var client = new HttpClient())
+                {
+                    var response = await client.GetAsync(url);
+                    if (!response.IsSuccessStatusCode) return null;
+
+                    string json = await response.Content.ReadAsStringAsync();
+                    var obj = Newtonsoft.Json.Linq.JObject.Parse(json);
+                    // Ищем расстояние в метрах
+                    var distanceValue = obj["routes"]?[0]?["legs"]?[0]?["distance"]?["value"]?.Value<double>();
+                    if (distanceValue.HasValue)
+                        return distanceValue.Value / 1000.0; // переводим в километры
+                }
+            }
+            catch { }
+            return null;
+        }
+
+        /// <summary>
+        /// Расчёт расстояния между двумя точками по формуле гаверсинуса (в километрах)
+        /// </summary>
+        public double CalculateDistance(double lat1, double lon1, double lat2, double lon2)
+        {
+            const double R = 6371; // радиус Земли в км
+            var dLat = (lat2 - lat1) * Math.PI / 180;
+            var dLon = (lon2 - lon1) * Math.PI / 180;
+            var a = Math.Sin(dLat / 2) * Math.Sin(dLat / 2) +
+                    Math.Cos(lat1 * Math.PI / 180) * Math.Cos(lat2 * Math.PI / 180) *
+                    Math.Sin(dLon / 2) * Math.Sin(dLon / 2);
+            var c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+            return R * c;
+        }
+
     }
 }
+
+ 

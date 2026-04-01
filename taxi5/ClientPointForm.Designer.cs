@@ -470,7 +470,7 @@
             this.MinimumSize = new System.Drawing.Size(1200, 672);
             this.Name = "ClientPointForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Мои точки";
+            this.Text = "Мои адреса";
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewPoints)).EndInit();
             this.groupBoxPointData.ResumeLayout(false);
             this.groupBoxPointData.PerformLayout();

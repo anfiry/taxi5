@@ -2,6 +2,11 @@
 using System.Data;
 using System.Drawing;
 using System.Windows.Forms;
+using Npgsql;
+using System.Net.Http;
+using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
+using System.Configuration; // для чтения ключа из App.config
 
 namespace taxi4
 {
@@ -10,6 +15,7 @@ namespace taxi4
         private ClientOrderData orderData;
         private int accountId;
         private int clientId;
+        private DataTable allAddresses; // для автодополнения
 
         public ClientOrderForm(int accountId)
         {
@@ -23,11 +29,10 @@ namespace taxi4
                 return;
             }
 
-            LoadClientPoints();
+            LoadAllAddresses();      // загружаем все адреса для подсказок
             LoadPromotions();
             LoadTariffs();
-            LoadPointTypes();
-            SetupPlaceholderTexts();
+            SetupAutoComplete();     // настраиваем автодополнение
         }
 
         private bool LoadClientInfo()
@@ -44,16 +49,43 @@ namespace taxi4
             return true;
         }
 
-        private void LoadClientPoints()
+        private void LoadAllAddresses()
         {
-            DataTable dt = orderData.GetClientPoints(clientId);
-            cmbStartPoint.DataSource = dt.Copy();
-            cmbStartPoint.DisplayMember = "full_address";
-            cmbStartPoint.ValueMember = "point_id";
+            string connStr = "Host=localhost;Port=5432;Database=taxi4;Username=postgres;Password=123";
+            using (var conn = new NpgsqlConnection(connStr))
+            {
+                conn.Open();
+                string query = @"
+            SELECT 
+                CONCAT(city, ', ', street, ', д.', house,
+                       CASE WHEN entrance IS NOT NULL AND entrance != '' 
+                            THEN ', подъезд ' || entrance ELSE '' END) AS full_address,
+                address_id
+            FROM address
+            ORDER BY city, street, house";
+                using (var adapter = new NpgsqlDataAdapter(query, conn))
+                {
+                    allAddresses = new DataTable();
+                    adapter.Fill(allAddresses);
+                }
+            }
+        }
 
-            cmbEndPoint.DataSource = dt.Copy();
-            cmbEndPoint.DisplayMember = "full_address";
-            cmbEndPoint.ValueMember = "point_id";
+        private void SetupAutoComplete()
+        {
+            var autoCompleteList = new AutoCompleteStringCollection();
+            foreach (DataRow row in allAddresses.Rows)
+            {
+                autoCompleteList.Add(row["full_address"].ToString());
+            }
+
+            cmbStartAddress.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+            cmbStartAddress.AutoCompleteSource = AutoCompleteSource.CustomSource;
+            cmbStartAddress.AutoCompleteCustomSource = autoCompleteList;
+
+            cmbEndAddress.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+            cmbEndAddress.AutoCompleteSource = AutoCompleteSource.CustomSource;
+            cmbEndAddress.AutoCompleteCustomSource = autoCompleteList;
         }
 
         private void LoadPromotions()
@@ -85,63 +117,76 @@ namespace taxi4
             cmbTariff.SelectedIndex = 0;
         }
 
-        private void LoadPointTypes()
+        // ---------- КНОПКИ ВЫБОРА ИЗ СОХРАНЁННЫХ ТОЧЕК ----------
+        private void btnSelectStartPoint_Click(object sender, EventArgs e)
         {
-            DataTable dt = orderData.GetPointTypes();
-            cmbPointType.DataSource = dt;
-            cmbPointType.DisplayMember = "name";
-            cmbPointType.ValueMember = "point_tupe";
-            cmbPointType.SelectedIndex = 0;
+            string selectedAddress = SelectPointFromList("Выберите точку отправления");
+            if (!string.IsNullOrEmpty(selectedAddress))
+                cmbStartAddress.Text = selectedAddress;
         }
 
-        // ---------- ПЛЕЙСХОЛДЕРЫ ----------
-        private void SetupPlaceholderTexts()
+        private void btnSelectEndPoint_Click(object sender, EventArgs e)
         {
-            SetPlaceholder(txtPointName, "Название точки");
-            SetPlaceholder(textBoxCity, "Город");
-            SetPlaceholder(textBoxStreet, "Улица");
-            SetPlaceholder(textBoxHouse, "Дом");
-            SetPlaceholder(textBoxEntrance, "Подъезд (опционально)");
+            string selectedAddress = SelectPointFromList("Выберите точку назначения");
+            if (!string.IsNullOrEmpty(selectedAddress))
+                cmbEndAddress.Text = selectedAddress;
         }
 
-        private void SetPlaceholder(TextBox textBox, string placeholder)
+        private string SelectPointFromList(string title)
         {
-            textBox.Tag = placeholder;
-            textBox.ForeColor = Color.Gray;
-            textBox.Text = placeholder;
-            textBox.Font = new Font(textBox.Font, FontStyle.Italic);
-        }
-
-        private void RemovePlaceholder(TextBox textBox)
-        {
-            if (textBox.ForeColor == Color.Gray)
+            DataTable points = orderData.GetClientPoints(clientId);
+            if (points == null || points.Rows.Count == 0)
             {
-                textBox.Text = "";
-                textBox.ForeColor = SystemColors.WindowText;
-                textBox.Font = new Font(textBox.Font, FontStyle.Regular);
+                MessageBox.Show("У вас нет сохранённых адресов. Добавьте их в разделе «Мои точки».", "Нет точек",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return null;
+            }
+
+            using (var selectForm = new Form())
+            {
+                selectForm.Text = title;
+                selectForm.Size = new Size(400, 300);
+                selectForm.StartPosition = FormStartPosition.CenterParent;
+                selectForm.FormBorderStyle = FormBorderStyle.FixedDialog;
+                selectForm.MaximizeBox = false;
+                selectForm.MinimizeBox = false;
+
+                ListBox listBox = new ListBox();
+                listBox.Dock = DockStyle.Fill;
+                listBox.DisplayMember = "full_address";
+                listBox.DataSource = points.Copy();
+
+                Button btnOk = new Button() { Text = "Выбрать", Dock = DockStyle.Bottom, Height = 35 };
+                Button btnCancel = new Button() { Text = "Отмена", Dock = DockStyle.Bottom, Height = 35 };
+                btnOk.Click += (s, e) => selectForm.DialogResult = DialogResult.OK;
+                btnCancel.Click += (s, e) => selectForm.DialogResult = DialogResult.Cancel;
+
+                selectForm.Controls.Add(listBox);
+                selectForm.Controls.Add(btnOk);
+                selectForm.Controls.Add(btnCancel);
+
+                if (selectForm.ShowDialog() == DialogResult.OK && listBox.SelectedItem != null)
+                {
+                    DataRowView row = (DataRowView)listBox.SelectedItem;
+                    return row["full_address"].ToString();
+                }
+                return null;
             }
         }
 
-        private bool IsPlaceholderActive(TextBox textBox)
+        // ---------- РАСЧЁТ СТОИМОСТИ ----------
+        private async void buttonCalculate_Click(object sender, EventArgs e)
         {
-            return textBox.ForeColor == Color.Gray && textBox.Text == textBox.Tag?.ToString();
-        }
-
-        private string GetRealText(TextBox textBox)
-        {
-            return IsPlaceholderActive(textBox) ? "" : textBox.Text.Trim();
-        }
-
-        // ---------- КНОПКИ ----------
-        private void buttonCalculate_Click(object sender, EventArgs e)
-        {
-            if (cmbStartPoint.SelectedValue == null || cmbEndPoint.SelectedValue == null)
+            MessageBox.Show("Начало расчёта");
+            // Проверяем, что адреса введены
+            if (string.IsNullOrWhiteSpace(cmbStartAddress.Text) || string.IsNullOrWhiteSpace(cmbEndAddress.Text))
             {
-                MessageBox.Show("Выберите точки отправления и назначения.", "Предупреждение",
+                MessageBox.Show("Введите адреса отправления и назначения.", "Предупреждение",
                                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
+            // Проверяем, что выбран тариф
             if (cmbTariff.SelectedValue == null)
             {
                 MessageBox.Show("Выберите тариф.", "Предупреждение",
@@ -151,101 +196,75 @@ namespace taxi4
 
             try
             {
-                DataRowView selectedTariff = (DataRowView)cmbTariff.SelectedItem;
-                decimal baseCost = Convert.ToDecimal(selectedTariff["base_cost"]);
-                decimal pricePerKm = Convert.ToDecimal(selectedTariff["price_per_km"]);
+                buttonCalculate.Enabled = false;
+                buttonCalculate.Text = "Расчёт расстояния...";
 
-                if (!double.TryParse(textBoxDistance.Text, out double distance) || distance <= 0)
+                // Получаем ключ из App.config
+                string apiKey = System.Configuration.ConfigurationManager.AppSettings["YandexApiKey"];
+
+                string fromAddress = cmbStartAddress.Text.Trim();
+                string toAddress = cmbEndAddress.Text.Trim();
+
+                // Получаем координаты
+                var startCoord = await orderData.GeocodeAddressYandex(fromAddress, apiKey);
+                var endCoord = await orderData.GeocodeAddressYandex(toAddress, apiKey);
+
+                if (startCoord.lat == null || endCoord.lat == null)
                 {
-                    MessageBox.Show("Введите корректное расстояние (положительное число).", "Ошибка",
-                                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show("Не удалось определить координаты одного из адресов.");
                     return;
                 }
 
-                decimal price = baseCost + (decimal)distance * pricePerKm;
+                // Расстояние по прямой (формула гаверсинуса)
+                double distance = orderData.CalculateDistance(
+                    startCoord.lat.Value, startCoord.lon.Value,
+                    endCoord.lat.Value, endCoord.lon.Value);
 
-                if (cmbPromotion.SelectedValue != null && cmbPromotion.SelectedValue != DBNull.Value)
+                textBoxDistance.Text = distance.ToString("F2");
+                textBoxDistance.ReadOnly = true;
+
+                // Расчёт стоимости (та же формула, что и раньше)
+                if (double.TryParse(textBoxDistance.Text, out double dist) && dist > 0)
                 {
-                    DataRowView selectedPromo = (DataRowView)cmbPromotion.SelectedItem;
-                    decimal discount = Convert.ToDecimal(selectedPromo["discont_percent"]);
-                    price *= (1 - discount / 100);
+                    DataRowView selectedTariff = (DataRowView)cmbTariff.SelectedItem;
+                    decimal baseCost = Convert.ToDecimal(selectedTariff["base_cost"]);
+                    decimal pricePerKm = Convert.ToDecimal(selectedTariff["price_per_km"]);
+                    decimal price = baseCost + (decimal)dist * pricePerKm;
+
+                    if (cmbPromotion.SelectedValue != null && cmbPromotion.SelectedValue != DBNull.Value)
+                    {
+                        DataRowView selectedPromo = (DataRowView)cmbPromotion.SelectedItem;
+                        decimal discount = Convert.ToDecimal(selectedPromo["discont_percent"]);
+                        price *= (1 - discount / 100);
+                    }
+
+                    textBoxPrice.Text = price.ToString("F2");
                 }
-
-                textBoxPrice.Text = price.ToString("F2");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ошибка расчёта: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        private void buttonSaveNewPoint_Click(object sender, EventArgs e)
-        {
-            string pointName = GetRealText(txtPointName);
-            if (string.IsNullOrEmpty(pointName))
-                pointName = "Новая точка";
-
-            string city = GetRealText(textBoxCity);
-            string street = GetRealText(textBoxStreet);
-            string house = GetRealText(textBoxHouse);
-            string entrance = GetRealText(textBoxEntrance);
-
-            if (string.IsNullOrEmpty(city) || string.IsNullOrEmpty(street) || string.IsNullOrEmpty(house))
-            {
-                MessageBox.Show("Заполните город, улицу и дом.", "Предупреждение",
-                                MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            int typeId = (int)cmbPointType.SelectedValue;
-
-            try
-            {
-                buttonSaveNewPoint.Enabled = false;
-                int newPointId = orderData.AddPoint(clientId, pointName, typeId, city, street, house, entrance);
-                if (newPointId != -1)
+                else
                 {
-                    MessageBox.Show("Адрес успешно добавлен!", "Информация",
-                                    MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    ClearNewAddressFields();
-                    SetupPlaceholderTexts();
-                    LoadClientPoints();
-                    cmbStartPoint.SelectedValue = newPointId;
+                    MessageBox.Show("Некорректное расстояние.", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка добавления адреса: {ex.Message}", "Ошибка",
-                                MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Ошибка при расчёте: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
-                buttonSaveNewPoint.Enabled = true;
+                buttonCalculate.Enabled = true;
+                buttonCalculate.Text = "Рассчитать";
             }
         }
 
-        private void buttonCancelNewPoint_Click(object sender, EventArgs e)
-        {
-            ClearNewAddressFields();
-            SetupPlaceholderTexts();
-        }
-
-        private void ClearNewAddressFields()
-        {
-            foreach (Control c in groupBoxNewAddress.Controls)
-            {
-                if (c is TextBox tb)
-                {
-                    tb.Text = "";
-                }
-            }
-        }
-
+        // ---------- СОЗДАНИЕ ЗАКАЗА ----------
         private void buttonOrder_Click(object sender, EventArgs e)
         {
-            if (cmbStartPoint.SelectedValue == null || cmbEndPoint.SelectedValue == null)
+            string fromAddress = cmbStartAddress.Text.Trim();
+            string toAddress = cmbEndAddress.Text.Trim();
+
+            if (string.IsNullOrWhiteSpace(fromAddress) || string.IsNullOrWhiteSpace(toAddress))
             {
-                MessageBox.Show("Выберите точки отправления и назначения.", "Ошибка",
+                MessageBox.Show("Введите адреса отправления и назначения.", "Ошибка",
                                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
@@ -272,10 +291,10 @@ namespace taxi4
 
             try
             {
-                int orderId = orderData.CreateOrder(
+                int orderId = orderData.CreateOrderWithAddresses(
                     clientId,
-                    Convert.ToInt32(cmbStartPoint.SelectedValue),
-                    Convert.ToInt32(cmbEndPoint.SelectedValue),
+                    fromAddress,
+                    toAddress,
                     price,
                     promotionId,
                     tariffId
@@ -283,7 +302,7 @@ namespace taxi4
 
                 MessageBox.Show($"Заказ №{orderId} успешно создан!", "Готово",
                                 MessageBoxButtons.OK, MessageBoxIcon.Information);
-                this.Close(); // Закрываем форму, родительская покажется через событие Closed
+                this.Close();
             }
             catch (Exception ex)
             {
@@ -294,43 +313,8 @@ namespace taxi4
 
         private void buttonBack_Click(object sender, EventArgs e)
         {
-            this.Close(); // Просто закрываем форму
-        }
-
-        // ---------- Обработчики placeholder'ов ----------
-        private void txtPointName_Enter(object sender, EventArgs e) => RemovePlaceholder(txtPointName);
-        private void txtPointName_Leave(object sender, EventArgs e)
-        {
-            if (string.IsNullOrWhiteSpace(txtPointName.Text))
-                SetPlaceholder(txtPointName, "Название точки");
-        }
-
-        private void textBoxCity_Enter(object sender, EventArgs e) => RemovePlaceholder(textBoxCity);
-        private void textBoxCity_Leave(object sender, EventArgs e)
-        {
-            if (string.IsNullOrWhiteSpace(textBoxCity.Text))
-                SetPlaceholder(textBoxCity, "Город");
-        }
-
-        private void textBoxStreet_Enter(object sender, EventArgs e) => RemovePlaceholder(textBoxStreet);
-        private void textBoxStreet_Leave(object sender, EventArgs e)
-        {
-            if (string.IsNullOrWhiteSpace(textBoxStreet.Text))
-                SetPlaceholder(textBoxStreet, "Улица");
-        }
-
-        private void textBoxHouse_Enter(object sender, EventArgs e) => RemovePlaceholder(textBoxHouse);
-        private void textBoxHouse_Leave(object sender, EventArgs e)
-        {
-            if (string.IsNullOrWhiteSpace(textBoxHouse.Text))
-                SetPlaceholder(textBoxHouse, "Дом");
-        }
-
-        private void textBoxEntrance_Enter(object sender, EventArgs e) => RemovePlaceholder(textBoxEntrance);
-        private void textBoxEntrance_Leave(object sender, EventArgs e)
-        {
-            if (string.IsNullOrWhiteSpace(textBoxEntrance.Text))
-                SetPlaceholder(textBoxEntrance, "Подъезд (опционально)");
+            this.Close();
         }
     }
+
 }

@@ -7,7 +7,6 @@ namespace taxi4
 {
     public class AdminDriver
     {
-        // Строка подключения (исправлено – теперь это поле класса)
         private string connectionString = "Host=localhost;Port=5432;Database=taxi4;Username=postgres;Password=123";
 
         // ---------- ВОДИТЕЛИ ----------
@@ -37,7 +36,6 @@ namespace taxi4
                         LEFT JOIN driver_status ds ON d.driver_status_id = ds.driver_status_id
                         LEFT JOIN account a ON d.account_id = a.account_id
                         ORDER BY d.driver_id";
-
                     using (var adapter = new NpgsqlDataAdapter(query, conn))
                     {
                         adapter.Fill(dt);
@@ -66,7 +64,6 @@ namespace taxi4
                         INSERT INTO account (role_id, login, password, confirmation)
                         VALUES (3, @login, @password, true)
                         RETURNING account_id";
-
                     using (var cmd = new NpgsqlCommand(query, conn))
                     {
                         cmd.Parameters.AddWithValue("@login", login);
@@ -99,10 +96,7 @@ namespace taxi4
                         return count > 0;
                     }
                 }
-                catch
-                {
-                    return false;
-                }
+                catch { return false; }
             }
         }
 
@@ -122,7 +116,6 @@ namespace taxi4
                         VALUES
                             (@firstName, @lastName, @patronymic, @phone, @statusId,
                              @accountId, @workExperience, @licenseSeries, @licenseNumber)";
-
                     using (var cmd = new NpgsqlCommand(query, conn))
                     {
                         cmd.Parameters.AddWithValue("@firstName", firstName ?? "");
@@ -134,7 +127,6 @@ namespace taxi4
                         cmd.Parameters.AddWithValue("@workExperience", workExperience);
                         cmd.Parameters.AddWithValue("@licenseSeries", string.IsNullOrEmpty(licenseSeries) ? DBNull.Value : (object)licenseSeries);
                         cmd.Parameters.AddWithValue("@licenseNumber", string.IsNullOrEmpty(licenseNumber) ? DBNull.Value : (object)licenseNumber);
-
                         return cmd.ExecuteNonQuery() > 0;
                     }
                 }
@@ -168,7 +160,6 @@ namespace taxi4
                             license_series = @licenseSeries,
                             license_number = @licenseNumber
                         WHERE driver_id = @driverId";
-
                     using (var cmd = new NpgsqlCommand(query, conn))
                     {
                         cmd.Parameters.AddWithValue("@driverId", driverId);
@@ -181,7 +172,6 @@ namespace taxi4
                         cmd.Parameters.AddWithValue("@workExperience", workExperience);
                         cmd.Parameters.AddWithValue("@licenseSeries", string.IsNullOrEmpty(licenseSeries) ? DBNull.Value : (object)licenseSeries);
                         cmd.Parameters.AddWithValue("@licenseNumber", string.IsNullOrEmpty(licenseNumber) ? DBNull.Value : (object)licenseNumber);
-
                         return cmd.ExecuteNonQuery() > 0;
                     }
                 }
@@ -244,6 +234,135 @@ namespace taxi4
             return dt;
         }
 
+        // ---------- НОВЫЕ МЕТОДЫ ДЛЯ БЛОКИРОВКИ/РАЗБЛОКИРОВКИ ----------
+        public int GetAccountIdByDriverId(int driverId)
+        {
+            using (var conn = new NpgsqlConnection(connectionString))
+            {
+                conn.Open();
+                string query = "SELECT account_id FROM driver WHERE driver_id = @driverId";
+                using (var cmd = new NpgsqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@driverId", driverId);
+                    var result = cmd.ExecuteScalar();
+                    return result != null ? Convert.ToInt32(result) : -1;
+                }
+            }
+        }
+
+        public DataTable GetBlockReasons()
+        {
+            var dt = new DataTable();
+            using (var conn = new NpgsqlConnection(connectionString))
+            {
+                conn.Open();
+                string query = "SELECT reason_id, reason_text FROM reason ORDER BY reason_id";
+                using (var adapter = new NpgsqlDataAdapter(query, conn))
+                {
+                    adapter.Fill(dt);
+                }
+            }
+            return dt;
+        }
+
+        public bool IsDriverBlocked(int driverId)
+        {
+            int accountId = GetAccountIdByDriverId(driverId);
+            if (accountId == -1) return false;
+            using (var conn = new NpgsqlConnection(connectionString))
+            {
+                conn.Open();
+                string query = "SELECT COUNT(*) FROM blacklist WHERE account_id = @accountId";
+                using (var cmd = new NpgsqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@accountId", accountId);
+                    long count = (long)cmd.ExecuteScalar();
+                    return count > 0;
+                }
+            }
+        }
+
+        public bool BlockDriver(int driverId, int reasonId, DateTime startDate, DateTime? endDate)
+        {
+            using (var conn = new NpgsqlConnection(connectionString))
+            {
+                conn.Open();
+                using (var transaction = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        int accountId = GetAccountIdByDriverId(driverId);
+                        if (accountId == -1) return false;
+
+                        string insertBlacklist = @"
+                            INSERT INTO blacklist (account_id, reason_id, start_date, end_date)
+                            VALUES (@accountId, @reasonId, @startDate, @endDate)";
+                        using (var cmd = new NpgsqlCommand(insertBlacklist, conn, transaction))
+                        {
+                            cmd.Parameters.AddWithValue("@accountId", accountId);
+                            cmd.Parameters.AddWithValue("@reasonId", reasonId);
+                            cmd.Parameters.AddWithValue("@startDate", startDate);
+                            cmd.Parameters.AddWithValue("@endDate", endDate.HasValue ? (object)endDate.Value : DBNull.Value);
+                            cmd.ExecuteNonQuery();
+                        }
+
+                        string updateStatus = "UPDATE driver SET driver_status_id = 2 WHERE driver_id = @driverId";
+                        using (var cmd = new NpgsqlCommand(updateStatus, conn, transaction))
+                        {
+                            cmd.Parameters.AddWithValue("@driverId", driverId);
+                            cmd.ExecuteNonQuery();
+                        }
+
+                        transaction.Commit();
+                        return true;
+                    }
+                    catch
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+            }
+        }
+
+        public bool UnblockDriver(int driverId)
+        {
+            using (var conn = new NpgsqlConnection(connectionString))
+            {
+                conn.Open();
+                using (var transaction = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        int accountId = GetAccountIdByDriverId(driverId);
+                        if (accountId == -1) return false;
+
+                        string deleteBlacklist = "DELETE FROM blacklist WHERE account_id = @accountId";
+                        using (var cmd = new NpgsqlCommand(deleteBlacklist, conn, transaction))
+                        {
+                            cmd.Parameters.AddWithValue("@accountId", accountId);
+                            cmd.ExecuteNonQuery();
+                        }
+
+                        string updateStatus = "UPDATE driver SET driver_status_id = 1 WHERE driver_id = @driverId";
+                        using (var cmd = new NpgsqlCommand(updateStatus, conn, transaction))
+                        {
+                            cmd.Parameters.AddWithValue("@driverId", driverId);
+                            cmd.ExecuteNonQuery();
+                        }
+
+                        transaction.Commit();
+                        return true;
+                    }
+                    catch
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+            }
+        }
+
         // ---------- АВТОМОБИЛИ (ДОБАВЛЕНИЕ НОВОГО ПРЯМО В ФОРМЕ) ----------
         public bool AddCarForDriver(int driverId,
                                     string brandName, string modelName, string colorName,
@@ -265,7 +384,6 @@ namespace taxi4
                                 (driver_id, brand_id, model_id, color_id, license_number, region_code, year_of_manufacture)
                             VALUES
                                 (@driverId, @brandId, @modelId, @colorId, @licenseNumber, @regionCode, @year)";
-
                         using (var cmd = new NpgsqlCommand(query, conn, tx))
                         {
                             cmd.Parameters.AddWithValue("@driverId", driverId);
@@ -275,10 +393,8 @@ namespace taxi4
                             cmd.Parameters.AddWithValue("@licenseNumber", licenseNumber ?? "");
                             cmd.Parameters.AddWithValue("@regionCode", regionCode ?? "");
                             cmd.Parameters.AddWithValue("@year", year);
-
                             cmd.ExecuteNonQuery();
                         }
-
                         tx.Commit();
                         return true;
                     }
@@ -303,7 +419,6 @@ namespace taxi4
                 if (result != null)
                     return Convert.ToInt32(result);
             }
-
             string insert = "INSERT INTO brand (name) VALUES (@name) RETURNING brand_id";
             using (var cmd = new NpgsqlCommand(insert, conn))
             {
@@ -323,7 +438,6 @@ namespace taxi4
                 if (result != null)
                     return Convert.ToInt32(result);
             }
-
             string insert = "INSERT INTO model (name, brand_id) VALUES (@name, @brandId) RETURNING model_id";
             using (var cmd = new NpgsqlCommand(insert, conn))
             {
@@ -343,7 +457,6 @@ namespace taxi4
                 if (result != null)
                     return Convert.ToInt32(result);
             }
-
             string insert = "INSERT INTO color (name) VALUES (@name) RETURNING color_id";
             using (var cmd = new NpgsqlCommand(insert, conn))
             {

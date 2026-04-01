@@ -16,7 +16,7 @@ namespace taxi4
             this.PassField.Size = new Size(this.PassField.Size.Width, 44);
         }
 
-        private void CloseButton_Click(object sender, EventArgs e)
+        private void InButton_Click(object sender, EventArgs e)
         {
             string login = LoginField.Text.Trim();
             string password = PassField.Text.Trim();
@@ -32,8 +32,7 @@ namespace taxi4
                 using (var connection = new NpgsqlConnection(connectionString))
                 {
                     connection.Open();
-
-                    // Запрос теперь возвращает и роль, и ID аккаунта
+                                        
                     string query = @"
                         SELECT role_id, account_id 
                         FROM account 
@@ -59,7 +58,7 @@ namespace taxi4
                                     adminMenu.Role = "Администратор";
                                     adminMenu.AccountId = accountId;
                                     adminMenu.UserLogin = login;
-                                    adminMenu.Closed += (s, args) => Close();
+                                    adminMenu.Closed += (s, args) => this.Show();
                                     adminMenu.Show();
                                     Hide();
                                 }
@@ -68,7 +67,7 @@ namespace taxi4
                                     ClientMenu clientMenu = new ClientMenu(accountId); // ← передаём accountId в конструктор
                                     clientMenu.Role = "Клиент";
                                     clientMenu.UserLogin = login;
-                                    clientMenu.Closed += (s, args) => Close();
+                                    clientMenu.Closed += (s, args) => this.Show();
                                     clientMenu.Show();
                                     Hide();
                                 }
@@ -77,7 +76,7 @@ namespace taxi4
                                     DriverMenu driverMenu = new DriverMenu(accountId); // ← передаём accountId в конструктор
                                     driverMenu.Role = "Водитель";
                                     driverMenu.UserLogin = login;
-                                    driverMenu.Closed += (s, args) => Close();
+                                    driverMenu.Closed += (s, args) => this.Show();
                                     driverMenu.Show();
                                     Hide();
                                 }
@@ -100,9 +99,10 @@ namespace taxi4
             }
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void RegButton_Click(object sender, EventArgs e)
         {
             RegistrationMenu registrationMenu = new RegistrationMenu();
+            registrationMenu.Closed += (s, args) => this.Show();
             registrationMenu.Show();
             this.Hide();
         }
