@@ -20,14 +20,29 @@ namespace taxi4
             this.driverId = driverId;
             this.connectionString = connectionString;
 
-            this.ClientSize = new Size(900, 600);
+            // Настройка полноэкранного режима
+            this.WindowState = FormWindowState.Maximized;
+            this.StartPosition = FormStartPosition.CenterScreen;
+            this.FormBorderStyle = FormBorderStyle.Sizable;
             this.MinimumSize = new Size(900, 600);
+
+            // Подписываемся на событие изменения размера
+            this.Resize += DriverOrdersForm_Resize;
 
             if (HasActiveOrder())
             {
                 ShowActiveOrderMessage();
             }
             else
+            {
+                LoadAvailableOrders();
+            }
+        }
+
+        private void DriverOrdersForm_Resize(object sender, EventArgs e)
+        {
+            // При изменении размера формы перезагружаем заказы
+            if (!HasActiveOrder())
             {
                 LoadAvailableOrders();
             }
@@ -42,7 +57,7 @@ namespace taxi4
                     SELECT order_id
                     FROM ""Order""
                     WHERE driver_id = @driver_id
-                      AND order_status = (SELECT order_status_id FROM order_status WHERE name = 'В процессе' LIMIT 1)
+                      AND order_status = 2
                     LIMIT 1";
                 using (var cmd = new NpgsqlCommand(query, conn))
                 {
@@ -62,19 +77,19 @@ namespace taxi4
 
         private void ShowActiveOrderMessage()
         {
-            flowLayoutPanel1.Controls.Clear();
+            flowLayoutPanel.Controls.Clear();
             lblActiveOrderInfo.Visible = true;
             lblActiveOrderInfo.Text = "⚠️ У вас уже есть активный заказ. Завершите его, чтобы видеть новые заказы.";
 
             Label lblMessage = new Label
             {
                 Text = "Выполняется активный заказ.\n",
-                Font = new Font("Arial", 12, FontStyle.Italic),
+                Font = new Font("Microsoft Sans Serif", 12F, FontStyle.Italic),
                 ForeColor = Color.Gray,
                 AutoSize = true,
                 Location = new Point(10, 10)
             };
-            flowLayoutPanel1.Controls.Add(lblMessage);
+            flowLayoutPanel.Controls.Add(lblMessage);
 
             int? activeOrderId = GetActiveOrderId();
             if (activeOrderId.HasValue)
@@ -87,7 +102,7 @@ namespace taxi4
                     BackColor = Color.FromArgb(46, 204, 113),
                     ForeColor = Color.White,
                     FlatStyle = FlatStyle.Flat,
-                    Font = new Font("Arial", 11, FontStyle.Bold)
+                    Font = new Font("Microsoft Sans Serif", 11F, FontStyle.Bold)
                 };
                 btnCompleteOrder.FlatAppearance.BorderSize = 0;
                 btnCompleteOrder.Click += (s, e) =>
@@ -123,7 +138,7 @@ namespace taxi4
                                         from,
                                         to,
                                         cost.ToString(),
-                                        "1",
+                                        "2",
                                         driverId,
                                         connectionString
                                     );
@@ -145,7 +160,7 @@ namespace taxi4
                         }
                     }
                 };
-                flowLayoutPanel1.Controls.Add(btnCompleteOrder);
+                flowLayoutPanel.Controls.Add(btnCompleteOrder);
             }
         }
 
@@ -156,24 +171,28 @@ namespace taxi4
 
         private void LoadAvailableOrders()
         {
-            flowLayoutPanel1.Controls.Clear();
+            flowLayoutPanel.Controls.Clear();
             lblActiveOrderInfo.Visible = false;
 
+            // Получаем ширину панели
+            int panelWidth = flowLayoutPanel.ClientSize.Width - 40;
+            int cardWidth = Math.Max(panelWidth, 700);
+
             string query = @"
-                SELECT 
-                    o.order_id,
-                    COALESCE(a_from.city, '') || ', ' || COALESCE(a_from.street, '') || ', д. ' || COALESCE(a_from.house, '') AS from_address,
-                    COALESCE(a_to.city, '') || ', ' || COALESCE(a_to.street, '') || ', д. ' || COALESCE(a_to.house, '') AS to_address,
-                    o.final_cost,
-                    t.name AS tariff_name
-                FROM ""Order"" o
-                JOIN address a_from ON o.address_from = a_from.address_id
-                JOIN address a_to ON o.address_to = a_to.address_id
-                JOIN tariff t ON o.tariff_id = t.tariff_id
-                WHERE o.driver_id IS NULL
-                  AND o.order_status = (SELECT order_status_id FROM order_status WHERE name = 'Создан' LIMIT 1)
-                ORDER BY o.order_datetime DESC
-                LIMIT 10;";
+        SELECT 
+            o.order_id,
+            COALESCE(a_from.city, '') || ', ' || COALESCE(a_from.street, '') || ', д. ' || COALESCE(a_from.house, '') AS from_address,
+            COALESCE(a_to.city, '') || ', ' || COALESCE(a_to.street, '') || ', д. ' || COALESCE(a_to.house, '') AS to_address,
+            o.final_cost,
+            t.name AS tariff_name
+        FROM ""Order"" o
+        JOIN address a_from ON o.address_from = a_from.address_id
+        JOIN address a_to ON o.address_to = a_to.address_id
+        JOIN tariff t ON o.tariff_id = t.tariff_id
+        WHERE o.driver_id IS NULL
+          AND o.order_status = 1
+        ORDER BY o.order_datetime DESC
+        LIMIT 20;";
 
             using (var conn = new NpgsqlConnection(connectionString))
             {
@@ -190,63 +209,72 @@ namespace taxi4
                             decimal cost = reader.GetDecimal(3);
                             string tariff = reader.GetString(4);
 
-                            Panel orderPanel = new Panel
+                            // Создаем карточку заказа
+                            Panel orderCard = new Panel
                             {
-                                Width = 850,
-                                Height = 120,
+                                Width = cardWidth - 20,
+                                Height = 110,
                                 BackColor = Color.FromArgb(245, 245, 250),
                                 BorderStyle = BorderStyle.FixedSingle,
-                                Margin = new Padding(5)
+                                Margin = new Padding(0, 0, 0, 10)
                             };
 
+                            // Адрес отправления
                             Label lblFrom = new Label
                             {
                                 Text = $"📍 {from}",
-                                Location = new Point(10, 10),
-                                Width = 400,
-                                Height = 20,
-                                Font = new Font("Arial", 10)
+                                Location = new Point(15, 12),
+                                Width = cardWidth - 180,
+                                Height = 22,
+                                Font = new Font("Microsoft Sans Serif", 10F),
+                                ForeColor = Color.Black
                             };
 
+                            // Адрес назначения
                             Label lblTo = new Label
                             {
                                 Text = $"➔ {to}",
-                                Location = new Point(10, 35),
-                                Width = 400,
-                                Height = 20,
-                                Font = new Font("Arial", 10)
+                                Location = new Point(15, 38),
+                                Width = cardWidth - 180,
+                                Height = 22,
+                                Font = new Font("Microsoft Sans Serif", 10F),
+                                ForeColor = Color.Black
                             };
 
+                            // Тариф
+                            Label lblTariff = new Label
+                            {
+                                Text = $"🚗 {tariff}",
+                                Location = new Point(15, 64),
+                                Width = 150,
+                                Height = 22,
+                                Font = new Font("Microsoft Sans Serif", 10F),
+                                ForeColor = Color.FromArgb(100, 100, 100)
+                            };
+
+                            // Цена - справа
                             Label lblPrice = new Label
                             {
                                 Text = $"{cost:N0} ₽",
-                                Location = new Point(500, 15),
-                                Width = 120,
+                                Location = new Point(cardWidth - 190, 25),
+                                Width = 100,
                                 Height = 30,
-                                Font = new Font("Arial", 14, FontStyle.Bold),
+                                Font = new Font("Microsoft Sans Serif", 14F, FontStyle.Bold),
                                 ForeColor = Color.Green,
                                 TextAlign = ContentAlignment.MiddleRight
                             };
 
-                            Label lblTariff = new Label
-                            {
-                                Text = $"🚗 {tariff}",
-                                Location = new Point(500, 50),
-                                Width = 120,
-                                Height = 20,
-                                Font = new Font("Arial", 10),
-                                TextAlign = ContentAlignment.MiddleRight
-                            };
-
+                            // Кнопка "Подробнее" - под ценой
                             Button btnDetails = new Button
                             {
                                 Text = "Подробнее →",
-                                Location = new Point(650, 35),
-                                Size = new Size(140, 45),
+                                Location = new Point(cardWidth - 190, 60),
+                                Size = new Size(100, 35),
                                 BackColor = Color.FromArgb(192, 176, 212),
                                 ForeColor = Color.White,
                                 FlatStyle = FlatStyle.Flat,
-                                Font = new Font("Arial", 10, FontStyle.Bold),
+                                Font = new Font("Microsoft Sans Serif", 10F, FontStyle.Bold),
+                                Cursor = Cursors.Hand,
                                 Tag = orderId
                             };
                             btnDetails.FlatAppearance.BorderSize = 0;
@@ -271,24 +299,24 @@ namespace taxi4
                                 }
                             };
 
-                            orderPanel.Controls.AddRange(new Control[] { lblFrom, lblTo, lblPrice, lblTariff, btnDetails });
-                            flowLayoutPanel1.Controls.Add(orderPanel);
+                            orderCard.Controls.AddRange(new Control[] { lblFrom, lblTo, lblTariff, lblPrice, btnDetails });
+                            flowLayoutPanel.Controls.Add(orderCard);
                         }
                     }
                 }
             }
 
-            if (flowLayoutPanel1.Controls.Count == 0)
+            if (flowLayoutPanel.Controls.Count == 0)
             {
                 Label lblEmpty = new Label
                 {
                     Text = "Нет доступных заказов.",
-                    Font = new Font("Arial", 12, FontStyle.Italic),
+                    Font = new Font("Microsoft Sans Serif", 12F, FontStyle.Italic),
                     ForeColor = Color.Gray,
                     AutoSize = true,
                     Location = new Point(10, 10)
                 };
-                flowLayoutPanel1.Controls.Add(lblEmpty);
+                flowLayoutPanel.Controls.Add(lblEmpty);
             }
         }
     }

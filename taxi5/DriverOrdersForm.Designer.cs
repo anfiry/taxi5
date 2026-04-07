@@ -7,9 +7,11 @@ namespace taxi4
     partial class DriverOrdersForm
     {
         private System.ComponentModel.IContainer components = null;
-        private FlowLayoutPanel flowLayoutPanel1;
+        private FlowLayoutPanel flowLayoutPanel;
         private Button btnBack;
         private Label lblActiveOrderInfo;
+        private Panel panelTop;
+        private Label labelTitle;
 
         protected override void Dispose(bool disposing)
         {
@@ -20,61 +22,101 @@ namespace taxi4
 
         private void InitializeComponent()
         {
-            this.flowLayoutPanel1 = new FlowLayoutPanel();
-            this.btnBack = new Button();
-            this.lblActiveOrderInfo = new Label();
+            this.flowLayoutPanel = new System.Windows.Forms.FlowLayoutPanel();
+            this.btnBack = new System.Windows.Forms.Button();
+            this.lblActiveOrderInfo = new System.Windows.Forms.Label();
+            this.panelTop = new System.Windows.Forms.Panel();
+            this.labelTitle = new System.Windows.Forms.Label();
+            this.panelTop.SuspendLayout();
             this.SuspendLayout();
-
-            // flowLayoutPanel1
-            this.flowLayoutPanel1.Dock = DockStyle.Fill;
-            this.flowLayoutPanel1.AutoScroll = true;
-            this.flowLayoutPanel1.BackColor = Color.White;
-            this.flowLayoutPanel1.BorderStyle = BorderStyle.FixedSingle;
-            this.flowLayoutPanel1.Padding = new Padding(10);
-            this.flowLayoutPanel1.Margin = new Padding(0);
-            this.flowLayoutPanel1.FlowDirection = FlowDirection.TopDown;
-            this.flowLayoutPanel1.WrapContents = false;
-            this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-
+            // 
+            // flowLayoutPanel
+            // 
+            this.flowLayoutPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.flowLayoutPanel.AutoScroll = true;
+            this.flowLayoutPanel.BackColor = System.Drawing.Color.White;
+            this.flowLayoutPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.flowLayoutPanel.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
+            this.flowLayoutPanel.Location = new System.Drawing.Point(20, 130);
+            this.flowLayoutPanel.Name = "flowLayoutPanel";
+            this.flowLayoutPanel.Padding = new System.Windows.Forms.Padding(10);
+            this.flowLayoutPanel.Size = new System.Drawing.Size(1160, 450);
+            this.flowLayoutPanel.TabIndex = 3;
+            this.flowLayoutPanel.WrapContents = false;
+            // 
             // btnBack
-            this.btnBack.Text = "← Назад";
-            this.btnBack.Font = new Font("Arial", 11, FontStyle.Bold);
-            this.btnBack.Size = new Size(100, 40);
-            this.btnBack.BackColor = Color.FromArgb(192, 176, 212);
-            this.btnBack.ForeColor = Color.White;
-            this.btnBack.FlatStyle = FlatStyle.Flat;
-            this.btnBack.FlatAppearance.BorderSize = 0;
-            this.btnBack.Cursor = Cursors.Hand;
-            this.btnBack.Dock = DockStyle.Bottom;
-            this.btnBack.Height = 50;
+            // 
+            this.btnBack.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnBack.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(227)))), ((int)(((byte)(227)))));
+            this.btnBack.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnBack.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold);
+            this.btnBack.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(4)))), ((int)(((byte)(0)))), ((int)(((byte)(66)))));
+            this.btnBack.Location = new System.Drawing.Point(2080, 15);
             this.btnBack.Name = "btnBack";
-            this.btnBack.Click += new EventHandler(this.BtnBack_Click);
-
+            this.btnBack.Size = new System.Drawing.Size(100, 40);
+            this.btnBack.TabIndex = 1;
+            this.btnBack.Text = "Назад";
+            this.btnBack.UseVisualStyleBackColor = false;
+            this.btnBack.Click += new System.EventHandler(this.BtnBack_Click);
+            // 
             // lblActiveOrderInfo
-            this.lblActiveOrderInfo.Dock = DockStyle.Top;
-            this.lblActiveOrderInfo.Height = 40;
-            this.lblActiveOrderInfo.BackColor = Color.FromArgb(255, 200, 200);
-            this.lblActiveOrderInfo.ForeColor = Color.DarkRed;
-            this.lblActiveOrderInfo.Font = new Font("Arial", 11, FontStyle.Bold);
-            this.lblActiveOrderInfo.TextAlign = ContentAlignment.MiddleCenter;
-            this.lblActiveOrderInfo.Visible = false;
+            // 
+            this.lblActiveOrderInfo.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(200)))), ((int)(((byte)(200)))));
+            this.lblActiveOrderInfo.Dock = System.Windows.Forms.DockStyle.Top;
+            this.lblActiveOrderInfo.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Bold);
+            this.lblActiveOrderInfo.ForeColor = System.Drawing.Color.DarkRed;
+            this.lblActiveOrderInfo.Location = new System.Drawing.Point(0, 70);
             this.lblActiveOrderInfo.Name = "lblActiveOrderInfo";
-
+            this.lblActiveOrderInfo.Size = new System.Drawing.Size(1200, 40);
+            this.lblActiveOrderInfo.TabIndex = 2;
+            this.lblActiveOrderInfo.Text = "⚠️ У вас уже есть активный заказ. Завершите его, чтобы видеть новые заказы.";
+            this.lblActiveOrderInfo.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.lblActiveOrderInfo.Visible = false;
+            // 
+            // panelTop
+            // 
+            this.panelTop.BackColor = System.Drawing.Color.White;
+            this.panelTop.Controls.Add(this.labelTitle);
+            this.panelTop.Controls.Add(this.btnBack);
+            this.panelTop.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panelTop.Location = new System.Drawing.Point(0, 0);
+            this.panelTop.Name = "panelTop";
+            this.panelTop.Size = new System.Drawing.Size(1200, 70);
+            this.panelTop.TabIndex = 4;
+            // 
+            // labelTitle
+            // 
+            this.labelTitle.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.labelTitle.AutoSize = true;
+            this.labelTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Bold);
+            this.labelTitle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(4)))), ((int)(((byte)(0)))), ((int)(((byte)(66)))));
+            this.labelTitle.Location = new System.Drawing.Point(447, 19);
+            this.labelTitle.Name = "labelTitle";
+            this.labelTitle.Size = new System.Drawing.Size(305, 36);
+            this.labelTitle.TabIndex = 0;
+            this.labelTitle.Text = "Доступные заказы";
+            this.labelTitle.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
             // DriverOrdersForm
-            this.AutoScaleDimensions = new SizeF(8F, 16F);
-            this.AutoScaleMode = AutoScaleMode.Font;
-            this.ClientSize = new Size(900, 600);
-            this.MinimumSize = new Size(900, 600);
-            this.Controls.Add(this.flowLayoutPanel1);
-            this.Controls.Add(this.btnBack);
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.Color.White;
+            this.ClientSize = new System.Drawing.Size(1200, 610);
+            this.Controls.Add(this.flowLayoutPanel);
             this.Controls.Add(this.lblActiveOrderInfo);
-            this.Text = "Доступные заказы";
-            this.StartPosition = FormStartPosition.CenterParent;
-            this.BackColor = Color.FromArgb(241, 59, 198);
-            this.FormBorderStyle = FormBorderStyle.FixedDialog;
-            this.MaximizeBox = false;
+            this.Controls.Add(this.panelTop);
+            this.MinimumSize = new System.Drawing.Size(900, 600);
             this.Name = "DriverOrdersForm";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.Text = "Доступные заказы";
+            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
+            this.panelTop.ResumeLayout(false);
+            this.panelTop.PerformLayout();
             this.ResumeLayout(false);
+
         }
     }
 }

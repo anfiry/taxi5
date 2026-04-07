@@ -10,7 +10,13 @@ namespace taxi4
         {
             InitializeComponent();
         }
-
+        public void OnClosed()
+        {
+            if (back)
+            { back = false; }
+            else { Application.Exit(); }
+        }
+        private bool back = false;
         private string connectionString = "Server=localhost;Port=5432;Database=taxi4;User Id=postgres;Password=123";
         private string currentPhoneNumber;
         private string currentVerificationCode;
@@ -326,8 +332,11 @@ namespace taxi4
         // Кнопка "Отмена"
         private void BtnCancel_Click(object sender, EventArgs e)
         {
-            
+            LoginForm loginForm = new LoginForm();
+            loginForm.Show();
+            back = true;
             this.Close();
+
         }
     }
 }

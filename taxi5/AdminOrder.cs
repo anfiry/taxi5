@@ -10,7 +10,7 @@ namespace taxi4
         private string connectionString = "Host=localhost;Port=5432;Database=taxi4;Username=postgres;Password=123";
 
         // ---------- ПОЛУЧЕНИЕ СПИСКА ЗАКАЗОВ ----------
-        public DataTable GetOrders(string statusFilter = null, DateTime? dateFrom = null, DateTime? dateTo = null)
+        public DataTable GetOrders(int? statusIdFilter = null, DateTime? dateFrom = null, DateTime? dateTo = null)
         {
             var dt = new DataTable();
             using (var conn = new NpgsqlConnection(connectionString))
@@ -30,7 +30,8 @@ namespace taxi4
                             (SELECT city || ', ' || street || ', д.' || house FROM address WHERE address_id = o.address_to) AS address_to_text,
                             o.order_datetime,
                             o.final_cost,
-                            o.order_status AS status_id
+                            o.order_status AS status_id,
+                            o.driver_id
                         FROM ""Order"" o
                         LEFT JOIN client c ON o.client_id = c.client_id
                         LEFT JOIN driver d ON o.driver_id = d.driver_id
@@ -42,10 +43,10 @@ namespace taxi4
                     var cmd = new NpgsqlCommand();
                     cmd.Connection = conn;
 
-                    if (!string.IsNullOrEmpty(statusFilter))
+                    if (statusIdFilter.HasValue && statusIdFilter.Value > 0)
                     {
-                        query += " AND os.name = @status";
-                        cmd.Parameters.AddWithValue("@status", statusFilter);
+                        query += " AND o.order_status = @statusId";
+                        cmd.Parameters.AddWithValue("@statusId", statusIdFilter.Value);
                     }
 
                     if (dateFrom.HasValue)
@@ -104,17 +105,26 @@ namespace taxi4
         {
             using (var conn = new NpgsqlConnection(connectionString))
             {
-                conn.Open();
-                string query = "SELECT rating, comment FROM review WHERE orber_id = @orderId";
-                using (var cmd = new NpgsqlCommand(query, conn))
+                try
                 {
-                    cmd.Parameters.AddWithValue("@orderId", orderId);
-                    using (var adapter = new NpgsqlDataAdapter(cmd))
+                    conn.Open();
+                    string query = "SELECT rating, comment FROM review WHERE orber_id = @orderId";
+                    using (var cmd = new NpgsqlCommand(query, conn))
                     {
-                        DataTable dt = new DataTable();
-                        adapter.Fill(dt);
-                        return dt.Rows.Count > 0 ? dt.Rows[0] : null;
+                        cmd.Parameters.AddWithValue("@orderId", orderId);
+                        using (var adapter = new NpgsqlDataAdapter(cmd))
+                        {
+                            DataTable dt = new DataTable();
+                            adapter.Fill(dt);
+                            return dt.Rows.Count > 0 ? dt.Rows[0] : null;
+                        }
                     }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Ошибка загрузки отзыва:\n{ex.Message}", "Ошибка",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return null;
                 }
             }
         }

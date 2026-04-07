@@ -58,7 +58,8 @@ namespace taxi4
                                     adminMenu.Role = "Администратор";
                                     adminMenu.AccountId = accountId;
                                     adminMenu.UserLogin = login;
-                                    adminMenu.Closed += (s, args) => this.Show();
+                                    adminMenu.Closed += (s, args) => Application.Exit();
+
                                     adminMenu.Show();
                                     Hide();
                                 }
@@ -67,7 +68,8 @@ namespace taxi4
                                     ClientMenu clientMenu = new ClientMenu(accountId); // ← передаём accountId в конструктор
                                     clientMenu.Role = "Клиент";
                                     clientMenu.UserLogin = login;
-                                    clientMenu.Closed += (s, args) => this.Show();
+                                    clientMenu.Closed += (s, args) => Application.Exit();
+
                                     clientMenu.Show();
                                     Hide();
                                 }
@@ -76,7 +78,7 @@ namespace taxi4
                                     DriverMenu driverMenu = new DriverMenu(accountId); // ← передаём accountId в конструктор
                                     driverMenu.Role = "Водитель";
                                     driverMenu.UserLogin = login;
-                                    driverMenu.Closed += (s, args) => this.Show();
+                                    driverMenu.Closed += (s, args) => Application.Exit();
                                     driverMenu.Show();
                                     Hide();
                                 }
@@ -102,7 +104,7 @@ namespace taxi4
         private void RegButton_Click(object sender, EventArgs e)
         {
             RegistrationMenu registrationMenu = new RegistrationMenu();
-            registrationMenu.Closed += (s, args) => this.Show();
+            registrationMenu.Closed += (s, args) => registrationMenu.OnClosed();
             registrationMenu.Show();
             this.Hide();
         }

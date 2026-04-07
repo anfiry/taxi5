@@ -9,7 +9,6 @@ namespace taxi4
     {
         private AdminOrder adminOrder;
         private DataTable ordersData;
-        private string currentStatusFilter = null;
 
         public AdminOrderForm()
         {
@@ -27,12 +26,15 @@ namespace taxi4
             try
             {
                 DataTable statuses = adminOrder.GetOrderStatuses();
+
+                // Добавляем "Все статусы"
                 DataRow allRow = statuses.NewRow();
                 allRow["order_status_id"] = 0;
                 allRow["name"] = "Все статусы";
                 statuses.Rows.InsertAt(allRow, 0);
+
                 comboBoxStatusFilter.DisplayMember = "name";
-                comboBoxStatusFilter.ValueMember = "name";
+                comboBoxStatusFilter.ValueMember = "order_status_id";
                 comboBoxStatusFilter.DataSource = statuses;
                 comboBoxStatusFilter.SelectedIndex = 0;
             }
@@ -43,16 +45,18 @@ namespace taxi4
             }
         }
 
-        // ---------- ЗАГРУЗКА ЗАКАЗОВ С ПРИМЕНЕНИЕМ ФИЛЬТРА ПО СТАТУСУ ----------
+        // ---------- ЗАГРУЗКА ЗАКАЗОВ ----------
         private void LoadOrders()
         {
             try
             {
-                string selectedStatus = comboBoxStatusFilter.SelectedIndex > 0
-                    ? comboBoxStatusFilter.SelectedValue.ToString()
-                    : null;
+                int? statusIdFilter = null;
+                if (comboBoxStatusFilter.SelectedIndex > 0)
+                {
+                    statusIdFilter = Convert.ToInt32(comboBoxStatusFilter.SelectedValue);
+                }
 
-                ordersData = adminOrder.GetOrders(selectedStatus);
+                ordersData = adminOrder.GetOrders(statusIdFilter);
                 dataGridViewOrders.DataSource = ordersData;
                 ConfigureDataGridView();
             }
@@ -77,18 +81,22 @@ namespace taxi4
             dataGridViewOrders.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
 
             SetColumn("order_id", "ID", 60, true);
-            SetColumn("client_name", "Клиент", 180, true);
-            SetColumn("driver_name", "Водитель", 180, false);
-            SetColumn("tariff_name", "Тариф", 120, false);
-            SetColumn("order_status_name", "Статус", 120, false);
-            SetColumn("payment_method_name", "Оплата", 120, false);
+            SetColumn("client_name", "Клиент", 150, true);
+            SetColumn("driver_name", "Водитель", 150, false);
+            SetColumn("tariff_name", "Тариф", 100, false);
+            SetColumn("order_status_name", "Статус", 100, false);
+            SetColumn("payment_method_name", "Оплата", 100, false);
             SetColumn("address_from_text", "Откуда", 200, false);
             SetColumn("address_to_text", "Куда", 200, false);
-            SetColumn("order_datetime", "Дата и время", 150, false);
-            SetColumn("final_cost", "Стоимость", 100, false);
+            SetColumn("order_datetime", "Дата и время", 130, false);
+            SetColumn("final_cost", "Стоимость", 90, false);
 
             if (dataGridViewOrders.Columns["status_id"] != null)
                 dataGridViewOrders.Columns["status_id"].Visible = false;
+            if (dataGridViewOrders.Columns["driver_id"] != null)
+                dataGridViewOrders.Columns["driver_id"].Visible = false;
+            if (dataGridViewOrders.Columns["order_id"] != null)
+                dataGridViewOrders.Columns["order_id"].Visible = false;
 
             if (dataGridViewOrders.Columns["order_datetime"] != null)
             {
@@ -120,7 +128,7 @@ namespace taxi4
             reviewButton.HeaderText = "Отзыв";
             reviewButton.Text = "Просмотр";
             reviewButton.UseColumnTextForButtonValue = true;
-            reviewButton.Width = 80;
+            reviewButton.Width = 70;
             dataGridViewOrders.Columns.Add(reviewButton);
 
             // Добавляем кнопку "Маршрут"
@@ -160,7 +168,38 @@ namespace taxi4
             }
         }
 
-        // ---------- ОБРАБОТЧИКИ ----------
+        // ---------- ОБРАБОТЧИК КЛИКА ПО КНОПКАМ В ТАБЛИЦЕ ----------
+        private void DataGridViewOrders_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0) return;
+
+            string columnName = dataGridViewOrders.Columns[e.ColumnIndex].Name;
+            int orderId = Convert.ToInt32(dataGridViewOrders.Rows[e.RowIndex].Cells["order_id"].Value);
+
+            if (columnName == "RouteButton")
+            {
+                string from = dataGridViewOrders.Rows[e.RowIndex].Cells["address_from_text"].Value.ToString();
+                string to = dataGridViewOrders.Rows[e.RowIndex].Cells["address_to_text"].Value.ToString();
+                RouteViewForm routeForm = new RouteViewForm(from, to);
+                routeForm.ShowDialog();
+            }
+            else if (columnName == "ReviewButton")
+            {
+                DataRow review = adminOrder.GetReview(orderId);
+                if (review != null)
+                {
+                    MessageBox.Show($"Оценка: {review["rating"]}\nКомментарий: {review["comment"]}", "Отзыв",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                {
+                    MessageBox.Show("Отзыв по данному заказу отсутствует.", "Информация",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+        }
+
+        // ---------- ОБРАБОТЧИКИ КНОПОК ----------
         private void buttonRefresh_Click(object sender, EventArgs e)
         {
             LoadOrders();
@@ -199,37 +238,6 @@ namespace taxi4
         {
             if (e.KeyCode == Keys.Enter)
                 buttonSearch_Click(sender, e);
-        }
-
-        // ---------- ОБРАБОТЧИК КЛИКА ПО КНОПКАМ В ТАБЛИЦЕ ----------
-        private void DataGridViewOrders_CellClick(object sender, DataGridViewCellEventArgs e)
-        {
-            if (e.RowIndex < 0) return;
-
-            string columnName = dataGridViewOrders.Columns[e.ColumnIndex].Name;
-
-            if (columnName == "RouteButton")
-            {
-                string from = dataGridViewOrders.Rows[e.RowIndex].Cells["address_from_text"].Value.ToString();
-                string to = dataGridViewOrders.Rows[e.RowIndex].Cells["address_to_text"].Value.ToString();
-                RouteViewForm routeForm = new RouteViewForm(from, to);
-                routeForm.ShowDialog();
-            }
-            else if (columnName == "ReviewButton")
-            {
-                int orderId = Convert.ToInt32(dataGridViewOrders.Rows[e.RowIndex].Cells["order_id"].Value);
-                DataRow review = adminOrder.GetReview(orderId);
-                if (review != null)
-                {
-                    MessageBox.Show($"Оценка: {review["rating"]}\nКомментарий: {review["comment"]}", "Отзыв",
-                        MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-                else
-                {
-                    MessageBox.Show("Отзыв по данному заказу отсутствует.", "Информация",
-                        MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-            }
         }
     }
 }

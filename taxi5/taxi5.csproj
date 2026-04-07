@@ -309,11 +309,20 @@
     <EmbeddedResource Include="ClientOrderHistoryForm.resx">
       <DependentUpon>ClientOrderHistoryForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="ClientPointForm.resx">
+      <DependentUpon>ClientPointForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="ClientPromotionForm.resx">
       <DependentUpon>ClientPromotionForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="ClientTrackOrderForm.resx">
+      <DependentUpon>ClientTrackOrderForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="DriverMenu.resx">
       <DependentUpon>DriverMenu.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DriverOrderDetailsForm.resx">
+      <DependentUpon>DriverOrderDetailsForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="LoginForm.resx">
       <DependentUpon>LoginForm.cs</DependentUpon>

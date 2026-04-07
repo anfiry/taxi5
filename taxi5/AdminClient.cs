@@ -1,6 +1,7 @@
 ﻿using Npgsql;
 using System;
 using System.Data;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace taxi4
@@ -12,54 +13,57 @@ namespace taxi4
         public DataTable GetClients()
         {
             DataTable dt = new DataTable();
-            using (var conn = new NpgsqlConnection(connectionString))
+            try
             {
-                try
+                using (var conn = new NpgsqlConnection(connectionString))
                 {
                     conn.Open();
                     string query = @"
                 SELECT 
                     c.client_id,
-                    c.first_name,
                     c.last_name,
+                    c.first_name,
                     c.patronymic,
                     c.phone_number,
                     cs.status_name,
                     c.clent_status_id,
                     c.account_id,
                     c.address_id,
-                    CONCAT(a.city, ', ', a.street, ', д.', a.house, 
+                    COALESCE(CONCAT(a.city, ', ', a.street, ', д.', a.house, 
                            CASE WHEN a.entrance IS NOT NULL AND a.entrance != '' 
-                                THEN ', подъезд ' || a.entrance ELSE '' END) as address_info,
+                                THEN ', подъезд ' || a.entrance ELSE '' END), 'Не указан') as address_info,
                     a.city,
                     a.street,
                     a.house,
                     a.entrance,
                     acc.login,
-                    acc.password AS password
+                    acc.password
                 FROM client c
                 JOIN clent_status cs ON c.clent_status_id = cs.clent_status_id
                 LEFT JOIN address a ON c.address_id = a.address_id
                 LEFT JOIN account acc ON c.account_id = acc.account_id
                 ORDER BY c.client_id";
+
                     using (var adapter = new NpgsqlDataAdapter(query, conn))
                     {
                         adapter.Fill(dt);
                     }
                 }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Ошибка загрузки клиентов: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка загрузки клиентов: {ex.Message}\n\n{ex.StackTrace}",
+                    "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                throw;
             }
             return dt;
         }
 
         public int CreateAccountForClient(string login, string password)
         {
-            using (var conn = new NpgsqlConnection(connectionString))
+            try
             {
-                try
+                using (var conn = new NpgsqlConnection(connectionString))
                 {
                     conn.Open();
                     string query = @"INSERT INTO account (role_id, login, password, confirmation) 
@@ -73,19 +77,34 @@ namespace taxi4
                         return result != null ? Convert.ToInt32(result) : -1;
                     }
                 }
-                catch (Exception ex)
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка создания аккаунта: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return -1;
+            }
+        }
+
+        public int GetClientStatusId(int clientId)
+        {
+            using (var conn = new NpgsqlConnection(connectionString))
+            {
+                conn.Open();
+                string query = "SELECT clent_status_id FROM client WHERE client_id = @clientId";
+                using (var cmd = new NpgsqlCommand(query, conn))
                 {
-                    MessageBox.Show($"Ошибка создания аккаунта: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return -1;
+                    cmd.Parameters.AddWithValue("@clientId", clientId);
+                    var result = cmd.ExecuteScalar();
+                    return result != null ? Convert.ToInt32(result) : 1;
                 }
             }
         }
 
         public bool AccountExists(int accountId)
         {
-            using (var conn = new NpgsqlConnection(connectionString))
+            try
             {
-                try
+                using (var conn = new NpgsqlConnection(connectionString))
                 {
                     conn.Open();
                     string query = "SELECT COUNT(*) FROM account WHERE account_id = @accountId";
@@ -96,16 +115,16 @@ namespace taxi4
                         return count > 0;
                     }
                 }
-                catch { return false; }
             }
+            catch { return false; }
         }
 
         public bool AddClient(string firstName, string lastName, string patronymic, string phone,
                               int statusId, int addressId, int accountId)
         {
-            using (var conn = new NpgsqlConnection(connectionString))
+            try
             {
-                try
+                using (var conn = new NpgsqlConnection(connectionString))
                 {
                     conn.Open();
                     string query = @"INSERT INTO client 
@@ -123,20 +142,20 @@ namespace taxi4
                         return cmd.ExecuteNonQuery() > 0;
                     }
                 }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Ошибка добавления клиента: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return false;
-                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка добавления клиента: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
             }
         }
 
         public bool UpdateClient(int clientId, string firstName, string lastName, string patronymic,
                                  string phone, int statusId, int addressId, int accountId)
         {
-            using (var conn = new NpgsqlConnection(connectionString))
+            try
             {
-                try
+                using (var conn = new NpgsqlConnection(connectionString))
                 {
                     conn.Open();
                     string query = @"UPDATE client SET 
@@ -161,41 +180,52 @@ namespace taxi4
                         return cmd.ExecuteNonQuery() > 0;
                     }
                 }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Ошибка обновления клиента: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return false;
-                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка обновления клиента: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
             }
         }
 
         // ---------- МЕТОДЫ ДЛЯ БЛОКИРОВКИ/РАЗБЛОКИРОВКИ ----------
         public int GetAccountIdByClientId(int clientId)
         {
-            using (var conn = new NpgsqlConnection(connectionString))
+            try
             {
-                conn.Open();
-                string query = "SELECT account_id FROM client WHERE client_id = @clientId";
-                using (var cmd = new NpgsqlCommand(query, conn))
+                using (var conn = new NpgsqlConnection(connectionString))
                 {
-                    cmd.Parameters.AddWithValue("@clientId", clientId);
-                    var result = cmd.ExecuteScalar();
-                    return result != null ? Convert.ToInt32(result) : -1;
+                    conn.Open();
+                    string query = "SELECT account_id FROM client WHERE client_id = @clientId";
+                    using (var cmd = new NpgsqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@clientId", clientId);
+                        var result = cmd.ExecuteScalar();
+                        return result != null ? Convert.ToInt32(result) : -1;
+                    }
                 }
             }
+            catch { return -1; }
         }
 
         public DataTable GetBlockReasons()
         {
             var dt = new DataTable();
-            using (var conn = new NpgsqlConnection(connectionString))
+            try
             {
-                conn.Open();
-                string query = "SELECT reason_id, reason_text FROM reason ORDER BY reason_id";
-                using (var adapter = new NpgsqlDataAdapter(query, conn))
+                using (var conn = new NpgsqlConnection(connectionString))
                 {
-                    adapter.Fill(dt);
+                    conn.Open();
+                    string query = "SELECT reason_id, reason_text FROM reason ORDER BY reason_id";
+                    using (var adapter = new NpgsqlDataAdapter(query, conn))
+                    {
+                        adapter.Fill(dt);
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка загрузки причин блокировки: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             return dt;
         }
@@ -204,27 +234,31 @@ namespace taxi4
         {
             int accountId = GetAccountIdByClientId(clientId);
             if (accountId == -1) return false;
-            using (var conn = new NpgsqlConnection(connectionString))
+            try
             {
-                conn.Open();
-                string query = "SELECT COUNT(*) FROM blacklist WHERE account_id = @accountId";
-                using (var cmd = new NpgsqlCommand(query, conn))
+                using (var conn = new NpgsqlConnection(connectionString))
                 {
-                    cmd.Parameters.AddWithValue("@accountId", accountId);
-                    long count = (long)cmd.ExecuteScalar();
-                    return count > 0;
+                    conn.Open();
+                    string query = "SELECT COUNT(*) FROM blacklist WHERE account_id = @accountId";
+                    using (var cmd = new NpgsqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@accountId", accountId);
+                        long count = (long)cmd.ExecuteScalar();
+                        return count > 0;
+                    }
                 }
             }
+            catch { return false; }
         }
 
         public bool BlockClient(int clientId, int reasonId, DateTime startDate, DateTime? endDate)
         {
-            using (var conn = new NpgsqlConnection(connectionString))
+            try
             {
-                conn.Open();
-                using (var transaction = conn.BeginTransaction())
+                using (var conn = new NpgsqlConnection(connectionString))
                 {
-                    try
+                    conn.Open();
+                    using (var transaction = conn.BeginTransaction())
                     {
                         int accountId = GetAccountIdByClientId(clientId);
                         if (accountId == -1) return false;
@@ -251,23 +285,23 @@ namespace taxi4
                         transaction.Commit();
                         return true;
                     }
-                    catch
-                    {
-                        transaction.Rollback();
-                        throw;
-                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка блокировки: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
             }
         }
 
         public bool UnblockClient(int clientId)
         {
-            using (var conn = new NpgsqlConnection(connectionString))
+            try
             {
-                conn.Open();
-                using (var transaction = conn.BeginTransaction())
+                using (var conn = new NpgsqlConnection(connectionString))
                 {
-                    try
+                    conn.Open();
+                    using (var transaction = conn.BeginTransaction())
                     {
                         int accountId = GetAccountIdByClientId(clientId);
                         if (accountId == -1) return false;
@@ -289,12 +323,12 @@ namespace taxi4
                         transaction.Commit();
                         return true;
                     }
-                    catch
-                    {
-                        transaction.Rollback();
-                        throw;
-                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка разблокировки: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
             }
         }
 
@@ -302,55 +336,77 @@ namespace taxi4
         public DataTable GetAddresses()
         {
             var dt = new DataTable();
-            using (var conn = new NpgsqlConnection(connectionString))
+            try
             {
-                conn.Open();
-                string query = @"SELECT 
-            address_id as id,
-            CONCAT(city, ', ', street, ', д.', house, 
-                   CASE WHEN entrance IS NOT NULL AND entrance != '' 
-                        THEN ', подъезд ' || entrance ELSE '' END) as full_address,
-            city, street, house, entrance
-            FROM address ORDER BY address_id";
-                using (var adapter = new NpgsqlDataAdapter(query, conn))
+                using (var conn = new NpgsqlConnection(connectionString))
                 {
-                    adapter.Fill(dt);
+                    conn.Open();
+                    string query = @"SELECT 
+                        address_id as id,
+                        CONCAT(city, ', ', street, ', д.', house, 
+                               CASE WHEN entrance IS NOT NULL AND entrance != '' 
+                                    THEN ', подъезд ' || entrance ELSE '' END) as full_address,
+                        city, street, house, entrance
+                        FROM address ORDER BY address_id";
+                    using (var adapter = new NpgsqlDataAdapter(query, conn))
+                    {
+                        adapter.Fill(dt);
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка загрузки адресов: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             return dt;
         }
 
         public int AddAddress(string city, string street, string house, string entrance)
         {
-            using (var conn = new NpgsqlConnection(connectionString))
+            try
             {
-                conn.Open();
-                string query = @"INSERT INTO address (city, street, house, entrance) 
-                         VALUES (@city, @street, @house, @entrance) 
-                         RETURNING address_id";
-                using (var cmd = new NpgsqlCommand(query, conn))
+                using (var conn = new NpgsqlConnection(connectionString))
                 {
-                    cmd.Parameters.AddWithValue("@city", city);
-                    cmd.Parameters.AddWithValue("@street", street);
-                    cmd.Parameters.AddWithValue("@house", house);
-                    cmd.Parameters.AddWithValue("@entrance", string.IsNullOrEmpty(entrance) ? (object)DBNull.Value : entrance);
-                    object result = cmd.ExecuteScalar();
-                    return result != null ? Convert.ToInt32(result) : -1;
+                    conn.Open();
+                    string query = @"INSERT INTO address (city, street, house, entrance) 
+                             VALUES (@city, @street, @house, @entrance) 
+                             RETURNING address_id";
+                    using (var cmd = new NpgsqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@city", city);
+                        cmd.Parameters.AddWithValue("@street", street);
+                        cmd.Parameters.AddWithValue("@house", house);
+                        cmd.Parameters.AddWithValue("@entrance", string.IsNullOrEmpty(entrance) ? (object)DBNull.Value : entrance);
+                        object result = cmd.ExecuteScalar();
+                        return result != null ? Convert.ToInt32(result) : -1;
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка добавления адреса: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return -1;
             }
         }
 
         public DataTable GetClientStatuses()
         {
             var dt = new DataTable();
-            using (var conn = new NpgsqlConnection(connectionString))
+            try
             {
-                conn.Open();
-                string query = "SELECT clent_status_id as id, status_name FROM clent_status ORDER BY clent_status_id";
-                using (var adapter = new NpgsqlDataAdapter(query, conn))
+                using (var conn = new NpgsqlConnection(connectionString))
                 {
-                    adapter.Fill(dt);
+                    conn.Open();
+                    string query = "SELECT clent_status_id as id, status_name FROM clent_status ORDER BY clent_status_id";
+                    using (var adapter = new NpgsqlDataAdapter(query, conn))
+                    {
+                        adapter.Fill(dt);
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка загрузки статусов: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             return dt;
         }

@@ -20,6 +20,7 @@ namespace taxi4
 
             labelPromotionId.Visible = false;
             textBoxPromotionId.Visible = false;
+            groupBoxPromotionData.Visible = false;
         }
 
         // ---------- ЗАГРУЗКА АКЦИЙ ----------
@@ -42,6 +43,8 @@ namespace taxi4
         private void ConfigureDataGridView()
         {
             if (dataGridViewPromotions.Columns.Count == 0) return;
+            if (dataGridViewPromotions.Columns["promotion_id"] != null)
+                dataGridViewPromotions.Columns["promotion_id"].Visible = false;
 
             dataGridViewPromotions.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
 
@@ -109,6 +112,8 @@ namespace taxi4
         private void buttonAdd_Click(object sender, EventArgs e)
         {
             ClearForm();
+            groupBoxPromotionData.Visible = true;
+
             groupBoxPromotionData.Text = "Добавление новой акции";
           
             labelPromotionId.Visible = false;
@@ -121,6 +126,8 @@ namespace taxi4
 
             labelPromotionId.Visible = false;
             textBoxPromotionId.Visible = false;
+            groupBoxPromotionData.Visible = true;
+
 
             if (dataGridViewPromotions.SelectedRows.Count == 0)
             {
@@ -203,6 +210,8 @@ namespace taxi4
 
                 if (success)
                 {
+                    groupBoxPromotionData.Visible = false;
+
                     ClearForm();
                     LoadPromotions();
                 }
@@ -255,6 +264,8 @@ namespace taxi4
 
             LoadPromotions();
             ClearForm();
+            groupBoxPromotionData.Visible = false;
+
             MessageBox.Show("Данные обновлены", "Информация",
                 MessageBoxButtons.OK, MessageBoxIcon.Information);
         }

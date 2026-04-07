@@ -19,6 +19,12 @@ namespace taxi4
         {
             this.clientId = clientId;
 
+            // Настройка полноэкранного режима
+            this.WindowState = FormWindowState.Maximized;
+            this.StartPosition = FormStartPosition.CenterScreen;
+            this.FormBorderStyle = FormBorderStyle.Sizable;
+            this.MinimumSize = new Size(1100, 640);
+
             if (!DesignMode)
             {
                 historyData = new ClientOrderHistoryData();
@@ -49,59 +55,63 @@ namespace taxi4
         {
             if (dataGridViewOrders.Columns.Count == 0) return;
 
-            dataGridViewOrders.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
+            // Растягиваем таблицу
+            dataGridViewOrders.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            dataGridViewOrders.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
 
-            // Скрываем служебную колонку has_review
-            if (dataGridViewOrders.Columns["has_review"] != null)
+            // Скрываем служебные колонки
+            if (dataGridViewOrders.Columns.Contains("order_id"))
+                dataGridViewOrders.Columns["order_id"].Visible = false;
+            if (dataGridViewOrders.Columns.Contains("has_review"))
                 dataGridViewOrders.Columns["has_review"].Visible = false;
 
-            // Настройка основных колонок
-            SetColumn("order_id", "№", 50, true);
-            SetColumn("order_datetime", "Дата и время", 130, false);
-            SetColumn("address_from", "Откуда", 200, false);
-            SetColumn("address_to", "Куда", 200, false);
-            SetColumn("tariff_name", "Тариф", 100, false);
-            SetColumn("order_status", "Статус", 100, false);
-            SetColumn("payment_method", "Оплата", 100, false);
-            SetColumn("final_cost", "Стоимость", 80, false);
-            SetColumn("driver_name", "Водитель", 150, false);
-            SetColumn("promotion_name", "Акция", 150, false);
-            SetColumn("promotion_percent", "Скидка, %", 70, false);
-            SetColumn("promotion_amount", "Сумма скидки", 80, false);
+            // Настройка колонок с весами
+            SetColumnFill("order_datetime", "Дата и время", 12);
+            SetColumnFill("address_from", "Откуда", 15);
+            SetColumnFill("address_to", "Куда", 15);
+            SetColumnFill("tariff_name", "Тариф", 8);
+            SetColumnFill("order_status", "Статус", 8);
+            SetColumnFill("payment_method", "Оплата", 8);
+            SetColumnFill("final_cost", "Стоимость", 8);
+            SetColumnFill("driver_name", "Водитель", 10);
+            SetColumnFill("promotion_name", "Акция", 8);
+            SetColumnFill("promotion_percent", "Скидка, %", 6);
+            SetColumnFill("promotion_amount", "Сумма скидки", 8);
 
-            // Форматирование столбцов
+            // Форматирование
             if (dataGridViewOrders.Columns["order_datetime"] != null)
                 dataGridViewOrders.Columns["order_datetime"].DefaultCellStyle.Format = "dd.MM.yyyy HH:mm";
             if (dataGridViewOrders.Columns["final_cost"] != null)
                 dataGridViewOrders.Columns["final_cost"].DefaultCellStyle.Format = "F2";
             if (dataGridViewOrders.Columns["promotion_amount"] != null)
                 dataGridViewOrders.Columns["promotion_amount"].DefaultCellStyle.Format = "F2";
-
-            // Порядок колонок
-            int index = 0;
-            string[] order = { "order_id", "order_datetime", "address_from", "address_to", "tariff_name",
-                               "order_status", "payment_method", "final_cost", "driver_name",
-                               "promotion_name", "promotion_percent", "promotion_amount" };
-            foreach (string colName in order)
-                if (dataGridViewOrders.Columns[colName] != null)
-                    dataGridViewOrders.Columns[colName].DisplayIndex = index++;
+            if (dataGridViewOrders.Columns["promotion_percent"] != null)
+                dataGridViewOrders.Columns["promotion_percent"].DefaultCellStyle.Format = "F0";
 
             // Добавляем кнопку "Отзыв"
-            DataGridViewButtonColumn reviewButton = new DataGridViewButtonColumn();
-            reviewButton.Name = "ReviewButton";
-            reviewButton.HeaderText = "Отзыв";
-            reviewButton.UseColumnTextForButtonValue = false;
-            reviewButton.Width = 100;
-            dataGridViewOrders.Columns.Add(reviewButton);
+            if (!dataGridViewOrders.Columns.Contains("ReviewButton"))
+            {
+                DataGridViewButtonColumn reviewButton = new DataGridViewButtonColumn();
+                reviewButton.Name = "ReviewButton";
+                reviewButton.HeaderText = "Отзыв";
+                reviewButton.UseColumnTextForButtonValue = false;
+                reviewButton.Width = 80;
+                reviewButton.FillWeight = 8;
+                dataGridViewOrders.Columns.Add(reviewButton);
+            }
 
             // Добавляем кнопку "Маршрут"
-            DataGridViewButtonColumn routeButton = new DataGridViewButtonColumn();
-            routeButton.Name = "RouteButton";
-            routeButton.HeaderText = "Маршрут";
-            routeButton.Text = "Показать на карте";
-            routeButton.UseColumnTextForButtonValue = true; // всегда один текст
-            routeButton.Width = 100;
-            dataGridViewOrders.Columns.Add(routeButton);
+            if (!dataGridViewOrders.Columns.Contains("RouteButton"))
+            {
+                DataGridViewButtonColumn routeButton = new DataGridViewButtonColumn();
+                routeButton.Name = "RouteButton";
+                routeButton.HeaderText = "Маршрут";
+                routeButton.Text = "На карте";
+                routeButton.UseColumnTextForButtonValue = true;
+                routeButton.Width = 80;
+                routeButton.FillWeight = 8;
+                dataGridViewOrders.Columns.Add(routeButton);
+            }
 
             // Стиль заголовков
             dataGridViewOrders.ColumnHeadersDefaultCellStyle.Font = new Font("Microsoft Sans Serif", 9, FontStyle.Bold);
@@ -112,24 +122,21 @@ namespace taxi4
 
             // Стиль строк
             dataGridViewOrders.DefaultCellStyle.Font = new Font("Microsoft Sans Serif", 9);
-            dataGridViewOrders.DefaultCellStyle.ForeColor = Color.Black;
-            dataGridViewOrders.DefaultCellStyle.SelectionBackColor = Color.FromArgb(52, 152, 219);
-            dataGridViewOrders.DefaultCellStyle.SelectionForeColor = Color.White;
             dataGridViewOrders.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(248, 249, 249);
             dataGridViewOrders.RowHeadersVisible = false;
-            dataGridViewOrders.AllowUserToResizeRows = false;
             dataGridViewOrders.ReadOnly = true;
             dataGridViewOrders.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dataGridViewOrders.AllowUserToAddRows = false;
+            dataGridViewOrders.AllowUserToDeleteRows = false;
         }
 
-        private void SetColumn(string columnName, string headerText, int width, bool frozen)
+        private void SetColumnFill(string columnName, string headerText, int fillWeight)
         {
             if (dataGridViewOrders.Columns[columnName] != null)
             {
                 dataGridViewOrders.Columns[columnName].HeaderText = headerText;
-                dataGridViewOrders.Columns[columnName].Width = width;
-                dataGridViewOrders.Columns[columnName].Frozen = frozen;
-                dataGridViewOrders.Columns[columnName].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+                dataGridViewOrders.Columns[columnName].FillWeight = fillWeight;
+                dataGridViewOrders.Columns[columnName].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
             }
         }
 
@@ -139,7 +146,14 @@ namespace taxi4
             {
                 DataGridViewRow row = dataGridViewOrders.Rows[e.RowIndex];
                 bool hasReview = Convert.ToBoolean(row.Cells["has_review"].Value);
-                e.Value = hasReview ? "Посмотреть отзыв" : "Оставить отзыв";
+                e.Value = hasReview ? "Просмотр" : "Написать";
+                e.FormattingApplied = true;
+            }
+
+            // Форматирование пустых значений
+            if (e.Value == null || e.Value == DBNull.Value)
+            {
+                e.Value = "—";
                 e.FormattingApplied = true;
             }
         }
@@ -153,7 +167,16 @@ namespace taxi4
             if (columnName == "ReviewButton")
             {
                 int orderId = Convert.ToInt32(dataGridViewOrders.Rows[e.RowIndex].Cells["order_id"].Value);
+                string status = dataGridViewOrders.Rows[e.RowIndex].Cells["order_status"].Value.ToString();
                 bool hasReview = Convert.ToBoolean(dataGridViewOrders.Rows[e.RowIndex].Cells["has_review"].Value);
+
+                // Проверка: можно оставить отзыв только для завершенных заказов
+                if (!hasReview && status != "Завершен")
+                {
+                    MessageBox.Show("Отзыв можно оставить только после завершения заказа.\nПожалуйста, дождитесь окончания поездки.",
+                        "Информация", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
 
                 if (hasReview)
                 {
@@ -207,7 +230,6 @@ namespace taxi4
 
         private void dataGridViewOrders_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
-            // Оставляем как есть для детального просмотра
             if (e.RowIndex >= 0)
             {
                 int orderId = Convert.ToInt32(dataGridViewOrders.Rows[e.RowIndex].Cells["order_id"].Value);
@@ -229,7 +251,7 @@ namespace taxi4
                                  $"Оплата: {details["payment_name"]}\n" +
                                  $"Стоимость: {Convert.ToDecimal(details["final_cost"]):F2}\n" +
                                  $"Водитель: {details["driver_full_name"]}\n" +
-                                 (details["promotion_name"] != DBNull.Value
+                                 (details["promotion_name"] != DBNull.Value && details["promotion_name"].ToString() != "—"
                                     ? $"Акция: {details["promotion_name"]} ({details["promotion_percent"]}%) – скидка {Convert.ToDecimal(details["promotion_amount"]):F2}"
                                     : "Акция: не применялась");
                 MessageBox.Show(message, "Детали заказа", MessageBoxButtons.OK, MessageBoxIcon.Information);

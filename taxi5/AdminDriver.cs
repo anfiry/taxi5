@@ -1,7 +1,9 @@
 ﻿using Npgsql;
 using System;
 using System.Data;
+using System.Linq;
 using System.Windows.Forms;
+
 
 namespace taxi4
 {
@@ -19,23 +21,29 @@ namespace taxi4
                 {
                     conn.Open();
                     string query = @"
-                        SELECT 
-                            d.driver_id,
-                            d.last_name,
-                            d.first_name,
-                            d.patronymic,
-                            d.phone_number,
-                            COALESCE(ds.status_name, '') AS status_name,
-                            d.driver_status_id,
-                            d.account_id,
-                            d.work_experience,
-                            d.license_series,
-                            d.license_number,
-                            COALESCE(a.login, '') AS login
-                        FROM driver d
-                        LEFT JOIN driver_status ds ON d.driver_status_id = ds.driver_status_id
-                        LEFT JOIN account a ON d.account_id = a.account_id
-                        ORDER BY d.driver_id";
+                SELECT 
+                    d.driver_id,
+                    d.last_name,
+                    d.first_name,
+                    d.patronymic,
+                    d.phone_number,
+                    COALESCE(ds.status_name, 'Неизвестно') AS status_name,
+                    CASE 
+                        WHEN ws.work_schedule IS NOT NULL AND ws.end_datetime IS NULL THEN 'Активная смена'
+                        ELSE 'Не в смене'
+                    END AS shift_status_name,
+                    d.driver_status_id,
+                    d.account_id,
+                    d.work_experience,
+                    d.license_series,
+                    d.license_number,
+                    COALESCE(a.login, '') AS login,
+                    COALESCE(a.password, '') AS password
+                FROM driver d
+                LEFT JOIN driver_status ds ON d.driver_status_id = ds.driver_status_id
+                LEFT JOIN work_schedule ws ON d.driver_id = ws.driver_id AND ws.end_datetime IS NULL
+                LEFT JOIN account a ON d.account_id = a.account_id
+                ORDER BY d.driver_id";
                     using (var adapter = new NpgsqlDataAdapter(query, conn))
                     {
                         adapter.Fill(dt);
@@ -50,20 +58,17 @@ namespace taxi4
             return dt;
         }
 
-        public int CreateAccountForDriver()
+        public int CreateAccountForDriver(string login, string password)
         {
             using (var conn = new NpgsqlConnection(connectionString))
             {
                 try
                 {
                     conn.Open();
-                    string timestamp = DateTime.Now.ToString("yyyyMMddHHmmssfff");
-                    string login = $"driver_{timestamp}";
-                    string password = Guid.NewGuid().ToString().Substring(0, 8);
                     string query = @"
-                        INSERT INTO account (role_id, login, password, confirmation)
-                        VALUES (3, @login, @password, true)
-                        RETURNING account_id";
+                INSERT INTO account (role_id, login, password, confirmation)
+                VALUES (3, @login, @password, true)
+                RETURNING account_id";
                     using (var cmd = new NpgsqlCommand(query, conn))
                     {
                         cmd.Parameters.AddWithValue("@login", login);
@@ -79,6 +84,23 @@ namespace taxi4
                     return -1;
                 }
             }
+        }
+
+        // Оставьте старый метод для обратной совместимости или удалите
+        public int CreateAccountForDriver()
+        {
+            string timestamp = DateTime.Now.ToString("yyyyMMddHHmmssfff");
+            string login = $"driver_{timestamp}";
+            string password = GenerateRandomPassword(8);
+            return CreateAccountForDriver(login, password);
+        }
+
+        private string GenerateRandomPassword(int length)
+        {
+            const string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            Random random = new Random();
+            return new string(Enumerable.Repeat(chars, length)
+                .Select(s => s[random.Next(s.Length)]).ToArray());
         }
 
         public bool AccountExists(int accountId)
@@ -135,6 +157,23 @@ namespace taxi4
                     MessageBox.Show($"Ошибка добавления водителя: {ex.Message}", "Ошибка",
                         MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return false;
+                }
+            }
+        }
+
+
+        // Добавьте этот метод в класс AdminDriver
+        public int GetDriverStatusId(int driverId)
+        {
+            using (var conn = new NpgsqlConnection(connectionString))
+            {
+                conn.Open();
+                string query = "SELECT driver_status_id FROM driver WHERE driver_id = @driverId";
+                using (var cmd = new NpgsqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@driverId", driverId);
+                    var result = cmd.ExecuteScalar();
+                    return result != null ? Convert.ToInt32(result) : 1;
                 }
             }
         }
@@ -234,7 +273,7 @@ namespace taxi4
             return dt;
         }
 
-        // ---------- НОВЫЕ МЕТОДЫ ДЛЯ БЛОКИРОВКИ/РАЗБЛОКИРОВКИ ----------
+        // ---------- МЕТОДЫ ДЛЯ БЛОКИРОВКИ/РАЗБЛОКИРОВКИ ----------
         public int GetAccountIdByDriverId(int driverId)
         {
             using (var conn = new NpgsqlConnection(connectionString))
@@ -269,9 +308,12 @@ namespace taxi4
         {
             int accountId = GetAccountIdByDriverId(driverId);
             if (accountId == -1) return false;
+
             using (var conn = new NpgsqlConnection(connectionString))
             {
                 conn.Open();
+
+                // Проверяем наличие в blacklist
                 string query = "SELECT COUNT(*) FROM blacklist WHERE account_id = @accountId";
                 using (var cmd = new NpgsqlCommand(query, conn))
                 {
@@ -295,8 +337,8 @@ namespace taxi4
                         if (accountId == -1) return false;
 
                         string insertBlacklist = @"
-                            INSERT INTO blacklist (account_id, reason_id, start_date, end_date)
-                            VALUES (@accountId, @reasonId, @startDate, @endDate)";
+                    INSERT INTO blacklist (account_id, reason_id, start_date, end_date)
+                    VALUES (@accountId, @reasonId, @startDate, @endDate)";
                         using (var cmd = new NpgsqlCommand(insertBlacklist, conn, transaction))
                         {
                             cmd.Parameters.AddWithValue("@accountId", accountId);
@@ -306,6 +348,7 @@ namespace taxi4
                             cmd.ExecuteNonQuery();
                         }
 
+                        // ИСПРАВЛЕНО: статус 2 - Заблокирован (было 3)
                         string updateStatus = "UPDATE driver SET driver_status_id = 2 WHERE driver_id = @driverId";
                         using (var cmd = new NpgsqlCommand(updateStatus, conn, transaction))
                         {
@@ -344,6 +387,7 @@ namespace taxi4
                             cmd.ExecuteNonQuery();
                         }
 
+                        // ИСПРАВЛЕНО: статус 1 - Активен
                         string updateStatus = "UPDATE driver SET driver_status_id = 1 WHERE driver_id = @driverId";
                         using (var cmd = new NpgsqlCommand(updateStatus, conn, transaction))
                         {
@@ -363,7 +407,7 @@ namespace taxi4
             }
         }
 
-        // ---------- АВТОМОБИЛИ (ДОБАВЛЕНИЕ НОВОГО ПРЯМО В ФОРМЕ) ----------
+        // ---------- АВТОМОБИЛИ ----------
         public bool AddCarForDriver(int driverId,
                                     string brandName, string modelName, string colorName,
                                     string licenseNumber, string regionCode, int year)

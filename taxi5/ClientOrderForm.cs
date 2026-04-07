@@ -1,12 +1,14 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using Npgsql;
+using System;
+using System.Collections.Generic;
+using System.Configuration;
 using System.Data;
 using System.Drawing;
-using System.Windows.Forms;
-using Npgsql;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
-using System.Configuration; // для чтения ключа из App.config
+using System.Windows.Forms;
 
 namespace taxi4
 {
@@ -15,13 +17,18 @@ namespace taxi4
         private ClientOrderData orderData;
         private int accountId;
         private int clientId;
-        private DataTable allAddresses; // для автодополнения
+        private DataTable allAddresses;
 
         public ClientOrderForm(int accountId)
         {
             InitializeComponent();
+
             this.accountId = accountId;
             orderData = new ClientOrderData();
+
+            this.WindowState = FormWindowState.Maximized;
+            this.StartPosition = FormStartPosition.CenterScreen;
+            this.FormBorderStyle = FormBorderStyle.Sizable;
 
             if (!LoadClientInfo())
             {
@@ -29,10 +36,10 @@ namespace taxi4
                 return;
             }
 
-            LoadAllAddresses();      // загружаем все адреса для подсказок
+            LoadAllAddresses();
             LoadPromotions();
             LoadTariffs();
-            SetupAutoComplete();     // настраиваем автодополнение
+            SetupAutoComplete();
         }
 
         private bool LoadClientInfo()
@@ -56,13 +63,13 @@ namespace taxi4
             {
                 conn.Open();
                 string query = @"
-            SELECT 
-                CONCAT(city, ', ', street, ', д.', house,
-                       CASE WHEN entrance IS NOT NULL AND entrance != '' 
-                            THEN ', подъезд ' || entrance ELSE '' END) AS full_address,
-                address_id
-            FROM address
-            ORDER BY city, street, house";
+                    SELECT 
+                        CONCAT(city, ', ', street, ', д.', house,
+                               CASE WHEN entrance IS NOT NULL AND entrance != '' 
+                                    THEN ', подъезд ' || entrance ELSE '' END) AS full_address,
+                        address_id
+                    FROM address
+                    ORDER BY city, street, house";
                 using (var adapter = new NpgsqlDataAdapter(query, conn))
                 {
                     allAddresses = new DataTable();
@@ -91,6 +98,15 @@ namespace taxi4
         private void LoadPromotions()
         {
             DataTable dt = orderData.GetAvailablePromotions(clientId);
+
+            if (dt == null)
+            {
+                dt = new DataTable();
+                dt.Columns.Add("promotion_id", typeof(int));
+                dt.Columns.Add("name", typeof(string));
+                dt.Columns.Add("discont_percent", typeof(decimal));
+            }
+
             DataRow emptyRow = dt.NewRow();
             emptyRow["promotion_id"] = DBNull.Value;
             emptyRow["name"] = "Без акции";
@@ -117,7 +133,6 @@ namespace taxi4
             cmbTariff.SelectedIndex = 0;
         }
 
-        // ---------- КНОПКИ ВЫБОРА ИЗ СОХРАНЁННЫХ ТОЧЕК ----------
         private void btnSelectStartPoint_Click(object sender, EventArgs e)
         {
             string selectedAddress = SelectPointFromList("Выберите точку отправления");
@@ -134,10 +149,11 @@ namespace taxi4
 
         private string SelectPointFromList(string title)
         {
-            DataTable points = orderData.GetClientPoints(clientId);
+            // ИСПРАВЛЕНО: используем GetClientPointsWithNames
+            DataTable points = orderData.GetClientPointsWithNames(clientId);
             if (points == null || points.Rows.Count == 0)
             {
-                MessageBox.Show("У вас нет сохранённых адресов. Добавьте их в разделе «Мои точки».", "Нет точек",
+                MessageBox.Show("У вас нет сохранённых адресов. Добавьте их в разделе «Мои адреса».", "Нет точек",
                     MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return null;
             }
@@ -145,7 +161,7 @@ namespace taxi4
             using (var selectForm = new Form())
             {
                 selectForm.Text = title;
-                selectForm.Size = new Size(400, 300);
+                selectForm.Size = new Size(550, 450);
                 selectForm.StartPosition = FormStartPosition.CenterParent;
                 selectForm.FormBorderStyle = FormBorderStyle.FixedDialog;
                 selectForm.MaximizeBox = false;
@@ -153,11 +169,22 @@ namespace taxi4
 
                 ListBox listBox = new ListBox();
                 listBox.Dock = DockStyle.Fill;
-                listBox.DisplayMember = "full_address";
-                listBox.DataSource = points.Copy();
+                listBox.Font = new Font("Microsoft Sans Serif", 10F);
 
-                Button btnOk = new Button() { Text = "Выбрать", Dock = DockStyle.Bottom, Height = 35 };
-                Button btnCancel = new Button() { Text = "Отмена", Dock = DockStyle.Bottom, Height = 35 };
+                var addressMap = new Dictionary<string, string>();
+
+                foreach (DataRow row in points.Rows)
+                {
+                    string pointName = row["point_name"].ToString();
+                    string fullAddress = row["full_address"].ToString();
+                    string displayText = $"📍 {pointName} - {fullAddress}";
+                    listBox.Items.Add(displayText);
+                    addressMap[displayText] = fullAddress;
+                }
+
+                Button btnOk = new Button() { Text = "✓ Выбрать", Dock = DockStyle.Bottom, Height = 40, Font = new Font("Microsoft Sans Serif", 10F, FontStyle.Bold) };
+                Button btnCancel = new Button() { Text = "✗ Отмена", Dock = DockStyle.Bottom, Height = 40, Font = new Font("Microsoft Sans Serif", 10F) };
+
                 btnOk.Click += (s, e) => selectForm.DialogResult = DialogResult.OK;
                 btnCancel.Click += (s, e) => selectForm.DialogResult = DialogResult.Cancel;
 
@@ -167,18 +194,54 @@ namespace taxi4
 
                 if (selectForm.ShowDialog() == DialogResult.OK && listBox.SelectedItem != null)
                 {
-                    DataRowView row = (DataRowView)listBox.SelectedItem;
-                    return row["full_address"].ToString();
+                    string selectedDisplay = listBox.SelectedItem.ToString();
+                    return addressMap[selectedDisplay];
                 }
                 return null;
             }
         }
 
-        // ---------- РАСЧЁТ СТОИМОСТИ ----------
+        private bool ValidateAddresses()
+        {
+            string fromAddress = cmbStartAddress.Text.Trim();
+            string toAddress = cmbEndAddress.Text.Trim();
+
+            if (!IsValidAddressFormat(fromAddress))
+            {
+                MessageBox.Show("Неверный формат адреса отправления.\n\n" +
+                                "Используйте формат: Воронеж, улица, д. номер\n" +
+                                "Пример: Воронеж, Ленина, д.10",
+                                "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return false;
+            }
+
+            if (!IsValidAddressFormat(toAddress))
+            {
+                MessageBox.Show("Неверный формат адреса назначения.\n\n" +
+                                "Используйте формат: Воронеж, улица, д. номер\n" +
+                                "Пример: Воронеж, Ленина, д.10",
+                                "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return false;
+            }
+
+            return true;
+        }
+
+        private bool IsValidAddressFormat(string address)
+        {
+            if (string.IsNullOrWhiteSpace(address)) return false;
+
+            if (!address.Contains("Воронеж"))
+                return false;
+
+            if (!address.Contains("д.") && !address.Contains(" д") && !address.Contains("дом"))
+                return false;
+
+            return true;
+        }
+
         private async void buttonCalculate_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Начало расчёта");
-            // Проверяем, что адреса введены
             if (string.IsNullOrWhiteSpace(cmbStartAddress.Text) || string.IsNullOrWhiteSpace(cmbEndAddress.Text))
             {
                 MessageBox.Show("Введите адреса отправления и назначения.", "Предупреждение",
@@ -186,7 +249,6 @@ namespace taxi4
                 return;
             }
 
-            // Проверяем, что выбран тариф
             if (cmbTariff.SelectedValue == null)
             {
                 MessageBox.Show("Выберите тариф.", "Предупреждение",
@@ -199,13 +261,11 @@ namespace taxi4
                 buttonCalculate.Enabled = false;
                 buttonCalculate.Text = "Расчёт расстояния...";
 
-                // Получаем ключ из App.config
-                string apiKey = System.Configuration.ConfigurationManager.AppSettings["YandexApiKey"];
+                string apiKey = ConfigurationManager.AppSettings["YandexApiKey"];
 
                 string fromAddress = cmbStartAddress.Text.Trim();
                 string toAddress = cmbEndAddress.Text.Trim();
 
-                // Получаем координаты
                 var startCoord = await orderData.GeocodeAddressYandex(fromAddress, apiKey);
                 var endCoord = await orderData.GeocodeAddressYandex(toAddress, apiKey);
 
@@ -215,7 +275,6 @@ namespace taxi4
                     return;
                 }
 
-                // Расстояние по прямой (формула гаверсинуса)
                 double distance = orderData.CalculateDistance(
                     startCoord.lat.Value, startCoord.lon.Value,
                     endCoord.lat.Value, endCoord.lon.Value);
@@ -223,7 +282,6 @@ namespace taxi4
                 textBoxDistance.Text = distance.ToString("F2");
                 textBoxDistance.ReadOnly = true;
 
-                // Расчёт стоимости (та же формула, что и раньше)
                 if (double.TryParse(textBoxDistance.Text, out double dist) && dist > 0)
                 {
                     DataRowView selectedTariff = (DataRowView)cmbTariff.SelectedItem;
@@ -256,9 +314,11 @@ namespace taxi4
             }
         }
 
-        // ---------- СОЗДАНИЕ ЗАКАЗА ----------
         private void buttonOrder_Click(object sender, EventArgs e)
         {
+            if (!ValidateAddresses())
+                return;
+
             string fromAddress = cmbStartAddress.Text.Trim();
             string toAddress = cmbEndAddress.Text.Trim();
 
@@ -316,5 +376,4 @@ namespace taxi4
             this.Close();
         }
     }
-
 }

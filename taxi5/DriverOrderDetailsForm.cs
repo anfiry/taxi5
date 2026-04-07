@@ -9,199 +9,184 @@ namespace taxi4
     public partial class DriverOrderDetailsForm : Form
     {
         private int orderId;
-        private string startAddress;
-        private string endAddress;
+        private string fromAddress;
+        private string toAddress;
         private string price;
-        private string passengers;
+        private string orderStatus;
         private int driverId;
         private string connectionString;
-        private string currentStatus;
+        private DateTime orderDateTime;
+        private DateTime? acceptTime;
+        private Timer cancelTimer;
 
-        public DriverOrderDetailsForm()
+        public DriverOrderDetailsForm(int orderId, string fromAddress, string toAddress, string price, string orderStatus, int driverId, string connectionString)
         {
             InitializeComponent();
-        }
-
-        public DriverOrderDetailsForm(int orderId, string from, string to, string price, string passengers, int driverId, string connectionString)
-        {
             this.orderId = orderId;
-            this.startAddress = from;
-            this.endAddress = to;
+            this.fromAddress = fromAddress;
+            this.toAddress = toAddress;
             this.price = price;
-            this.passengers = passengers;
+            this.orderStatus = orderStatus;
             this.driverId = driverId;
             this.connectionString = connectionString;
 
-            InitializeComponent();
-            InitializeOrderDetailsForm();
+            // Настройка полноэкранного режима
+            this.WindowState = FormWindowState.Maximized;
+            this.StartPosition = FormStartPosition.CenterScreen;
+            this.FormBorderStyle = FormBorderStyle.Sizable;
+            this.MinimumSize = new Size(1200, 672);
 
-            LoadOrderStatus();
+            LoadOrderDetails();
+            LoadMapWithRoute();
+            SetupUI();
         }
 
-        private void LoadOrderStatus()
+        private void SetupUI()
         {
-            using (var conn = new NpgsqlConnection(connectionString))
+            if (orderStatus == "1") // Создан
             {
-                conn.Open();
-                string query = @"
-                    SELECT os.name, o.driver_id
-                    FROM ""Order"" o
-                    JOIN order_status os ON o.order_status = os.order_status_id
-                    WHERE o.order_id = @order_id";
-                using (var cmd = new NpgsqlCommand(query, conn))
-                {
-                    cmd.Parameters.AddWithValue("@order_id", orderId);
-                    using (var reader = cmd.ExecuteReader())
-                    {
-                        if (reader.Read())
-                        {
-                            currentStatus = reader.GetString(0);
-                            int? assignedDriver = reader.IsDBNull(1) ? (int?)null : reader.GetInt32(1);
+                btnAction.Visible = true;
+                btnAction.Text = "✅ ПРИНЯТЬ ЗАКАЗ";
+                btnAction.BackColor = Color.FromArgb(46, 204, 113);
+                btnCancel.Visible = false;
+            }
+            else if (orderStatus == "2") // В процессе
+            {
+                btnAction.Visible = true;
+                btnAction.Text = "🏁 ЗАВЕРШИТЬ ЗАКАЗ";
+                btnAction.BackColor = Color.FromArgb(52, 152, 219);
+                btnCancel.Visible = true;
+                btnCancel.Text = "❌ ОТМЕНИТЬ ЗАКАЗ";
+                btnCancel.BackColor = Color.FromArgb(231, 76, 60);
 
-                            ConfigureUIForStatus(currentStatus, assignedDriver);
+                // Получаем время принятия заказа из БД
+                LoadAcceptTime();
+
+                // Запускаем таймер для проверки возможности отмены
+                cancelTimer = new Timer();
+                cancelTimer.Interval = 1000; // Проверяем каждую секунду
+                cancelTimer.Tick += (s, e) =>
+                {
+                    if (acceptTime.HasValue)
+                    {
+                        TimeSpan elapsed = DateTime.Now - acceptTime.Value;
+                        if (elapsed.TotalMinutes >= 2)
+                        {
+                            btnCancel.Enabled = false;
+                            btnCancel.Text = "⏰ Время отмены истекло";
+                            btnCancel.BackColor = Color.FromArgb(150, 150, 150);
+                            cancelTimer.Stop();
+                        }
+                        else
+                        {
+                            int remainingSeconds = 120 - (int)elapsed.TotalSeconds;
+                            btnCancel.Text = $"❌ ОТМЕНИТЬ ЗАКАЗ ({remainingSeconds} сек)";
+                        }
+                    }
+                };
+                cancelTimer.Start();
+            }
+            else if (orderStatus == "3") // Завершен
+            {
+                btnAction.Visible = false;
+                btnCancel.Visible = false;
+            }
+            else if (orderStatus == "4") // Отменен
+            {
+                btnAction.Visible = false;
+                btnCancel.Visible = false;
+                lblStatus.Text = "Статус: Отменен";
+                lblStatus.ForeColor = Color.Red;
+            }
+        }
+
+        private void LoadAcceptTime()
+        {
+            try
+            {
+                using (var conn = new NpgsqlConnection(connectionString))
+                {
+                    conn.Open();
+                    string query = @"
+                        SELECT start_trip_time
+                        FROM ""Order""
+                        WHERE order_id = @orderId";
+
+                    using (var cmd = new NpgsqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@orderId", orderId);
+                        var result = cmd.ExecuteScalar();
+                        if (result != null && result != DBNull.Value)
+                        {
+                            acceptTime = Convert.ToDateTime(result);
                         }
                     }
                 }
             }
-        }
-
-        private void ConfigureUIForStatus(string status, int? assignedDriver)
-        {
-            btnAction1.Visible = false;
-            btnAction2.Visible = false;
-            btnDecline.Visible = false;
-
-            if (assignedDriver == driverId)
+            catch (Exception ex)
             {
-                if (status == "Завершён")
-                {
-                    MessageBox.Show("Этот заказ уже завершён.", "Информация");
-                    this.Close();
-                    return;
-                }
-                else if (status == "В процессе")
-                {
-                    // Заказ принят – можно завершить
-                    btnAction2.Visible = true;
-                    btnAction2.Text = "🏁 Завершить поездку";
-                    btnAction2.BackColor = Color.FromArgb(46, 204, 113);
-                    btnAction2.Click += BtnEndTrip_Click;
-                    lblStatus.Text = "Статус: принят, можно завершить";
-                }
-            }
-            else if (assignedDriver == null)
-            {
-                // Заказ свободен
-                btnAction1.Visible = true;
-                btnAction1.Text = "✅ ПРИНЯТЬ ЗАКАЗ";
-                btnAction1.BackColor = Color.FromArgb(46, 204, 113);
-                btnAction1.Click += BtnAccept_Click;
-
-                btnDecline.Visible = true;
-                btnDecline.Text = "❌ ОТКАЗАТЬСЯ";
-                btnDecline.BackColor = Color.FromArgb(231, 76, 60);
-                btnDecline.Click += BtnDecline_Click;
-
-                lblStatus.Text = "Статус: доступен";
-            }
-            else
-            {
-                MessageBox.Show("Этот заказ уже принят другим водителем.", "Информация");
-                this.Close();
+                MessageBox.Show($"Ошибка загрузки времени принятия: {ex.Message}", "Ошибка",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        private void InitializeOrderDetailsForm()
+        private void LoadOrderDetails()
         {
-            this.Text = $"Детали заказа #{orderId}";
-            this.Size = new Size(1000, 750);
-            this.BackColor = Color.FromArgb(241, 59, 198);
+            try
+            {
+                using (var conn = new NpgsqlConnection(connectionString))
+                {
+                    conn.Open();
+                    string query = @"
+                        SELECT o.order_datetime, os.name as status_name
+                        FROM ""Order"" o
+                        JOIN order_status os ON o.order_status = os.order_status_id
+                        WHERE o.order_id = @orderId";
 
-            Panel mainPanel = new Panel();
-            mainPanel.Dock = DockStyle.Fill;
-            mainPanel.Padding = new Padding(10);
+                    using (var cmd = new NpgsqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@orderId", orderId);
+                        using (var reader = cmd.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                orderDateTime = reader.GetDateTime(0);
+                                string statusName = reader.GetString(1);
 
-            // Информационная панель
-            Panel infoPanel = new Panel();
-            infoPanel.Dock = DockStyle.Top;
-            infoPanel.Height = 150;
-            infoPanel.BackColor = Color.FromArgb(192, 176, 212);
-            infoPanel.BorderStyle = BorderStyle.FixedSingle;
+                                lblOrderId.Text = $"Заказ #{orderId}";
+                                lblFrom.Text = fromAddress;
+                                lblTo.Text = toAddress;
+                                lblPrice.Text = $"💰 {price} ₽";
+                                lblTime.Text = $"🕐 Создан: {orderDateTime:dd.MM.yyyy HH:mm}";
+                                lblStatus.Text = $"Статус: {statusName}";
 
-            Label lblTitle = new Label();
-            lblTitle.Text = $"Заказ #{orderId}";
-            lblTitle.Font = new Font("Arial", 14, FontStyle.Bold);
-            lblTitle.Location = new Point(15, 15);
-            lblTitle.Size = new Size(300, 25);
-
-            Label lblRoute = new Label();
-            lblRoute.Text = $"📍 {startAddress}\n➔\n📍 {endAddress}";
-            lblRoute.Font = new Font("Arial", 11);
-            lblRoute.Location = new Point(15, 45);
-            lblRoute.Size = new Size(500, 60);
-
-            Panel detailsPanel = new Panel();
-            detailsPanel.Location = new Point(530, 15);
-            detailsPanel.Size = new Size(300, 90);
-
-            Label lblPrice = new Label();
-            lblPrice.Text = $"💰 Стоимость: {price} руб";
-            lblPrice.Font = new Font("Arial", 11, FontStyle.Bold);
-            lblPrice.Location = new Point(0, 0);
-            lblPrice.Size = new Size(200, 25);
-
-            Label lblPassengers = new Label();
-            lblPassengers.Text = $"👥 Пассажиров: {passengers}";
-            lblPassengers.Font = new Font("Arial", 11);
-            lblPassengers.Location = new Point(0, 30);
-            lblPassengers.Size = new Size(200, 25);
-
-            Label lblTime = new Label();
-            lblTime.Text = $"🕐 Создан: {DateTime.Now:HH:mm}";
-            lblTime.Font = new Font("Arial", 10);
-            lblTime.Location = new Point(0, 60);
-            lblTime.Size = new Size(200, 25);
-
-            detailsPanel.Controls.AddRange(new Control[] { lblPrice, lblPassengers, lblTime });
-
-            infoPanel.Controls.AddRange(new Control[] { lblTitle, lblRoute, detailsPanel, lblStatus });
-
-            // Панель карты
-            Panel mapPanel = new Panel();
-            mapPanel.Dock = DockStyle.Fill;
-            mapPanel.Padding = new Padding(0, 10, 0, 0);
-
-            webBrowser1.Dock = DockStyle.Fill;
-
-            mapPanel.Controls.Add(webBrowser1);
-
-            // Кнопка "Открыть в Яндекс.Картах"
-            Button btnOpenInYandex = new Button();
-            btnOpenInYandex.Text = "🗺️ ОТКРЫТЬ В ЯНДЕКС.КАРТАХ";
-            btnOpenInYandex.Size = new Size(220, 45);
-            btnOpenInYandex.Location = new Point(600, 12);
-            btnOpenInYandex.BackColor = Color.FromArgb(52, 152, 219);
-            btnOpenInYandex.ForeColor = Color.White;
-            btnOpenInYandex.Font = new Font("Arial", 10, FontStyle.Bold);
-            btnOpenInYandex.FlatStyle = FlatStyle.Flat;
-            btnOpenInYandex.FlatAppearance.BorderSize = 0;
-            btnOpenInYandex.Cursor = Cursors.Hand;
-            btnOpenInYandex.Click += BtnOpenInYandex_Click;
-
-            actionPanel.Controls.Add(btnOpenInYandex);
-
-            mainPanel.Controls.AddRange(new Control[] { infoPanel, mapPanel, actionPanel });
-            this.Controls.Add(mainPanel);
-
-            LoadMapWithRoute();
+                                // Цвет статуса
+                                if (statusName == "Создан")
+                                    lblStatus.ForeColor = Color.Orange;
+                                else if (statusName == "В процессе")
+                                    lblStatus.ForeColor = Color.Blue;
+                                else if (statusName == "Завершен")
+                                    lblStatus.ForeColor = Color.Green;
+                                else if (statusName == "Отменен")
+                                    lblStatus.ForeColor = Color.Red;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка загрузки деталей заказа: {ex.Message}", "Ошибка",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void LoadMapWithRoute()
         {
             try
             {
-                string encodedStart = Uri.EscapeDataString(startAddress);
-                string encodedEnd = Uri.EscapeDataString(endAddress);
+                string encodedStart = Uri.EscapeDataString(fromAddress);
+                string encodedEnd = Uri.EscapeDataString(toAddress);
                 string yandexMapsUrl = $"https://yandex.ru/maps/?rtext={encodedStart}~{encodedEnd}&rtt=auto&z=13";
                 webBrowser1.Navigate(yandexMapsUrl);
             }
@@ -212,116 +197,271 @@ namespace taxi4
             }
         }
 
-        private void BtnAccept_Click(object sender, EventArgs e)
+        // ---------- ЕДИНАЯ КНОПКА ДЕЙСТВИЯ ----------
+        private void btnAction_Click(object sender, EventArgs e)
         {
-            DialogResult result = MessageBox.Show(
-                $"Вы уверены, что хотите принять заказ #{orderId}?",
-                "Подтверждение заказа",
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Question);
-
-            if (result == DialogResult.Yes)
+            if (orderStatus == "1") // Создан -> Принять
             {
-                try
+                DialogResult result = MessageBox.Show(
+                    $"Вы уверены, что хотите принять заказ #{orderId}?",
+                    "Подтверждение заказа",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question);
+
+                if (result == DialogResult.Yes)
                 {
-                    using (var conn = new NpgsqlConnection(connectionString))
-                    {
-                        conn.Open();
-                        string getStatusIdQuery = "SELECT order_status_id FROM order_status WHERE name = 'В процессе' LIMIT 1";
-                        int inProgressStatusId = Convert.ToInt32(new NpgsqlCommand(getStatusIdQuery, conn).ExecuteScalar());
-
-                        string updateQuery = @"
-                            UPDATE ""Order"" 
-                            SET driver_id = @driver_id, 
-                                order_status = @status_id
-                            WHERE order_id = @order_id";
-                        using (var cmd = new NpgsqlCommand(updateQuery, conn))
-                        {
-                            cmd.Parameters.AddWithValue("@driver_id", driverId);
-                            cmd.Parameters.AddWithValue("@status_id", inProgressStatusId);
-                            cmd.Parameters.AddWithValue("@order_id", orderId);
-                            cmd.ExecuteNonQuery();
-                        }
-                    }
-
-                    MessageBox.Show($"Заказ #{orderId} принят!", "Заказ принят",
-                        MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                    LoadOrderStatus();
+                    AcceptOrder();
                 }
-                catch (Exception ex)
+            }
+            else if (orderStatus == "2") // В процессе -> Завершить
+            {
+                DialogResult result = MessageBox.Show(
+                    $"Завершить заказ #{orderId}?",
+                    "Завершение заказа",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question);
+
+                if (result == DialogResult.Yes)
                 {
-                    MessageBox.Show($"Ошибка при принятии заказа: {ex.Message}", "Ошибка",
-                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    CompleteOrder();
                 }
             }
         }
 
-        private void BtnDecline_Click(object sender, EventArgs e)
-        {
-            DialogResult result = MessageBox.Show(
-                "Отказаться от заказа? Он останется доступным для других водителей.",
-                "Отказ от заказа",
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Question);
-
-            if (result == DialogResult.Yes)
-            {
-                this.DialogResult = DialogResult.Cancel;
-                this.Close();
-            }
-        }
-
-        private void BtnEndTrip_Click(object sender, EventArgs e)
-        {
-            DialogResult result = MessageBox.Show(
-                "Завершить поездку?",
-                "Завершение заказа",
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Question);
-
-            if (result == DialogResult.Yes)
-            {
-                try
-                {
-                    using (var conn = new NpgsqlConnection(connectionString))
-                    {
-                        conn.Open();
-                        string getStatusIdQuery = "SELECT order_status_id FROM order_status WHERE name = 'Завершён' LIMIT 1";
-                        int completedStatusId = Convert.ToInt32(new NpgsqlCommand(getStatusIdQuery, conn).ExecuteScalar());
-
-                        string updateQuery = @"
-                            UPDATE ""Order""
-                            SET order_status = @status_id
-                            WHERE order_id = @order_id";
-                        using (var cmd = new NpgsqlCommand(updateQuery, conn))
-                        {
-                            cmd.Parameters.AddWithValue("@status_id", completedStatusId);
-                            cmd.Parameters.AddWithValue("@order_id", orderId);
-                            cmd.ExecuteNonQuery();
-                        }
-                    }
-
-                    MessageBox.Show($"Заказ #{orderId} завершён! Спасибо за работу!",
-                        "Заказ завершён", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                    this.DialogResult = DialogResult.OK;
-                    this.Close();
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Ошибка при завершении заказа: {ex.Message}", "Ошибка",
-                        MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
-        }
-
-        private void BtnOpenInYandex_Click(object sender, EventArgs e)
+        private void AcceptOrder()
         {
             try
             {
-                string encodedStart = Uri.EscapeDataString(startAddress);
-                string encodedEnd = Uri.EscapeDataString(endAddress);
+                using (var conn = new NpgsqlConnection(connectionString))
+                {
+                    conn.Open();
+
+                    // Проверяем, что заказ еще не занят
+                    string checkQuery = @"
+                        SELECT COUNT(*) 
+                        FROM ""Order"" 
+                        WHERE order_id = @orderId 
+                        AND driver_id IS NULL 
+                        AND order_status = 1";
+
+                    using (var checkCmd = new NpgsqlCommand(checkQuery, conn))
+                    {
+                        checkCmd.Parameters.AddWithValue("@orderId", orderId);
+                        long count = (long)checkCmd.ExecuteScalar();
+
+                        if (count == 0)
+                        {
+                            MessageBox.Show("Заказ уже занят другим водителем!", "Ошибка",
+                                MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            this.DialogResult = DialogResult.Cancel;
+                            this.Close();
+                            return;
+                        }
+                    }
+
+                    // Обновляем заказ: назначаем водителя, меняем статус на 2 (В процессе)
+                    string updateQuery = @"
+                        UPDATE ""Order"" 
+                        SET driver_id = @driverId, 
+                            order_status = 2, 
+                            start_trip_time = @startTime 
+                        WHERE order_id = @orderId 
+                        AND driver_id IS NULL 
+                        AND order_status = 1
+                        RETURNING order_id";
+
+                    using (var cmd = new NpgsqlCommand(updateQuery, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@orderId", orderId);
+                        cmd.Parameters.AddWithValue("@driverId", driverId);
+                        cmd.Parameters.AddWithValue("@startTime", DateTime.Now);
+
+                        var result = cmd.ExecuteScalar();
+                        if (result != null)
+                        {
+                            acceptTime = DateTime.Now;
+                            MessageBox.Show("Заказ принят! Статус изменен на 'В процессе'\n\n" +
+                                           "Внимание: у вас есть 2 минуты, чтобы отменить заказ!",
+                                "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            this.DialogResult = DialogResult.OK;
+                            this.Close();
+                        }
+                        else
+                        {
+                            MessageBox.Show("Не удалось принять заказ. Возможно, его уже кто-то взял.", "Ошибка",
+                                MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при принятии заказа: {ex.Message}", "Ошибка",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        // ---------- ОТМЕНА ЗАКАЗА ----------
+        private void btnCancel_Click(object sender, EventArgs e)
+        {
+            if (orderStatus != "2")
+            {
+                MessageBox.Show("Отменить можно только заказ в статусе 'В процессе'", "Ошибка",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // Проверяем, не прошло ли 2 минуты после принятия
+            if (acceptTime.HasValue)
+            {
+                TimeSpan elapsed = DateTime.Now - acceptTime.Value;
+                if (elapsed.TotalMinutes >= 2)
+                {
+                    MessageBox.Show("Время отмены заказа истекло (2 минуты после принятия)", "Ошибка",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+            }
+            else
+            {
+                // Если acceptTime не загружен, загружаем из БД
+                LoadAcceptTime();
+                if (acceptTime.HasValue)
+                {
+                    TimeSpan elapsed = DateTime.Now - acceptTime.Value;
+                    if (elapsed.TotalMinutes >= 2)
+                    {
+                        MessageBox.Show("Время отмены заказа истекло (2 минуты после принятия)", "Ошибка",
+                            MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+                }
+            }
+
+            DialogResult result = MessageBox.Show(
+                $"Отменить заказ #{orderId}?",
+                "Отмена заказа",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question);
+
+            if (result == DialogResult.Yes)
+            {
+                CancelOrder();
+            }
+        }
+
+        private void CancelOrder()
+        {
+            try
+            {
+                using (var conn = new NpgsqlConnection(connectionString))
+                {
+                    conn.Open();
+                    string query = @"
+                        UPDATE ""Order"" 
+                        SET order_status = 4,
+                            driver_id = NULL
+                        WHERE order_id = @orderId 
+                        AND driver_id = @driverId
+                        AND order_status = 2";
+
+                    using (var cmd = new NpgsqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@orderId", orderId);
+                        cmd.Parameters.AddWithValue("@driverId", driverId);
+
+                        int rowsAffected = cmd.ExecuteNonQuery();
+                        if (rowsAffected > 0)
+                        {
+                            MessageBox.Show("Заказ отменен", "Успех",
+                                MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            this.DialogResult = DialogResult.OK;
+                            this.Close();
+                        }
+                        else
+                        {
+                            MessageBox.Show("Не удалось отменить заказ.", "Ошибка",
+                                MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при отмене заказа: {ex.Message}", "Ошибка",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void CompleteOrder()
+        {
+            try
+            {
+                // Используем существующую стоимость из заказа
+                decimal finalCost = decimal.Parse(price);
+
+                DialogResult result = MessageBox.Show(
+                    $"Завершить заказ #{orderId}?\n\n" +
+                    $"Стоимость: {finalCost:N2} ₽",
+                    "Завершение заказа",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question);
+
+                if (result == DialogResult.No)
+                    return;
+
+                using (var conn = new NpgsqlConnection(connectionString))
+                {
+                    conn.Open();
+                    string query = @"
+                UPDATE ""Order"" 
+                SET order_status = 3, 
+                    end_trip_time = @endTime, 
+                    final_cost = @cost 
+                WHERE order_id = @orderId 
+                AND order_status = 2 
+                AND driver_id = @driverId";
+
+                    using (var cmd = new NpgsqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@orderId", orderId);
+                        cmd.Parameters.AddWithValue("@driverId", driverId);
+                        cmd.Parameters.AddWithValue("@endTime", DateTime.Now);
+                        cmd.Parameters.AddWithValue("@cost", finalCost);
+
+                        int rowsAffected = cmd.ExecuteNonQuery();
+                        if (rowsAffected > 0)
+                        {
+                            // Обновляем статистику водителя
+                            DriverMenu.AddToShiftTotal(finalCost);
+
+                            MessageBox.Show($"Заказ завершен!\nСтоимость: {finalCost:N2} ₽", "Успех",
+                                MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            this.DialogResult = DialogResult.OK;
+                            this.Close();
+                        }
+                        else
+                        {
+                            MessageBox.Show("Не удалось завершить заказ.", "Ошибка",
+                                MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при завершении заказа: {ex.Message}", "Ошибка",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        // ---------- ОТКРЫТИЕ КАРТЫ В БРАУЗЕРЕ ----------
+        private void btnOpenInYandex_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string encodedStart = Uri.EscapeDataString(fromAddress);
+                string encodedEnd = Uri.EscapeDataString(toAddress);
                 string url = $"https://yandex.ru/maps/?rtext={encodedStart}~{encodedEnd}&rtt=auto";
                 Process.Start(new ProcessStartInfo
                 {
@@ -336,8 +476,11 @@ namespace taxi4
             }
         }
 
-        // Обработчики-заглушки для событий, которые могут быть вызваны дизайнером
-        private void BtnAction1_Click(object sender, EventArgs e) { }
-        private void BtnAction2_Click(object sender, EventArgs e) { }
+        private void btnBack_Click(object sender, EventArgs e)
+        {
+            cancelTimer?.Stop();
+            this.DialogResult = DialogResult.Cancel;
+            this.Close();
+        }
     }
 }

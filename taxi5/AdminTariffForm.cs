@@ -18,6 +18,8 @@ namespace taxi4
             LoadTariffs();
             LoadComboBoxData();
             ClearForm();
+            groupBoxTariffData.Visible = false;
+
         }
 
         private void LoadTariffs()
@@ -54,6 +56,9 @@ namespace taxi4
         private void ConfigureDataGridView()
         {
             if (dataGridViewTariffs.Columns.Count == 0) return;
+
+            if (dataGridViewTariffs.Columns["tariff_id"] != null)
+                dataGridViewTariffs.Columns["tariff_id"].Visible = false;
 
             dataGridViewTariffs.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
 
@@ -106,11 +111,11 @@ namespace taxi4
         private void buttonAdd_Click(object sender, EventArgs e)
         {
             ClearForm();
+            groupBoxTariffData.Visible = true;
             groupBoxTariffData.Text = "Добавление нового тарифа";
             textBoxTariffId.Visible = false;
             labelTariffId.Visible = false;
-
-            
+            textBoxBaseCost.Text = "0"; // Устанавливаем значение по умолчанию
         }
 
         private void buttonEdit_Click(object sender, EventArgs e)
@@ -120,10 +125,9 @@ namespace taxi4
                 MessageBox.Show("Выберите тариф для редактирования", "Информация",
                     MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
-
-
             }
 
+            groupBoxTariffData.Visible = true;
             DataGridViewRow row = dataGridViewTariffs.SelectedRows[0];
             LoadTariffToForm(row);
             groupBoxTariffData.Text = "Редактирование тарифа";
@@ -180,6 +184,7 @@ namespace taxi4
                 if (success)
                 {
                     ClearForm();
+                    groupBoxTariffData.Visible = false;
                     LoadTariffs();
                     LoadComboBoxData();
                 }
@@ -227,6 +232,8 @@ namespace taxi4
             LoadTariffs();
             LoadComboBoxData();
             ClearForm();
+            groupBoxTariffData.Visible = false;
+
             MessageBox.Show("Данные обновлены", "Информация",
                 MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
@@ -268,6 +275,7 @@ namespace taxi4
 
         private bool ValidateForm()
         {
+            // Проверка названия
             if (string.IsNullOrWhiteSpace(textBoxName.Text))
             {
                 MessageBox.Show("Введите название тарифа", "Ошибка",
@@ -276,6 +284,16 @@ namespace taxi4
                 return false;
             }
 
+            // Проверка названия на длину
+            if (textBoxName.Text.Trim().Length > 50)
+            {
+                MessageBox.Show("Название тарифа не должно превышать 50 символов", "Ошибка",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                textBoxName.Focus();
+                return false;
+            }
+
+            // Проверка стоимости - пустое поле
             if (string.IsNullOrWhiteSpace(textBoxBaseCost.Text))
             {
                 MessageBox.Show("Введите базовую стоимость", "Ошибка",
@@ -284,14 +302,34 @@ namespace taxi4
                 return false;
             }
 
-            if (!decimal.TryParse(textBoxBaseCost.Text, out decimal cost) || cost < 0)
+            // Проверка стоимости - корректное число
+            if (!decimal.TryParse(textBoxBaseCost.Text, out decimal cost))
             {
-                MessageBox.Show("Введите корректную стоимость (положительное число)", "Ошибка",
+                MessageBox.Show("Введите корректное числовое значение стоимости", "Ошибка",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
                 textBoxBaseCost.Focus();
                 return false;
             }
 
+            // Проверка стоимости - не отрицательная
+            if (cost < 0)
+            {
+                MessageBox.Show("Стоимость не может быть отрицательной", "Ошибка",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                textBoxBaseCost.Focus();
+                return false;
+            }
+
+            // Проверка стоимости - максимальное значение
+            if (cost > 999999)
+            {
+                MessageBox.Show("Стоимость не может превышать 999 999", "Ошибка",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                textBoxBaseCost.Focus();
+                return false;
+            }
+
+            // Проверка статуса
             if (comboBoxStatus.SelectedValue == null)
             {
                 MessageBox.Show("Выберите статус", "Ошибка",
@@ -305,12 +343,46 @@ namespace taxi4
 
         private void textBoxBaseCost_KeyPress(object sender, KeyPressEventArgs e)
         {
+            // Разрешаем цифры, запятую/точку и управляющие клавиши
             if (!char.IsDigit(e.KeyChar) && e.KeyChar != ',' && e.KeyChar != '.' && !char.IsControl(e.KeyChar))
+            {
                 e.Handled = true;
+                return;
+            }
 
             // Заменяем точку на запятую для корректного парсинга decimal
             if (e.KeyChar == '.')
                 e.KeyChar = ',';
+
+            // Запрещаем ввод второй запятой
+            if (e.KeyChar == ',' && ((TextBox)sender).Text.Contains(","))
+            {
+                e.Handled = true;
+                return;
+            }
+
+            // Запрещаем ввод ведущих нулей
+            if (((TextBox)sender).Text == "0" && char.IsDigit(e.KeyChar) && e.KeyChar != '0')
+            {
+                ((TextBox)sender).Text = "";
+            }
+        }
+
+        private void textBoxBaseCost_Leave(object sender, EventArgs e)
+        {
+            // Автоматическое форматирование при потере фокуса
+            if (!string.IsNullOrWhiteSpace(textBoxBaseCost.Text))
+            {
+                if (decimal.TryParse(textBoxBaseCost.Text, out decimal value))
+                {
+                    if (value < 0)
+                        textBoxBaseCost.Text = "0";
+                    else if (value > 999999)
+                        textBoxBaseCost.Text = "999999";
+                    else
+                        textBoxBaseCost.Text = value.ToString("N0");
+                }
+            }
         }
 
         private void textBoxSearch_KeyDown(object sender, KeyEventArgs e)
@@ -326,6 +398,7 @@ namespace taxi4
                 DataGridViewRow row = dataGridViewTariffs.Rows[e.RowIndex];
                 LoadTariffToForm(row);
                 groupBoxTariffData.Text = "Редактирование тарифа";
+                groupBoxTariffData.Visible = true;
             }
         }
     }

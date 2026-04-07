@@ -34,8 +34,7 @@ namespace taxi4
         private System.Windows.Forms.Button buttonBack;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.TextBox textBoxAccountId;
-        private System.Windows.Forms.Button buttonBlock;
-        private System.Windows.Forms.Button buttonUnblock;
+
 
         protected override void Dispose(bool disposing)
         {
@@ -74,8 +73,6 @@ namespace taxi4
             this.label8 = new System.Windows.Forms.Label();
             this.buttonSearch = new System.Windows.Forms.Button();
             this.buttonBack = new System.Windows.Forms.Button();
-            this.buttonBlock = new System.Windows.Forms.Button();
-            this.buttonUnblock = new System.Windows.Forms.Button();
             this.groupBoxClientData.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewClients)).BeginInit();
             this.SuspendLayout();
@@ -313,27 +310,6 @@ namespace taxi4
             this.buttonBack.Text = "Назад";
             this.buttonBack.Click += new System.EventHandler(this.buttonBack_Click);
 
-            // buttonBlock
-            this.buttonBlock.BackColor = System.Drawing.Color.FromArgb(255, 200, 200);
-            this.buttonBlock.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.buttonBlock.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
-            this.buttonBlock.ForeColor = System.Drawing.Color.FromArgb(4, 0, 66);
-            this.buttonBlock.Location = new System.Drawing.Point(390, 42);
-            this.buttonBlock.Name = "buttonBlock";
-            this.buttonBlock.Size = new System.Drawing.Size(144, 40);
-            this.buttonBlock.Text = "Заблокировать";
-            this.buttonBlock.Click += new System.EventHandler(this.buttonBlock_Click);
-
-            // buttonUnblock
-            this.buttonUnblock.BackColor = System.Drawing.Color.FromArgb(200, 255, 200);
-            this.buttonUnblock.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.buttonUnblock.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
-            this.buttonUnblock.ForeColor = System.Drawing.Color.FromArgb(4, 0, 66);
-            this.buttonUnblock.Location = new System.Drawing.Point(550, 42);
-            this.buttonUnblock.Name = "buttonUnblock";
-            this.buttonUnblock.Size = new System.Drawing.Size(155, 40);
-            this.buttonUnblock.Text = "Разблокировать";
-            this.buttonUnblock.Click += new System.EventHandler(this.buttonUnblock_Click);
 
             // AdminClientForm
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -345,8 +321,7 @@ namespace taxi4
             this.Controls.Add(this.label8);
             this.Controls.Add(this.textBoxSearch);
             this.Controls.Add(this.buttonRefresh);
-            this.Controls.Add(this.buttonUnblock);
-            this.Controls.Add(this.buttonBlock);
+
             this.Controls.Add(this.buttonEdit);
             this.Controls.Add(this.buttonAdd);
             this.Controls.Add(this.groupBoxClientData);
