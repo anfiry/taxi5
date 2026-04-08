@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Data;
 using System.Drawing;
 using System.Windows.Forms;
 using Npgsql;
@@ -10,92 +9,201 @@ namespace taxi4
     {
         private int driverId;
         private string connectionString;
-        private DataGridView dgvHistory;
 
-        // Конструктор с двумя параметрами
-        public DriverShiftsForm(int driverId, string connString)
+        public DriverShiftsForm(int driverId, string connectionString)
         {
             this.driverId = driverId;
-            this.connectionString = connString;
-
+            this.connectionString = connectionString;
             InitializeComponent();
-            this.Text = "История смен";
-            this.Size = new Size(800, 500);
-            this.StartPosition = FormStartPosition.CenterParent;
 
-            SetupDataGridView();
+            // Подписываемся на события
+            this.btnBack.Click += BtnBack_Click;
+            this.Resize += DriverShiftsForm_Resize;
+            this.Load += DriverShiftsForm_Load;
+
+            // Устанавливаем позицию кнопки
+            UpdateButtonPosition();
+        }
+
+        private void DriverShiftsForm_Load(object sender, EventArgs e)
+        {
             LoadHistory();
         }
 
-        private void SetupDataGridView()
+        private void DriverShiftsForm_Resize(object sender, EventArgs e)
         {
-            dgvHistory = new DataGridView();
-            dgvHistory.Dock = DockStyle.Fill;
-            dgvHistory.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-            dgvHistory.ReadOnly = true;
-            dgvHistory.RowHeadersVisible = false;
-            dgvHistory.AllowUserToAddRows = false;
-            dgvHistory.BackgroundColor = Color.White;
-            dgvHistory.AlternatingRowsDefaultCellStyle.BackColor = Color.LightGray;
+            UpdateButtonPosition();
+        }
 
-            // Колонки
-            dgvHistory.Columns.Add("Date", "Дата");
-            dgvHistory.Columns.Add("Start", "Начало");
-            dgvHistory.Columns.Add("End", "Конец");
-            dgvHistory.Columns.Add("Duration", "Длительность");
+        private void UpdateButtonPosition()
+        {
+            if (btnBack != null)
+            {
+                btnBack.Location = new Point(this.ClientSize.Width - 120, 12);
+            }
+        }
 
-            dgvHistory.Columns["Date"].Width = 100;
-            dgvHistory.Columns["Start"].Width = 80;
-            dgvHistory.Columns["End"].Width = 80;
-            dgvHistory.Columns["Duration"].Width = 100;
+        /// <summary>
+        /// Форматирует TimeSpan в читаемый вид
+        /// </summary>
+        private string FormatDuration(TimeSpan duration)
+        {
+            if (duration.TotalSeconds < 0)
+                return "0 мин";
 
-            this.Controls.Add(dgvHistory);
+            int days = duration.Days;
+            int hours = duration.Hours;
+            int minutes = duration.Minutes;
+
+            if (days > 0)
+            {
+                if (hours > 0 && minutes > 0)
+                    return $"{days} д {hours} ч {minutes} мин";
+                else if (hours > 0)
+                    return $"{days} д {hours} ч";
+                else if (minutes > 0)
+                    return $"{days} д {minutes} мин";
+                else
+                    return $"{days} д";
+            }
+            else if (hours > 0)
+            {
+                if (minutes > 0)
+                    return $"{hours} ч {minutes} мин";
+                else
+                    return $"{hours} ч";
+            }
+            else if (minutes > 0)
+            {
+                return $"{minutes} мин";
+            }
+            else
+            {
+                return "0 мин";
+            }
         }
 
         private void LoadHistory()
         {
-            dgvHistory.Rows.Clear();
-
-            string query = @"
-                SELECT shift_date, start_time, end_time
-                FROM work_schedule
-                WHERE driver_id = @driver_id
-                  AND end_time IS NOT NULL
-                ORDER BY shift_date DESC, start_time DESC;";
-
-            using (var conn = new NpgsqlConnection(connectionString))
+            try
             {
-                conn.Open();
-                using (var cmd = new NpgsqlCommand(query, conn))
+                using (var conn = new NpgsqlConnection(connectionString))
                 {
-                    cmd.Parameters.AddWithValue("@driver_id", driverId);
-                    using (var reader = cmd.ExecuteReader())
+                    conn.Open();
+
+                    // Запрос с датой и временем начала и конца смены
+                    string query = @"
+                        SELECT 
+                            ws.start_datetime,
+                            ws.end_datetime,
+                            ss.status_name
+                        FROM work_schedule ws
+                        LEFT JOIN shift_status ss ON ws.shift_status_id = ss.shiaft_status_id
+                        WHERE ws.driver_id = @driver_id
+                        ORDER BY ws.start_datetime DESC";
+
+                    using (var cmd = new NpgsqlCommand(query, conn))
                     {
-                        while (reader.Read())
+                        cmd.Parameters.AddWithValue("@driver_id", driverId);
+                        using (var reader = cmd.ExecuteReader())
                         {
-                            DateTime date = reader.GetDateTime(0);
-                            TimeSpan start = reader.GetTimeSpan(1);
-                            TimeSpan end = reader.GetTimeSpan(2);
+                            dgvHistory.Rows.Clear();
 
-                            DateTime startDateTime = date.Add(start);
-                            DateTime endDateTime = date.Add(end);
-                            TimeSpan duration = endDateTime - startDateTime;
+                            while (reader.Read())
+                            {
+                                DateTime startDateTime = reader.GetDateTime(0);
+                                DateTime? endDateTime = reader.IsDBNull(1) ? (DateTime?)null : reader.GetDateTime(1);
+                                string status = reader.GetString(2);
 
-                            dgvHistory.Rows.Add(
-                                date.ToString("dd.MM.yyyy"),
-                                start.ToString(@"hh\:mm"),
-                                end.ToString(@"hh\:mm"),
-                                duration.ToString(@"hh\:mm")
-                            );
+                                string startStr = startDateTime.ToString("dd.MM.yyyy HH:mm");
+                                string endStr = endDateTime.HasValue ? endDateTime.Value.ToString("dd.MM.yyyy HH:mm") : "—";
+                                string durationStr = "";
+                                string statusDisplay = "";
+                                string statusKey = status.ToLower();
+
+                                // Определяем статус на русском и рассчитываем длительность
+                                if (statusKey == "active" || statusKey == "активна")
+                                {
+                                    statusDisplay = "🟢 Активная смена";
+                                    // Для активной смены считаем длительность от начала до текущего момента
+                                    if (endDateTime == null)
+                                    {
+                                        TimeSpan currentDuration = DateTime.Now - startDateTime;
+                                        durationStr = FormatDuration(currentDuration) + " (идет)";
+                                    }
+                                    else
+                                    {
+                                        durationStr = "—";
+                                    }
+                                }
+                                else if (statusKey == "completed" || statusKey == "завершена")
+                                {
+                                    statusDisplay = "✅ Завершена";
+                                    if (endDateTime.HasValue)
+                                    {
+                                        // Правильный расчет длительности для завершенной смены
+                                        TimeSpan duration = endDateTime.Value - startDateTime;
+                                        durationStr = FormatDuration(duration);
+                                    }
+                                    else
+                                    {
+                                        durationStr = "—";
+                                    }
+                                }
+                                else if (statusKey == "cancelled" || statusKey == "отменена")
+                                {
+                                    statusDisplay = "❌ Отменена";
+                                    durationStr = "—";
+                                }
+                                else
+                                {
+                                    statusDisplay = status;
+                                    durationStr = "—";
+                                }
+
+                                dgvHistory.Rows.Add(startStr, endStr, durationStr, statusDisplay);
+
+                                // Закрашиваем строку в зависимости от статуса
+                                int rowIndex = dgvHistory.Rows.Count - 1;
+                                if (statusKey == "active" || statusKey == "активна")
+                                {
+                                    dgvHistory.Rows[rowIndex].DefaultCellStyle.BackColor = Color.FromArgb(220, 255, 220);
+                                    dgvHistory.Rows[rowIndex].DefaultCellStyle.ForeColor = Color.DarkGreen;
+                                }
+                                else if (statusKey == "completed" || statusKey == "завершена")
+                                {
+                                    dgvHistory.Rows[rowIndex].DefaultCellStyle.BackColor = Color.FromArgb(255, 255, 220);
+                                }
+                                else if (statusKey == "cancelled" || statusKey == "отменена")
+                                {
+                                    dgvHistory.Rows[rowIndex].DefaultCellStyle.BackColor = Color.FromArgb(255, 220, 220);
+                                }
+                            }
                         }
                     }
                 }
-            }
 
-            if (dgvHistory.Rows.Count == 0)
-            {
-                dgvHistory.Rows.Add("Нет завершённых смен", "", "", "");
+                if (dgvHistory.Rows.Count == 0)
+                {
+                    dgvHistory.Rows.Add("Нет данных о сменах", "", "", "");
+                    dgvHistory.Rows[0].DefaultCellStyle.ForeColor = Color.Gray;
+                    dgvHistory.Rows[0].DefaultCellStyle.BackColor = Color.FromArgb(245, 245, 245);
+                }
+
+                // Настройка внешнего вида
+                dgvHistory.ClearSelection();
+                dgvHistory.RowsDefaultCellStyle.Font = new Font("Segoe UI", 10F);
             }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка загрузки истории смен: {ex.Message}", "Ошибка",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void BtnBack_Click(object sender, EventArgs e)
+        {
+            this.Close();
         }
     }
 }

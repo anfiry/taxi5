@@ -20,10 +20,17 @@ namespace taxi4
             this.connectionString = connectionString;
             InitializeComponent();
 
-            // Настройка колонок DataGridView (переносим сюда из InitializeComponent)
+            // Создание карточек статистики
+            InitializeStatCards();
+
+            // Настройка колонок DataGridView
             ConfigureDataGridViewColumns();
 
+            // Создание элементов распределения оценок
+            InitializeRatingDistributionControls();
+
             // Настройка отрисовки ListBox
+            this.lstComments.DrawMode = DrawMode.OwnerDrawFixed;
             this.lstComments.DrawItem += LstComments_DrawItem;
 
             // Создание и настройка кнопки "Назад"
@@ -36,21 +43,117 @@ namespace taxi4
             this.Resize += DriverStatisticsRatingForm_Resize;
         }
 
+        private void InitializeStatCards()
+        {
+            // Очищаем панель
+            indicatorsPanel.Controls.Clear();
+
+            // Создаем карточки
+            cardEarnings = CreateStatCard("💰 Общий заработок", "0 ₽", Color.FromArgb(200, 230, 200));
+            cardOrders = CreateStatCard("📦 Выполнено заказов", "0", Color.FromArgb(200, 210, 240));
+            cardAvgBill = CreateStatCard("💳 Средний чек", "0 ₽", Color.FromArgb(250, 240, 200));
+
+            // Устанавливаем позиции
+            int cardWidth = 350;
+            cardEarnings.Location = new Point(0, 0);
+            cardOrders.Location = new Point(cardWidth + 10, 0);
+            cardAvgBill.Location = new Point((cardWidth + 10) * 2, 0);
+
+            // Добавляем на панель
+            indicatorsPanel.Controls.Add(cardEarnings);
+            indicatorsPanel.Controls.Add(cardOrders);
+            indicatorsPanel.Controls.Add(cardAvgBill);
+
+            // Получаем ссылки на лейблы со значениями
+            lblTotalEarnings = (Label)cardEarnings.Controls[1];
+            lblOrdersCount = (Label)cardOrders.Controls[1];
+            lblAvgBill = (Label)cardAvgBill.Controls[1];
+        }
+
+        private Panel CreateStatCard(string title, string value, Color color)
+        {
+            Panel card = new Panel();
+            card.Size = new Size(350, 130);
+            card.BackColor = color;
+            card.BorderStyle = BorderStyle.FixedSingle;
+
+            Label lblTitle = new Label();
+            lblTitle.Text = title;
+            lblTitle.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
+            lblTitle.Location = new Point(10, 15);
+            lblTitle.Size = new Size(330, 25);
+            lblTitle.TextAlign = ContentAlignment.MiddleCenter;
+
+            Label lblValue = new Label();
+            lblValue.Text = value;
+            lblValue.Font = new Font("Segoe UI", 28, FontStyle.Bold);
+            lblValue.Location = new Point(10, 45);
+            lblValue.Size = new Size(330, 50);
+            lblValue.TextAlign = ContentAlignment.MiddleCenter;
+
+            Label lblSub = new Label();
+            lblSub.Text = "за выбранный период";
+            lblSub.Font = new Font("Segoe UI", 8F);
+            lblSub.Location = new Point(10, 100);
+            lblSub.Size = new Size(330, 20);
+            lblSub.TextAlign = ContentAlignment.MiddleCenter;
+            lblSub.ForeColor = Color.Gray;
+
+            card.Controls.Add(lblTitle);
+            card.Controls.Add(lblValue);
+            card.Controls.Add(lblSub);
+
+            return card;
+        }
+
+        private void InitializeRatingDistributionControls()
+        {
+            // Инициализируем массивы
+            ratingProgressBars = new ProgressBar[5];
+            ratingCountLabels = new Label[5];
+
+            string[] starLabels = { "⭐⭐⭐⭐⭐ (5 звезд)", "⭐⭐⭐⭐ (4 звезды)", "⭐⭐⭐ (3 звезды)", "⭐⭐ (2 звезды)", "⭐ (1 звезда)" };
+
+            for (int i = 0; i < 5; i++)
+            {
+                int y = 25 + i * 36;
+
+                var lblStar = new Label();
+                lblStar.Text = starLabels[i];
+                lblStar.Location = new Point(10, y);
+                lblStar.Size = new Size(170, 25);
+                lblStar.Font = new Font("Segoe UI", 9F);
+                this.distributionGroup.Controls.Add(lblStar);
+
+                var pb = new ProgressBar();
+                pb.Location = new Point(190, y);
+                pb.Size = new Size(350, 25);
+                pb.Maximum = 100;
+                this.ratingProgressBars[i] = pb;
+                this.distributionGroup.Controls.Add(pb);
+
+                var lblCount = new Label();
+                lblCount.Text = "0 (0%)";
+                lblCount.Location = new Point(550, y);
+                lblCount.Size = new Size(130, 25);
+                lblCount.Font = new Font("Segoe UI", 9F);
+                this.ratingCountLabels[i] = lblCount;
+                this.distributionGroup.Controls.Add(lblCount);
+            }
+        }
+
         private void ConfigureDataGridViewColumns()
         {
-            // Настройка выравнивания для колонки Earnings
             if (dgvDailyStats.Columns["Earnings"] != null)
             {
                 dgvDailyStats.Columns["Earnings"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
             }
 
-            // Настройка выравнивания для колонки Rating
             if (dgvDailyStats.Columns["Rating"] != null)
             {
                 dgvDailyStats.Columns["Rating"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
             }
 
-            // Настройка выравнивания для колонки Passenger
             if (dgvDailyStats.Columns["Passenger"] != null)
             {
                 dgvDailyStats.Columns["Passenger"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
@@ -105,13 +208,13 @@ namespace taxi4
             {
                 indicatorsPanel.Width = width;
                 int cardWidth = (width - 40) / 3;
-                if (cardWidth > 0)
+                if (cardWidth > 0 && cardEarnings != null && cardOrders != null && cardAvgBill != null)
                 {
-                    if (cardEarnings != null) cardEarnings.Width = cardWidth;
-                    if (cardOrders != null) cardOrders.Width = cardWidth;
-                    if (cardAvgBill != null) cardAvgBill.Width = cardWidth;
-                    if (cardOrders != null) cardOrders.Left = cardWidth + 10;
-                    if (cardAvgBill != null) cardAvgBill.Left = (cardWidth + 10) * 2;
+                    cardEarnings.Width = cardWidth;
+                    cardOrders.Width = cardWidth;
+                    cardAvgBill.Width = cardWidth;
+                    cardOrders.Left = cardWidth + 10;
+                    cardAvgBill.Left = (cardWidth + 10) * 2;
                 }
             }
 
@@ -129,9 +232,9 @@ namespace taxi4
             e.DrawBackground();
             string text = ((ListBox)sender).Items[e.Index].ToString();
 
-            using (var font = new System.Drawing.Font("Segoe UI", 9F))
+            using (var font = new Font("Segoe UI", 9F))
             {
-                e.Graphics.DrawString(text, font, System.Drawing.Brushes.Black, e.Bounds);
+                e.Graphics.DrawString(text, font, Brushes.Black, e.Bounds);
             }
             e.DrawFocusRectangle();
         }
@@ -229,9 +332,9 @@ namespace taxi4
                                 decimal avgBill = reader.GetDecimal(2);
                                 SafeInvoke(() =>
                                 {
-                                    lblTotalEarnings.Text = $"{totalEarnings:N0} ₽";
-                                    lblOrdersCount.Text = totalOrdersForPeriod.ToString();
-                                    lblAvgBill.Text = $"{avgBill:N0} ₽";
+                                    if (lblTotalEarnings != null) lblTotalEarnings.Text = $"{totalEarnings:N0} ₽";
+                                    if (lblOrdersCount != null) lblOrdersCount.Text = totalOrdersForPeriod.ToString();
+                                    if (lblAvgBill != null) lblAvgBill.Text = $"{avgBill:N0} ₽";
                                 });
                             }
                         }

@@ -32,10 +32,12 @@ namespace taxi4
         private System.Windows.Forms.Label lblStars;
         private System.Windows.Forms.Label lblRatingCount;
         private System.Windows.Forms.GroupBox distributionGroup;
-        private System.Windows.Forms.ProgressBar[] ratingProgressBars;
-        private System.Windows.Forms.Label[] ratingCountLabels;
         private System.Windows.Forms.GroupBox commentsGroup;
         private System.Windows.Forms.ListBox lstComments;
+
+        // Массивы для распределения оценок
+        private System.Windows.Forms.ProgressBar[] ratingProgressBars;
+        private System.Windows.Forms.Label[] ratingCountLabels;
 
         protected override void Dispose(bool disposing)
         {
@@ -46,8 +48,6 @@ namespace taxi4
 
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
-
             // Настройка формы
             this.Text = "📊 Статистика и рейтинг водителя";
             this.WindowState = FormWindowState.Maximized;
@@ -101,26 +101,15 @@ namespace taxi4
             this.periodGroup.Controls.Add(this.lblPeriod);
             this.periodGroup.Controls.Add(this.cmbPeriod);
 
-            // Панель карточек
+            // Панель карточек (просто пустая панель, карточки создадим в коде)
             this.indicatorsPanel = new Panel();
             this.indicatorsPanel.Location = new System.Drawing.Point(20, 100);
             this.indicatorsPanel.Size = new System.Drawing.Size(1140, 140);
 
-            // Карточка "Общий заработок"
-            this.cardEarnings = CreateStatCard("💰 Общий заработок", "0 ₽", System.Drawing.Color.FromArgb(200, 230, 200));
-            this.cardEarnings.Location = new System.Drawing.Point(0, 0);
-
-            // Карточка "Выполнено заказов"
-            this.cardOrders = CreateStatCard("📦 Выполнено заказов", "0", System.Drawing.Color.FromArgb(200, 210, 240));
-            this.cardOrders.Location = new System.Drawing.Point(370, 0);
-
-            // Карточка "Средний чек"
-            this.cardAvgBill = CreateStatCard("💳 Средний чек", "0 ₽", System.Drawing.Color.FromArgb(250, 240, 200));
-            this.cardAvgBill.Location = new System.Drawing.Point(740, 0);
-
-            this.lblTotalEarnings = (Label)this.cardEarnings.Controls[1];
-            this.lblOrdersCount = (Label)this.cardOrders.Controls[1];
-            this.lblAvgBill = (Label)this.cardAvgBill.Controls[1];
+            // Временно создаем простые панели для карточек (будут заменены в конструкторе)
+            this.cardEarnings = new Panel();
+            this.cardOrders = new Panel();
+            this.cardAvgBill = new Panel();
 
             this.indicatorsPanel.Controls.Add(this.cardEarnings);
             this.indicatorsPanel.Controls.Add(this.cardOrders);
@@ -145,7 +134,7 @@ namespace taxi4
             this.dgvDailyStats.AlternatingRowsDefaultCellStyle.BackColor = System.Drawing.Color.FromArgb(245, 245, 245);
             this.dgvDailyStats.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
 
-            // Только создаем колонки, без настройки стилей!
+            // Создаем колонки
             this.dgvDailyStats.Columns.Add("StartDateTime", "📅 Дата и время начала");
             this.dgvDailyStats.Columns.Add("EndDateTime", "🏁 Дата и время завершения");
             this.dgvDailyStats.Columns.Add("Passenger", "👤 Пассажир");
@@ -193,43 +182,12 @@ namespace taxi4
             this.ratingGroup.Controls.Add(this.lblStars);
             this.ratingGroup.Controls.Add(this.lblRatingCount);
 
-            // Группа распределения оценок
+            // Группа распределения оценок (только контейнер)
             this.distributionGroup = new GroupBox();
             this.distributionGroup.Text = "📊 Распределение оценок";
             this.distributionGroup.Location = new System.Drawing.Point(640, 20);
             this.distributionGroup.Size = new System.Drawing.Size(700, 220);
             this.distributionGroup.Font = new System.Drawing.Font("Segoe UI", 9F, FontStyle.Bold);
-
-            this.ratingProgressBars = new ProgressBar[5];
-            this.ratingCountLabels = new Label[5];
-            string[] starLabels = { "⭐⭐⭐⭐⭐ (5 звезд)", "⭐⭐⭐⭐ (4 звезды)", "⭐⭐⭐ (3 звезды)", "⭐⭐ (2 звезды)", "⭐ (1 звезда)" };
-
-            for (int i = 0; i < 5; i++)
-            {
-                int y = 25 + i * 36;
-
-                var lblStar = new Label();
-                lblStar.Text = starLabels[i];
-                lblStar.Location = new System.Drawing.Point(10, y);
-                lblStar.Size = new System.Drawing.Size(170, 25);
-                lblStar.Font = new System.Drawing.Font("Segoe UI", 9F);
-                this.distributionGroup.Controls.Add(lblStar);
-
-                var pb = new ProgressBar();
-                pb.Location = new System.Drawing.Point(190, y);
-                pb.Size = new System.Drawing.Size(350, 25);
-                pb.Maximum = 100;
-                this.ratingProgressBars[i] = pb;
-                this.distributionGroup.Controls.Add(pb);
-
-                var lblCount = new Label();
-                lblCount.Text = "0 (0%)";
-                lblCount.Location = new System.Drawing.Point(550, y);
-                lblCount.Size = new System.Drawing.Size(130, 25);
-                lblCount.Font = new System.Drawing.Font("Segoe UI", 9F);
-                this.ratingCountLabels[i] = lblCount;
-                this.distributionGroup.Controls.Add(lblCount);
-            }
 
             // Группа комментариев
             this.commentsGroup = new GroupBox();
@@ -243,7 +201,6 @@ namespace taxi4
             this.lstComments.Size = new System.Drawing.Size(1120, 260);
             this.lstComments.Font = new System.Drawing.Font("Segoe UI", 10F);
             this.lstComments.BackColor = System.Drawing.Color.White;
-            this.lstComments.DrawMode = DrawMode.OwnerDrawFixed;
 
             this.commentsGroup.Controls.Add(this.lstComments);
 
@@ -254,45 +211,6 @@ namespace taxi4
 
             // Добавление элементов на форму
             this.Controls.Add(this.tabControl);
-
-            this.SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.DoubleBuffer | ControlStyles.ResizeRedraw, true);
-            this.UpdateStyles();
-        }
-
-        private Panel CreateStatCard(string title, string value, System.Drawing.Color color)
-        {
-            Panel card = new Panel();
-            card.Size = new System.Drawing.Size(350, 130);
-            card.BackColor = color;
-            card.BorderStyle = BorderStyle.FixedSingle;
-
-            Label lblTitle = new Label();
-            lblTitle.Text = title;
-            lblTitle.Font = new System.Drawing.Font("Segoe UI", 11F, FontStyle.Bold);
-            lblTitle.Location = new System.Drawing.Point(10, 15);
-            lblTitle.Size = new System.Drawing.Size(330, 25);
-            lblTitle.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-
-            Label lblValue = new Label();
-            lblValue.Text = value;
-            lblValue.Font = new System.Drawing.Font("Segoe UI", 28, FontStyle.Bold);
-            lblValue.Location = new System.Drawing.Point(10, 45);
-            lblValue.Size = new System.Drawing.Size(330, 50);
-            lblValue.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-
-            Label lblSub = new Label();
-            lblSub.Text = "за выбранный период";
-            lblSub.Font = new System.Drawing.Font("Segoe UI", 8F);
-            lblSub.Location = new System.Drawing.Point(10, 100);
-            lblSub.Size = new System.Drawing.Size(330, 20);
-            lblSub.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            lblSub.ForeColor = System.Drawing.Color.Gray;
-
-            card.Controls.Add(lblTitle);
-            card.Controls.Add(lblValue);
-            card.Controls.Add(lblSub);
-
-            return card;
         }
     }
 }
