@@ -174,6 +174,7 @@ namespace taxi4
             this.Hide();
         }
 
+
         private void textBoxSearch_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
