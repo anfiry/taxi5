@@ -9,15 +9,26 @@ namespace taxi4
     {
         private ClientOrderHistoryData historyData;
         private int clientId;
+        private int accountId;
+        private bool back = false;
+
 
         public ClientOrderHistoryForm()
         {
             InitializeComponent();
         }
 
-        public ClientOrderHistoryForm(int clientId) : this()
+        public void OnClosed()
+        {
+            if (back)
+            { back = false; }
+            else { Application.Exit(); }
+        }
+
+        public ClientOrderHistoryForm(int clientId, int accountId) : this()
         {
             this.clientId = clientId;
+            this.accountId = accountId;
 
             // Настройка полноэкранного режима
             this.WindowState = FormWindowState.Maximized;
@@ -42,6 +53,36 @@ namespace taxi4
             try
             {
                 DataTable dt = historyData.GetClientOrders(clientId);
+
+                // Добавляем вычисляемые колонки для отображения дат начала и завершения
+                dt.Columns.Add("start_trip_display", typeof(string));
+                dt.Columns.Add("end_trip_display", typeof(string));
+
+                foreach (DataRow row in dt.Rows)
+                {
+                    // Обработка даты начала поездки
+                    if (row.Table.Columns.Contains("start_trip_time") && row["start_trip_time"] != DBNull.Value)
+                    {
+                        DateTime startTime = Convert.ToDateTime(row["start_trip_time"]);
+                        row["start_trip_display"] = startTime.ToString("dd.MM.yyyy HH:mm");
+                    }
+                    else
+                    {
+                        row["start_trip_display"] = "—";
+                    }
+
+                    // Обработка даты завершения поездки
+                    if (row.Table.Columns.Contains("end_trip_time") && row["end_trip_time"] != DBNull.Value)
+                    {
+                        DateTime endTime = Convert.ToDateTime(row["end_trip_time"]);
+                        row["end_trip_display"] = endTime.ToString("dd.MM.yyyy HH:mm");
+                    }
+                    else
+                    {
+                        row["end_trip_display"] = "—";
+                    }
+                }
+
                 dataGridViewOrders.DataSource = dt;
             }
             catch (Exception ex)
@@ -64,21 +105,27 @@ namespace taxi4
                 dataGridViewOrders.Columns["order_id"].Visible = false;
             if (dataGridViewOrders.Columns.Contains("has_review"))
                 dataGridViewOrders.Columns["has_review"].Visible = false;
+            if (dataGridViewOrders.Columns.Contains("start_trip_time"))
+                dataGridViewOrders.Columns["start_trip_time"].Visible = false;
+            if (dataGridViewOrders.Columns.Contains("end_trip_time"))
+                dataGridViewOrders.Columns["end_trip_time"].Visible = false;
 
-            // Настройка колонок с весами
-            SetColumnFill("order_datetime", "Дата и время", 12);
-            SetColumnFill("address_from", "Откуда", 15);
-            SetColumnFill("address_to", "Куда", 15);
-            SetColumnFill("tariff_name", "Тариф", 8);
-            SetColumnFill("order_status", "Статус", 8);
-            SetColumnFill("payment_method", "Оплата", 8);
+            // Настройка колонок с весами (ТРИ колонки для дат)
+            SetColumnFill("order_datetime", "Дата создания", 10);
+            SetColumnFill("start_trip_display", "Начало поездки", 10);
+            SetColumnFill("end_trip_display", "Завершение поездки", 10);
+            SetColumnFill("address_from", "Откуда", 12);
+            SetColumnFill("address_to", "Куда", 12);
+            SetColumnFill("tariff_name", "Тариф", 6);
+            SetColumnFill("order_status", "Статус", 6);
+            SetColumnFill("payment_method", "Оплата", 6);
             SetColumnFill("final_cost", "Стоимость", 8);
             SetColumnFill("driver_name", "Водитель", 10);
             SetColumnFill("promotion_name", "Акция", 8);
-            SetColumnFill("promotion_percent", "Скидка, %", 6);
-            SetColumnFill("promotion_amount", "Сумма скидки", 8);
+            SetColumnFill("promotion_percent", "Скидка, %", 5);
+            SetColumnFill("promotion_amount", "Сумма скидки", 7);
 
-            // Форматирование
+            // Форматирование дат и чисел
             if (dataGridViewOrders.Columns["order_datetime"] != null)
                 dataGridViewOrders.Columns["order_datetime"].DefaultCellStyle.Format = "dd.MM.yyyy HH:mm";
             if (dataGridViewOrders.Columns["final_cost"] != null)
@@ -93,10 +140,10 @@ namespace taxi4
             {
                 DataGridViewButtonColumn reviewButton = new DataGridViewButtonColumn();
                 reviewButton.Name = "ReviewButton";
-                reviewButton.HeaderText = "Отзыв";
+                reviewButton.HeaderText = "⭐ Отзыв";
                 reviewButton.UseColumnTextForButtonValue = false;
-                reviewButton.Width = 80;
-                reviewButton.FillWeight = 8;
+                reviewButton.Width = 70;
+                reviewButton.FillWeight = 6;
                 dataGridViewOrders.Columns.Add(reviewButton);
             }
 
@@ -105,23 +152,23 @@ namespace taxi4
             {
                 DataGridViewButtonColumn routeButton = new DataGridViewButtonColumn();
                 routeButton.Name = "RouteButton";
-                routeButton.HeaderText = "Маршрут";
+                routeButton.HeaderText = "🗺️ Маршрут";
                 routeButton.Text = "На карте";
                 routeButton.UseColumnTextForButtonValue = true;
-                routeButton.Width = 80;
-                routeButton.FillWeight = 8;
+                routeButton.Width = 70;
+                routeButton.FillWeight = 6;
                 dataGridViewOrders.Columns.Add(routeButton);
             }
 
             // Стиль заголовков
-            dataGridViewOrders.ColumnHeadersDefaultCellStyle.Font = new Font("Microsoft Sans Serif", 9, FontStyle.Bold);
+            dataGridViewOrders.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 9, FontStyle.Bold);
             dataGridViewOrders.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(52, 73, 94);
             dataGridViewOrders.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
             dataGridViewOrders.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewOrders.ColumnHeadersHeight = 40;
+            dataGridViewOrders.ColumnHeadersHeight = 45;
 
             // Стиль строк
-            dataGridViewOrders.DefaultCellStyle.Font = new Font("Microsoft Sans Serif", 9);
+            dataGridViewOrders.DefaultCellStyle.Font = new Font("Segoe UI", 9);
             dataGridViewOrders.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(248, 249, 249);
             dataGridViewOrders.RowHeadersVisible = false;
             dataGridViewOrders.ReadOnly = true;
@@ -167,17 +214,32 @@ namespace taxi4
             if (columnName == "ReviewButton")
             {
                 int orderId = Convert.ToInt32(dataGridViewOrders.Rows[e.RowIndex].Cells["order_id"].Value);
-                string status = dataGridViewOrders.Rows[e.RowIndex].Cells["order_status"].Value.ToString();
+                string statusText = dataGridViewOrders.Rows[e.RowIndex].Cells["order_status"].Value.ToString();
                 bool hasReview = Convert.ToBoolean(dataGridViewOrders.Rows[e.RowIndex].Cells["has_review"].Value);
 
+                // Пытаемся определить статус как число или как текст
+                bool isCompleted = false;
+
+                // Если статус - число
+                if (int.TryParse(statusText, out int statusId))
+                {
+                    isCompleted = (statusId == 3); // 3 = Завершен
+                }
+                else
+                {
+                    // Если статус - текст
+                    isCompleted = statusText.Equals("Завершен", StringComparison.OrdinalIgnoreCase) ||
+                                  statusText.Equals("Завершён", StringComparison.OrdinalIgnoreCase);
+                }
+
                 // Проверка: можно оставить отзыв только для завершенных заказов
-                if (!hasReview && status != "Завершен")
+                if (!hasReview && !isCompleted)
                 {
                     MessageBox.Show("Отзыв можно оставить только после завершения заказа.\nПожалуйста, дождитесь окончания поездки.",
                         "Информация", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
                 }
-
+                               
                 if (hasReview)
                 {
                     DataRow review = historyData.GetReview(orderId);
@@ -220,6 +282,10 @@ namespace taxi4
 
         private void buttonBack_Click(object sender, EventArgs e)
         {
+            ClientMenu ClientMenu = new ClientMenu(accountId);
+            back = true;
+
+            ClientMenu.Show();
             this.Close();
         }
 

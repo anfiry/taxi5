@@ -18,29 +18,30 @@ namespace taxi4
                 {
                     conn.Open();
                     string query = @"
-                        SELECT 
-                            o.order_id,
-                            o.order_datetime,
-                            CONCAT(a_from.city, ', ', a_from.street, ', д.', a_from.house,
-                                   CASE WHEN a_from.entrance IS NOT NULL AND a_from.entrance != '' 
-                                        THEN ', подъезд ' || a_from.entrance ELSE '' END) AS address_from,
-                            CONCAT(a_to.city, ', ', a_to.street, ', д.', a_to.house,
-                                   CASE WHEN a_to.entrance IS NOT NULL AND a_to.entrance != '' 
-                                        THEN ', подъезд ' || a_to.entrance ELSE '' END) AS address_to,
-                            COALESCE(t.name, 'Не указан') AS tariff_name,
-                            COALESCE(os.name, 'Неизвестно') AS order_status,
-                            COALESCE(d.last_name || ' ' || d.first_name, 'Не назначен') AS driver_name,
-                            COALESCE(d.phone_number, 'Не указан') AS driver_phone
-                        FROM ""Order"" o
-                        LEFT JOIN address a_from ON o.address_from = a_from.address_id
-                        LEFT JOIN address a_to ON o.address_to = a_to.address_id
-                        LEFT JOIN tariff t ON o.tariff_id = t.tariff_id
-                        LEFT JOIN order_status os ON o.order_status = os.order_status_id
-                        LEFT JOIN driver d ON o.driver_id = d.driver_id
-                        WHERE o.client_id = @clientId
-                          AND o.order_status IN (1, 2)
-                        ORDER BY o.order_datetime DESC";
-
+                SELECT 
+                    o.order_id,
+                    o.order_datetime,
+                    o.start_trip_time,   
+                    CONCAT(a_from.city, ', ', a_from.street, ', д.', a_from.house,
+                           CASE WHEN a_from.entrance IS NOT NULL AND a_from.entrance != '' 
+                                THEN ', подъезд ' || a_from.entrance ELSE '' END) AS address_from,
+                    CONCAT(a_to.city, ', ', a_to.street, ', д.', a_to.house,
+                           CASE WHEN a_to.entrance IS NOT NULL AND a_to.entrance != '' 
+                                THEN ', подъезд ' || a_to.entrance ELSE '' END) AS address_to,
+                    COALESCE(t.name, 'Не указан') AS tariff_name,
+                    COALESCE(os.name, 'Неизвестно') AS order_status,
+                    COALESCE(d.last_name || ' ' || d.first_name, 'Не назначен') AS driver_name,
+                    COALESCE(d.phone_number, 'Не указан') AS driver_phone
+                FROM ""Order"" o
+                LEFT JOIN address a_from ON o.address_from = a_from.address_id
+                LEFT JOIN address a_to ON o.address_to = a_to.address_id
+                LEFT JOIN tariff t ON o.tariff_id = t.tariff_id
+                LEFT JOIN order_status os ON o.order_status = os.order_status_id
+                LEFT JOIN driver d ON o.driver_id = d.driver_id
+                WHERE o.client_id = @clientId
+                  AND o.order_status IN (1, 2)
+                ORDER BY o.order_datetime DESC";
+                    
                     using (var cmd = new NpgsqlCommand(query, conn))
                     {
                         cmd.Parameters.AddWithValue("@clientId", clientId);

@@ -14,12 +14,15 @@ namespace taxi4
         private string price;
         private string orderStatus;
         private int driverId;
+        private int accountId;
         private string connectionString;
         private DateTime orderDateTime;
         private DateTime? acceptTime;
         private Timer cancelTimer;
+        private bool back = false;
 
-        public DriverOrderDetailsForm(int orderId, string fromAddress, string toAddress, string price, string orderStatus, int driverId, string connectionString)
+
+        public DriverOrderDetailsForm(int orderId, string fromAddress, string toAddress, string price, string orderStatus, int driverId, string connectionString, int accountId)
         {
             InitializeComponent();
             this.orderId = orderId;
@@ -28,6 +31,7 @@ namespace taxi4
             this.price = price;
             this.orderStatus = orderStatus;
             this.driverId = driverId;
+            this.accountId = accountId;
             this.connectionString = connectionString;
 
             // Настройка полноэкранного режима
@@ -39,6 +43,13 @@ namespace taxi4
             LoadOrderDetails();
             LoadMapWithRoute();
             SetupUI();
+        }
+
+        public void OnClosed()
+        {
+            if (back)
+            { back = false; }
+            else { Application.Exit(); }
         }
 
         private void SetupUI()
@@ -479,7 +490,10 @@ namespace taxi4
         private void btnBack_Click(object sender, EventArgs e)
         {
             cancelTimer?.Stop();
-            this.DialogResult = DialogResult.Cancel;
+            DriverMenu driverMenu = new DriverMenu(accountId);
+            back = true;
+
+            driverMenu.Show();
             this.Close();
         }
     }

@@ -10,13 +10,23 @@ namespace taxi4
         private ClientTrackData trackData;
         private int clientId;
         private Timer refreshTimer;
+        private bool back = false;
+        private int accountId;
+
 
         public ClientTrackOrderForm()
         {
             InitializeComponent();
         }
 
-        public ClientTrackOrderForm(int clientId)
+        public void OnClosed()
+        {
+            if (back)
+            { back = false; }
+            else { Application.Exit(); }
+        }
+
+        public ClientTrackOrderForm(int clientId, int accountId)
         {
             InitializeComponent();
 
@@ -35,6 +45,7 @@ namespace taxi4
             refreshTimer.Start();
 
             dataGridViewOrders.CellClick += DataGridViewOrders_CellClick;
+            this.accountId = accountId;
         }
 
         private void LoadActiveOrders()
@@ -44,6 +55,22 @@ namespace taxi4
                 if (trackData == null) return;
 
                 DataTable dt = trackData.GetActiveOrders(clientId);
+
+                dt.Columns.Add("start_trip_display", typeof(string));
+
+                foreach (DataRow row in dt.Rows)
+                {
+                    if (row.Table.Columns.Contains("start_trip_time") && row["start_trip_time"] != DBNull.Value)
+                    {
+                        DateTime startTime = Convert.ToDateTime(row["start_trip_time"]);
+                        row["start_trip_display"] = startTime.ToString("dd.MM.yyyy HH:mm");
+                    }
+                    else
+                    {
+                        row["start_trip_display"] = "—";
+                    }
+                }
+
                 dataGridViewOrders.DataSource = dt;
                 labelCount.Text = $"Активных заказов: {dt.Rows.Count}";
             }
@@ -64,12 +91,16 @@ namespace taxi4
                 dataGridViewOrders.Columns["address_to_full"].Visible = false;
             if (dataGridViewOrders.Columns.Contains("order_id"))
                 dataGridViewOrders.Columns["order_id"].Visible = false;
+            if (dataGridViewOrders.Columns.Contains("start_trip_time"))  // ← ДОБАВИТЬ
+                dataGridViewOrders.Columns["start_trip_time"].Visible = false;  // ← ДОБАВИТЬ
 
             // Настройка заголовков
             if (dataGridViewOrders.Columns.Contains("order_id"))
                 dataGridViewOrders.Columns["order_id"].HeaderText = "№";
             if (dataGridViewOrders.Columns.Contains("order_datetime"))
-                dataGridViewOrders.Columns["order_datetime"].HeaderText = "Дата и время";
+                dataGridViewOrders.Columns["order_datetime"].HeaderText = "Дата создания";
+            if (dataGridViewOrders.Columns.Contains("start_trip_display"))  // ← ДОБАВИТЬ
+                dataGridViewOrders.Columns["start_trip_display"].HeaderText = "Начало поездки";  // ← ДОБАВИТЬ
             if (dataGridViewOrders.Columns.Contains("address_from"))
                 dataGridViewOrders.Columns["address_from"].HeaderText = "Откуда";
             if (dataGridViewOrders.Columns.Contains("address_to"))
@@ -93,12 +124,12 @@ namespace taxi4
                 DataGridViewButtonColumn btn = new DataGridViewButtonColumn();
                 btn.Name = "RouteButton";
                 btn.HeaderText = "";
-                btn.Text = "🗺️ Маршрут";
+                btn.Text = "Маршрут";
                 btn.UseColumnTextForButtonValue = true;
                 dataGridViewOrders.Columns.Add(btn);
             }
 
-            // Настройка внешнего вида
+                  // Настройка внешнего вида
             dataGridViewOrders.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dataGridViewOrders.ReadOnly = true;
             dataGridViewOrders.RowHeadersVisible = false;
@@ -145,6 +176,9 @@ namespace taxi4
         private void buttonBack_Click(object sender, EventArgs e)
         {
             refreshTimer?.Stop();
+            ClientMenu ClientMenu = new ClientMenu(accountId);
+            ClientMenu.Show();
+            back = true;
             this.Close();
         }
 

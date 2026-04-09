@@ -22,15 +22,17 @@ namespace taxi4
                         SELECT 
                             o.order_id,
                             c.last_name || ' ' || c.first_name AS client_name,
-                            d.last_name || ' ' || d.first_name AS driver_name,
+                            COALESCE(d.last_name || ' ' || d.first_name, 'Не назначен') AS driver_name,
                             t.name AS tariff_name,
                             os.name AS order_status_name,
                             pm.method_name AS payment_method_name,
                             (SELECT city || ', ' || street || ', д.' || house FROM address WHERE address_id = o.address_from) AS address_from_text,
                             (SELECT city || ', ' || street || ', д.' || house FROM address WHERE address_id = o.address_to) AS address_to_text,
-                            o.order_datetime,
+                            o.order_datetime,  -- ← ИСПРАВЛЕНО: order_datetime
+                            o.start_trip_time,
+                            o.end_trip_time,
                             o.final_cost,
-                            o.order_status AS status_id,
+                            o.order_status,
                             o.driver_id
                         FROM ""Order"" o
                         LEFT JOIN client c ON o.client_id = c.client_id
@@ -51,17 +53,17 @@ namespace taxi4
 
                     if (dateFrom.HasValue)
                     {
-                        query += " AND o.order_datetime >= @dateFrom";
+                        query += " AND o.order_datetime >= @dateFrom";  // ← ИСПРАВЛЕНО: order_datetime
                         cmd.Parameters.AddWithValue("@dateFrom", dateFrom.Value);
                     }
 
                     if (dateTo.HasValue)
                     {
-                        query += " AND o.order_datetime <= @dateTo";
+                        query += " AND o.order_datetime <= @dateTo";  // ← ИСПРАВЛЕНО: order_datetime
                         cmd.Parameters.AddWithValue("@dateTo", dateTo.Value.AddDays(1).AddSeconds(-1));
                     }
 
-                    query += " ORDER BY o.order_datetime DESC";
+                    query += " ORDER BY o.order_datetime DESC";  // ← ИСПРАВЛЕНО: order_datetime
                     cmd.CommandText = query;
 
                     using (var adapter = new NpgsqlDataAdapter(cmd))

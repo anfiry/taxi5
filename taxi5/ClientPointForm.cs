@@ -12,11 +12,16 @@ namespace taxi4
         private DataTable pointsData;
         private DataTable allAddresses;
         private int clientId;
+        private int accountId;
+        private bool back = false;
 
-        public ClientPointForm(int clientId)
+
+        public ClientPointForm(int clientId, int accountId)
         {
             InitializeComponent();
             this.clientId = clientId;
+            this.accountId = accountId;
+
             clientPoint = new ClientPoint();
 
             // Настройка полноэкранного режима
@@ -34,6 +39,13 @@ namespace taxi4
 
             // Скрываем правую панель
             groupBoxPointData.Visible = false;
+        }
+
+        public void OnClosed()
+        {
+            if (back)
+            { back = false; }
+            else { Application.Exit(); }
         }
 
         // ---------- ЗАГРУЗКА АДРЕСОВ ДЛЯ АВТОДОПОЛНЕНИЯ ----------
@@ -453,6 +465,9 @@ namespace taxi4
 
         private void buttonBack_Click(object sender, EventArgs e)
         {
+            ClientMenu ClientMenu = new ClientMenu(accountId);
+            ClientMenu.Show();
+            back = true;
             this.Close();
         }
 

@@ -10,6 +10,8 @@ namespace taxi4
     {
         private AdminPromotion adminPromotion;
         private DataTable promotionsData;
+        private bool back = false;
+
 
         public AdminPromotionForm()
         {
@@ -21,6 +23,13 @@ namespace taxi4
             labelPromotionId.Visible = false;
             textBoxPromotionId.Visible = false;
             groupBoxPromotionData.Visible = false;
+        }
+
+        public void OnClosed()
+        {
+            if (back)
+            { back = false; }
+            else { Application.Exit(); }
         }
 
         // ---------- ЗАГРУЗКА АКЦИЙ ----------
@@ -288,7 +297,9 @@ namespace taxi4
         {
             AdminMenu adminMenu = new AdminMenu();
             adminMenu.Show();
-            this.Hide();
+            back = true;
+            this.Close();
+
         }
 
         private void ClearForm()

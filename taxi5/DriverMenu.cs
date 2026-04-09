@@ -21,12 +21,20 @@ namespace taxi4
         private string driverName = "";
         private int? currentWorkScheduleId = null;
         private DateTime shiftStartTime;
+        private bool back = false;
 
         // Статический метод для добавления суммы заказа
         public static void AddToShiftTotal(decimal amount)
         {
             shiftTotalEarnings += amount;
             shiftTotalOrders++;
+        }
+
+        public void OnClosed()
+        {
+            if (back)
+            { back = false; }
+            else { Application.Exit(); }
         }
 
         // Статический метод для сброса статистики
@@ -59,6 +67,8 @@ namespace taxi4
             this.WindowState = FormWindowState.Maximized;
             this.StartPosition = FormStartPosition.CenterScreen;
         }
+
+        
 
         private void LoadDriverData()
         {
@@ -353,9 +363,10 @@ namespace taxi4
         // ---------- Кнопки ----------
         private void button4_Click(object sender, EventArgs e)
         {
+            LoginForm loginForm = new LoginForm();
+            back = true;
+            loginForm.Show();
             this.Close();
-            LoginForm авторизация = new LoginForm();
-            авторизация.Show();
         }
 
         private void Orders_Click(object sender, EventArgs e)
@@ -373,8 +384,8 @@ namespace taxi4
                 return;
             }
 
-            DriverOrdersForm ordersForm = new DriverOrdersForm(currentDriverId, connectionString);
-            ordersForm.Closed += (s, args) => this.Show();
+            DriverOrdersForm ordersForm = new DriverOrdersForm(this.currentDriverId, this.connectionString, this.AccountId);
+            ordersForm.Closed += (s, args) => ordersForm.OnClosed();
             ordersForm.Show();
             this.Hide();
         }
@@ -387,8 +398,8 @@ namespace taxi4
                 return;
             }
 
-            DriverStatisticsRatingForm statsForm = new DriverStatisticsRatingForm(currentDriverId, connectionString);
-            statsForm.Closed += (s, args) => this.Show();
+            DriverStatisticsRatingForm statsForm = new DriverStatisticsRatingForm(this.currentDriverId, this.connectionString, this.AccountId);
+            statsForm.Closed += (s, args) => statsForm.OnClosed();
             statsForm.Show();
             this.Hide();
         }
@@ -401,10 +412,10 @@ namespace taxi4
                 return;
             }
 
-            DriverShiftsForm shiftsForm = new DriverShiftsForm(currentDriverId, connectionString);
-            shiftsForm.Closed += (s, args) => this.Show();
+            DriverShiftsForm shiftsForm = new DriverShiftsForm(this.currentDriverId, this.connectionString, this.AccountId);
+            shiftsForm.Closed += (s, args) => shiftsForm.OnClosed();
             shiftsForm.Show();
-            this.Hide();
+            this.Close();
         }
 
         // Пустые обработчики для дизайнера

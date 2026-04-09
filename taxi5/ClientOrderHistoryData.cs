@@ -18,35 +18,37 @@ namespace taxi4
                 {
                     conn.Open();
                     string query = @"
-                        SELECT 
-                            o.order_id,
-                            o.order_datetime,
-                            CONCAT(a_from.city, ', ', a_from.street, ', д.', a_from.house,
-                                   CASE WHEN a_from.entrance IS NOT NULL AND a_from.entrance != '' 
-                                        THEN ', подъезд ' || a_from.entrance ELSE '' END) AS address_from,
-                            CONCAT(a_to.city, ', ', a_to.street, ', д.', a_to.house,
-                                   CASE WHEN a_to.entrance IS NOT NULL AND a_to.entrance != '' 
-                                        THEN ', подъезд ' || a_to.entrance ELSE '' END) AS address_to,
-                            COALESCE(t.name, 'Не указан') AS tariff_name,
-                            COALESCE(os.name, 'Неизвестно') AS order_status,
-                            COALESCE(pm.method_name, 'Не указана') AS payment_method,
-                            o.final_cost,
-                            COALESCE(d.last_name || ' ' || d.first_name, 'Не назначен') AS driver_name,
-                            COALESCE(op.promotion_name, '—') AS promotion_name,
-                            COALESCE(op.promotion_percent, 0) AS promotion_percent,
-                            COALESCE(op.promotion_amount, 0) AS promotion_amount,
-                            CASE WHEN r.review_id IS NOT NULL THEN 1 ELSE 0 END AS has_review
-                        FROM ""Order"" o
-                        LEFT JOIN address a_from ON o.address_from = a_from.address_id
-                        LEFT JOIN address a_to ON o.address_to = a_to.address_id
-                        LEFT JOIN tariff t ON o.tariff_id = t.tariff_id
-                        LEFT JOIN order_status os ON o.order_status = os.order_status_id
-                        LEFT JOIN payment_method pm ON o.payment_method = pm.method_id
-                        LEFT JOIN driver d ON o.driver_id = d.driver_id
-                        LEFT JOIN order_promotion op ON o.order_id = op.order_id
-                        LEFT JOIN review r ON o.order_id = r.orber_id
-                        WHERE o.client_id = @clientId
-                        ORDER BY o.order_datetime DESC";
+                SELECT 
+                    o.order_id,
+                    o.order_datetime,
+                    o.start_trip_time,
+                    o.end_trip_time,
+                    CONCAT(a_from.city, ', ', a_from.street, ', д.', a_from.house,
+                           CASE WHEN a_from.entrance IS NOT NULL AND a_from.entrance != '' 
+                                THEN ', подъезд ' || a_from.entrance ELSE '' END) AS address_from,
+                    CONCAT(a_to.city, ', ', a_to.street, ', д.', a_to.house,
+                           CASE WHEN a_to.entrance IS NOT NULL AND a_to.entrance != '' 
+                                THEN ', подъезд ' || a_to.entrance ELSE '' END) AS address_to,
+                    COALESCE(t.name, 'Не указан') AS tariff_name,
+                    COALESCE(os.name, 'Неизвестно') AS order_status,
+                    COALESCE(pm.method_name, 'Не указана') AS payment_method,
+                    o.final_cost,
+                    COALESCE(d.last_name || ' ' || d.first_name, 'Не назначен') AS driver_name,
+                    COALESCE(op.promotion_name, '—') AS promotion_name,
+                    COALESCE(op.promotion_percent, 0) AS promotion_percent,
+                    COALESCE(op.promotion_amount, 0) AS promotion_amount,
+                    CASE WHEN r.review_id IS NOT NULL THEN 1 ELSE 0 END AS has_review
+                FROM ""Order"" o
+                LEFT JOIN address a_from ON o.address_from = a_from.address_id
+                LEFT JOIN address a_to ON o.address_to = a_to.address_id
+                LEFT JOIN tariff t ON o.tariff_id = t.tariff_id
+                LEFT JOIN order_status os ON o.order_status = os.order_status_id
+                LEFT JOIN payment_method pm ON o.payment_method = pm.method_id
+                LEFT JOIN driver d ON o.driver_id = d.driver_id
+                LEFT JOIN order_promotion op ON o.order_id = op.order_id
+                LEFT JOIN review r ON o.order_id = r.orber_id
+                WHERE o.client_id = @clientId
+                ORDER BY o.order_datetime DESC";
 
                     using (var cmd = new NpgsqlCommand(query, conn))
                     {
@@ -77,6 +79,8 @@ namespace taxi4
                 SELECT 
                     o.order_id,
                     o.order_datetime,
+                    o.start_trip_time,
+                    o.end_trip_time,
                     CONCAT(COALESCE(a_from.city, ''), ', ', COALESCE(a_from.street, ''), ', д.', COALESCE(a_from.house, ''),
                            CASE WHEN a_from.entrance IS NOT NULL AND a_from.entrance != '' 
                                 THEN ', подъезд ' || a_from.entrance ELSE '' END) AS address_from_full,

@@ -1,4 +1,8 @@
-﻿namespace taxi4
+﻿using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+namespace taxi4
 {
     partial class AdminOrderForm
     {
@@ -54,10 +58,10 @@
             // buttonRefresh
             // 
             this.buttonRefresh.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.buttonRefresh.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(251)))), ((int)(((byte)(228)))), ((int)(((byte)(255)))));
+            this.buttonRefresh.BackColor = System.Drawing.Color.FromArgb(251, 228, 255);
             this.buttonRefresh.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonRefresh.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
-            this.buttonRefresh.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(4)))), ((int)(((byte)(0)))), ((int)(((byte)(66)))));
+            this.buttonRefresh.ForeColor = System.Drawing.Color.FromArgb(4, 0, 66);
             this.buttonRefresh.Location = new System.Drawing.Point(1102, 35);
             this.buttonRefresh.Name = "buttonRefresh";
             this.buttonRefresh.Size = new System.Drawing.Size(120, 40);
@@ -69,10 +73,10 @@
             // buttonSearch
             // 
             this.buttonSearch.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.buttonSearch.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(227)))), ((int)(((byte)(255)))));
+            this.buttonSearch.BackColor = System.Drawing.Color.FromArgb(230, 227, 255);
             this.buttonSearch.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonSearch.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
-            this.buttonSearch.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(4)))), ((int)(((byte)(0)))), ((int)(((byte)(66)))));
+            this.buttonSearch.ForeColor = System.Drawing.Color.FromArgb(4, 0, 66);
             this.buttonSearch.Location = new System.Drawing.Point(907, 35);
             this.buttonSearch.Name = "buttonSearch";
             this.buttonSearch.Size = new System.Drawing.Size(90, 40);
@@ -84,10 +88,10 @@
             // buttonBack
             // 
             this.buttonBack.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.buttonBack.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(227)))), ((int)(((byte)(227)))));
+            this.buttonBack.BackColor = System.Drawing.Color.FromArgb(255, 227, 227);
             this.buttonBack.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonBack.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
-            this.buttonBack.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(4)))), ((int)(((byte)(0)))), ((int)(((byte)(66)))));
+            this.buttonBack.ForeColor = System.Drawing.Color.FromArgb(4, 0, 66);
             this.buttonBack.Location = new System.Drawing.Point(1316, 35);
             this.buttonBack.Name = "buttonBack";
             this.buttonBack.Size = new System.Drawing.Size(120, 40);
@@ -99,10 +103,10 @@
             // buttonApplyFilter
             // 
             this.buttonApplyFilter.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.buttonApplyFilter.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(227)))), ((int)(((byte)(255)))));
+            this.buttonApplyFilter.BackColor = System.Drawing.Color.FromArgb(230, 227, 255);
             this.buttonApplyFilter.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonApplyFilter.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
-            this.buttonApplyFilter.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(4)))), ((int)(((byte)(0)))), ((int)(((byte)(66)))));
+            this.buttonApplyFilter.ForeColor = System.Drawing.Color.FromArgb(4, 0, 66);
             this.buttonApplyFilter.Location = new System.Drawing.Point(386, 35);
             this.buttonApplyFilter.Name = "buttonApplyFilter";
             this.buttonApplyFilter.Size = new System.Drawing.Size(122, 40);
@@ -176,7 +180,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewOrders)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
-
         }
     }
 }

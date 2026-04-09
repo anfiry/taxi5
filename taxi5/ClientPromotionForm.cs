@@ -9,13 +9,16 @@ namespace taxi4
     {
         private ClientPromotionData promotionData;
         private int clientId;
+        private bool back = false;
+        private int accountId;
+
 
         public ClientPromotionForm()
         {
             InitializeComponent();
         }
 
-        public ClientPromotionForm(int clientId)
+        public ClientPromotionForm(int clientId, int accountId)
         {
             InitializeComponent();
 
@@ -33,6 +36,14 @@ namespace taxi4
             promotionData = new ClientPromotionData();
             LoadPromotions();
             ConfigureDataGridView();
+            this.accountId = accountId;
+        }
+
+        public void OnClosed()
+        {
+            if (back)
+            { back = false; }
+            else { Application.Exit(); }
         }
 
         private void LoadPromotions()
@@ -156,6 +167,9 @@ namespace taxi4
 
         private void buttonBack_Click(object sender, EventArgs e)
         {
+            ClientMenu ClientMenu = new ClientMenu(accountId);
+            ClientMenu.Show();
+            back = true;
             this.Close();
         }
 

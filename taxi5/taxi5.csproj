@@ -324,6 +324,12 @@
     <EmbeddedResource Include="DriverOrderDetailsForm.resx">
       <DependentUpon>DriverOrderDetailsForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="DriverShiftsForm.resx">
+      <DependentUpon>DriverShiftsForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DriverStatisticsRatingForm.resx">
+      <DependentUpon>DriverStatisticsRatingForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="LoginForm.resx">
       <DependentUpon>LoginForm.cs</DependentUpon>
     </EmbeddedResource>

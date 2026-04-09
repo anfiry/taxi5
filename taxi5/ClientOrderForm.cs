@@ -18,6 +18,14 @@ namespace taxi4
         private int accountId;
         private int clientId;
         private DataTable allAddresses;
+        private bool back = false;
+
+        public void OnClosed()
+        {
+            if (back)
+            { back = false; }
+            else { Application.Exit(); }
+        }
 
         public ClientOrderForm(int accountId)
         {
@@ -373,6 +381,9 @@ namespace taxi4
 
         private void buttonBack_Click(object sender, EventArgs e)
         {
+            ClientMenu ClientMenu = new ClientMenu(accountId);
+            ClientMenu.Show();
+            back = true;
             this.Close();
         }
     }

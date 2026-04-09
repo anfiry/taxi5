@@ -8,12 +8,21 @@ namespace taxi4
     public partial class LoginForm : Form
     {
         private string connectionString = "Server=localhost;Port=5432;Database=taxi4;User Id=postgres;Password=123";
-
+        private bool back = false;
         public LoginForm()
         {
             InitializeComponent();
             this.PassField.AutoSize = false;
             this.PassField.Size = new Size(this.PassField.Size.Width, 44);
+
+            this.Closed += (s, args) => OnClosed();
+        }
+
+        public void OnClosed()
+        {
+            if (back)
+            { back = false; }
+            else { Application.Exit(); }
         }
 
         private void InButton_Click(object sender, EventArgs e)
@@ -58,29 +67,29 @@ namespace taxi4
                                     adminMenu.Role = "Администратор";
                                     adminMenu.AccountId = accountId;
                                     adminMenu.UserLogin = login;
-                                    adminMenu.Closed += (s, args) => Application.Exit();
+                                    adminMenu.Closed += (s, args) => adminMenu.OnClosed();
 
                                     adminMenu.Show();
-                                    Hide();
+                                    this.Hide();
                                 }
                                 else if (roleId == 2) // клиент
                                 {
                                     ClientMenu clientMenu = new ClientMenu(accountId); // ← передаём accountId в конструктор
                                     clientMenu.Role = "Клиент";
                                     clientMenu.UserLogin = login;
-                                    clientMenu.Closed += (s, args) => Application.Exit();
+                                    clientMenu.Closed += (s, args) => clientMenu.OnClosed();
 
                                     clientMenu.Show();
-                                    Hide();
+                                    this.Hide();
                                 }
                                 else if (roleId == 3) // водитель
                                 {
                                     DriverMenu driverMenu = new DriverMenu(accountId); // ← передаём accountId в конструктор
                                     driverMenu.Role = "Водитель";
                                     driverMenu.UserLogin = login;
-                                    driverMenu.Closed += (s, args) => Application.Exit();
+                                    driverMenu.Closed += (s, args) => driverMenu.OnClosed();
                                     driverMenu.Show();
-                                    Hide();
+                                    this.Hide();
                                 }
                                 else
                                 {

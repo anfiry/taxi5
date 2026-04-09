@@ -1,4 +1,8 @@
-﻿namespace taxi4
+﻿using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+namespace taxi4
 {
     partial class ClientTrackOrderForm
     {
@@ -28,8 +32,8 @@
             // 
             this.dataGridViewOrders.AllowUserToAddRows = false;
             this.dataGridViewOrders.AllowUserToDeleteRows = false;
-            this.dataGridViewOrders.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.dataGridViewOrders.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.dataGridViewOrders.BackgroundColor = System.Drawing.Color.White;
             this.dataGridViewOrders.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
@@ -100,7 +104,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewOrders)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
-
         }
     }
 }

@@ -10,6 +10,8 @@ namespace taxi4
     {
         private AdminTariff adminTariff;
         private DataTable tariffsData;
+        private bool back = false;
+
 
         public AdminTariffForm()
         {
@@ -20,6 +22,13 @@ namespace taxi4
             ClearForm();
             groupBoxTariffData.Visible = false;
 
+        }
+
+        public void OnClosed()
+        {
+            if (back)
+            { back = false; }
+            else { Application.Exit(); }
         }
 
         private void LoadTariffs()
@@ -256,7 +265,8 @@ namespace taxi4
         {
             AdminMenu adminMenu = new AdminMenu();
             adminMenu.Show();
-            this.Hide();
+            back = true;
+            this.Close();
         }
 
         private void ClearForm()

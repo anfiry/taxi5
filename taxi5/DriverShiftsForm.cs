@@ -9,12 +9,26 @@ namespace taxi4
     {
         private int driverId;
         private string connectionString;
+        private bool back = false;
+        private int accountId;
 
-        public DriverShiftsForm(int driverId, string connectionString)
+        public void OnClosed()
+        {
+            if (back)
+            { back = false; }
+            else { Application.Exit(); }
+        }
+
+        public DriverShiftsForm(int driverId, string connectionString, int accountId)
         {
             this.driverId = driverId;
             this.connectionString = connectionString;
+            this.accountId = accountId;
+
             InitializeComponent();
+
+            // Настройка стилей колонок ПОСЛЕ InitializeComponent
+            ConfigureDataGridViewColumns();
 
             // Подписываемся на события
             this.btnBack.Click += BtnBack_Click;
@@ -23,6 +37,16 @@ namespace taxi4
 
             // Устанавливаем позицию кнопки
             UpdateButtonPosition();
+        }
+
+        private void ConfigureDataGridViewColumns()
+        {
+            // Настройка выравнивания колонок
+            if (dgvHistory.Columns["Duration"] != null)
+                dgvHistory.Columns["Duration"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+
+            if (dgvHistory.Columns["Status"] != null)
+                dgvHistory.Columns["Status"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
         }
 
         private void DriverShiftsForm_Load(object sender, EventArgs e)
@@ -203,6 +227,10 @@ namespace taxi4
 
         private void BtnBack_Click(object sender, EventArgs e)
         {
+            DriverMenu driverMenu = new DriverMenu(accountId);
+            back = true;
+
+            driverMenu.Show();
             this.Close();
         }
     }

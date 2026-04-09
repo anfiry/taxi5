@@ -13,6 +13,8 @@ namespace taxi4
         private DataTable allBrands;
         private DataTable allModels;
         private DataTable allColors;
+        private bool back = false;
+
 
         public AdminCarForm()
         {
@@ -27,6 +29,13 @@ namespace taxi4
             labelCarId.Visible = false;
             textBoxCarId.Visible = false;
             groupBoxCarData.Visible = false;
+        }
+
+        public void OnClosed()
+        {
+            if (back)
+            { back = false; }
+            else { Application.Exit(); }
         }
 
         // ---------- ЗАГРУЗКА ДАННЫХ ----------
@@ -482,7 +491,9 @@ namespace taxi4
         {
             AdminMenu adminMenu = new AdminMenu();
             adminMenu.Show();
-            this.Hide();
+            back = true;
+
+            this.Close();
         }
 
         private void ClearForm()

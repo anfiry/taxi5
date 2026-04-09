@@ -1,7 +1,8 @@
-﻿using System;
+﻿using Npgsql;
+using System;
 using System.Drawing;
+using System.Net;
 using System.Windows.Forms;
-using Npgsql;
 
 namespace taxi4
 {
@@ -9,24 +10,32 @@ namespace taxi4
     {
         private int driverId;
         private string connectionString;
+        private int accountId;
+        private bool back = false;
 
         public DriverOrdersForm()
         {
             InitializeComponent();
         }
 
-        public DriverOrdersForm(int driverId, string connectionString) : this()
+        public void OnClosed()
+        {
+            if (back)
+            { back = false; }
+            else { Application.Exit(); }
+        }
+
+        public DriverOrdersForm(int driverId, string connectionString, int accountId) : this()
         {
             this.driverId = driverId;
             this.connectionString = connectionString;
+            this.accountId = accountId;
 
-            // Настройка полноэкранного режима
             this.WindowState = FormWindowState.Maximized;
             this.StartPosition = FormStartPosition.CenterScreen;
             this.FormBorderStyle = FormBorderStyle.Sizable;
             this.MinimumSize = new Size(900, 600);
 
-            // Подписываемся на событие изменения размера
             this.Resize += DriverOrdersForm_Resize;
 
             if (HasActiveOrder())
@@ -41,7 +50,6 @@ namespace taxi4
 
         private void DriverOrdersForm_Resize(object sender, EventArgs e)
         {
-            // При изменении размера формы перезагружаем заказы
             if (!HasActiveOrder())
             {
                 LoadAvailableOrders();
@@ -79,7 +87,6 @@ namespace taxi4
         {
             flowLayoutPanel.Controls.Clear();
             lblActiveOrderInfo.Visible = true;
-            lblActiveOrderInfo.Text = "⚠️ У вас уже есть активный заказ. Завершите его, чтобы видеть новые заказы.";
 
             Label lblMessage = new Label
             {
@@ -105,7 +112,7 @@ namespace taxi4
                     Font = new Font("Microsoft Sans Serif", 11F, FontStyle.Bold)
                 };
                 btnCompleteOrder.FlatAppearance.BorderSize = 0;
-                btnCompleteOrder.Click += (s, e) =>
+                btnCompleteOrder.Click += (sender, evt) =>
                 {
                     using (var conn = new NpgsqlConnection(connectionString))
                     {
@@ -140,7 +147,8 @@ namespace taxi4
                                         cost.ToString(),
                                         "2",
                                         driverId,
-                                        connectionString
+                                        connectionString,
+                                        accountId
                                     );
 
                                     if (detailsForm.ShowDialog() == DialogResult.OK)
@@ -166,6 +174,10 @@ namespace taxi4
 
         private void BtnBack_Click(object sender, EventArgs e)
         {
+            DriverMenu driverMenu = new DriverMenu(accountId);
+            back = true;
+
+            driverMenu.Show();
             this.Close();
         }
 
@@ -174,25 +186,24 @@ namespace taxi4
             flowLayoutPanel.Controls.Clear();
             lblActiveOrderInfo.Visible = false;
 
-            // Получаем ширину панели
             int panelWidth = flowLayoutPanel.ClientSize.Width - 40;
             int cardWidth = Math.Max(panelWidth, 700);
 
             string query = @"
-        SELECT 
-            o.order_id,
-            COALESCE(a_from.city, '') || ', ' || COALESCE(a_from.street, '') || ', д. ' || COALESCE(a_from.house, '') AS from_address,
-            COALESCE(a_to.city, '') || ', ' || COALESCE(a_to.street, '') || ', д. ' || COALESCE(a_to.house, '') AS to_address,
-            o.final_cost,
-            t.name AS tariff_name
-        FROM ""Order"" o
-        JOIN address a_from ON o.address_from = a_from.address_id
-        JOIN address a_to ON o.address_to = a_to.address_id
-        JOIN tariff t ON o.tariff_id = t.tariff_id
-        WHERE o.driver_id IS NULL
-          AND o.order_status = 1
-        ORDER BY o.order_datetime DESC
-        LIMIT 20;";
+                SELECT 
+                    o.order_id,
+                    COALESCE(a_from.city, '') || ', ' || COALESCE(a_from.street, '') || ', д. ' || COALESCE(a_from.house, '') AS from_address,
+                    COALESCE(a_to.city, '') || ', ' || COALESCE(a_to.street, '') || ', д. ' || COALESCE(a_to.house, '') AS to_address,
+                    o.final_cost,
+                    t.name AS tariff_name
+                FROM ""Order"" o
+                JOIN address a_from ON o.address_from = a_from.address_id
+                JOIN address a_to ON o.address_to = a_to.address_id
+                JOIN tariff t ON o.tariff_id = t.tariff_id
+                WHERE o.driver_id IS NULL
+                  AND o.order_status = 1
+                ORDER BY o.order_datetime DESC
+                LIMIT 20;";
 
             using (var conn = new NpgsqlConnection(connectionString))
             {
@@ -209,7 +220,6 @@ namespace taxi4
                             decimal cost = reader.GetDecimal(3);
                             string tariff = reader.GetString(4);
 
-                            // Создаем карточку заказа
                             Panel orderCard = new Panel
                             {
                                 Width = cardWidth - 20,
@@ -219,7 +229,6 @@ namespace taxi4
                                 Margin = new Padding(0, 0, 0, 10)
                             };
 
-                            // Адрес отправления
                             Label lblFrom = new Label
                             {
                                 Text = $"📍 {from}",
@@ -230,7 +239,6 @@ namespace taxi4
                                 ForeColor = Color.Black
                             };
 
-                            // Адрес назначения
                             Label lblTo = new Label
                             {
                                 Text = $"➔ {to}",
@@ -241,7 +249,6 @@ namespace taxi4
                                 ForeColor = Color.Black
                             };
 
-                            // Тариф
                             Label lblTariff = new Label
                             {
                                 Text = $"🚗 {tariff}",
@@ -252,7 +259,6 @@ namespace taxi4
                                 ForeColor = Color.FromArgb(100, 100, 100)
                             };
 
-                            // Цена - справа
                             Label lblPrice = new Label
                             {
                                 Text = $"{cost:N0} ₽",
@@ -264,7 +270,6 @@ namespace taxi4
                                 TextAlign = ContentAlignment.MiddleRight
                             };
 
-                            // Кнопка "Подробнее" - под ценой
                             Button btnDetails = new Button
                             {
                                 Text = "Подробнее →",
@@ -278,7 +283,7 @@ namespace taxi4
                                 Tag = orderId
                             };
                             btnDetails.FlatAppearance.BorderSize = 0;
-                            btnDetails.Click += (s, e) =>
+                            btnDetails.Click += (senderBtn, evtBtn) =>
                             {
                                 DriverOrderDetailsForm detailsForm = new DriverOrderDetailsForm(
                                     orderId,
@@ -287,16 +292,13 @@ namespace taxi4
                                     cost.ToString(),
                                     "1",
                                     driverId,
-                                    connectionString
+                                    connectionString,
+                                    accountId
                                 );
 
-                                if (detailsForm.ShowDialog() == DialogResult.OK)
-                                {
-                                    if (HasActiveOrder())
-                                        ShowActiveOrderMessage();
-                                    else
-                                        LoadAvailableOrders();
-                                }
+                                detailsForm.Closed += (s, args) => detailsForm.OnClosed();
+                                detailsForm.Show();
+                                this.Hide();
                             };
 
                             orderCard.Controls.AddRange(new Control[] { lblFrom, lblTo, lblTariff, lblPrice, btnDetails });

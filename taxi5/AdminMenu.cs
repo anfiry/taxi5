@@ -9,19 +9,26 @@ namespace taxi4
         public string Role { get; set; }
         public int AccountId { get; set; }
         public string UserLogin { get; set; }
-
+        private bool back = false;
         public AdminMenu()
         {
             InitializeComponent();
+        }
+
+        public void OnClosed()
+        {
+            if (back)
+            { back = false; }
+            else { Application.Exit(); }
         }
 
         // Кнопка "Назад" – просто закрывает меню, LoginForm покажется через событие Closed
         private void AdmButtonCancel_Click(object sender, EventArgs e)
         {
             LoginForm loginForm = new LoginForm();
-            loginForm.Closed += (s, args) => this.Show();
+            back = true;
             loginForm.Show();
-            this.Hide();
+            this.Close();
         }
             
        
@@ -29,7 +36,7 @@ namespace taxi4
         private void AdmButtonDrivers_Click(object sender, EventArgs e)
         {
             AdminDriverForm driverForm = new AdminDriverForm();
-            driverForm.Closed += (s, args) => this.Show();
+            driverForm.Closed += (s, args) => driverForm.OnClosed();
             driverForm.Show();
             this.Hide();
         }
@@ -38,7 +45,7 @@ namespace taxi4
         private void AdmButtonCar_Click(object sender, EventArgs e)
         {
             AdminCarForm carForm = new AdminCarForm();
-            carForm.Closed += (s, args) => this.Show();
+            carForm.Closed += (s, args) => carForm.OnClosed();
             carForm.Show();
             this.Hide();
         }
@@ -47,7 +54,7 @@ namespace taxi4
         private void AdmButtonTarifs_Click(object sender, EventArgs e)
         {
             AdminTariffForm tariffForm = new AdminTariffForm();
-            tariffForm.Closed += (s, args) => this.Show();
+            tariffForm.Closed += (s, args) => tariffForm.OnClosed();
             tariffForm.Show();
             this.Hide();
         }
@@ -56,7 +63,7 @@ namespace taxi4
         private void AdmButtonOrders_Click(object sender, EventArgs e)
         {
             AdminOrderForm orderForm = new AdminOrderForm();
-            orderForm.Closed += (s, args) => this.Show();
+            orderForm.Closed += (s, args) => orderForm.OnClosed();
             orderForm.Show();
             this.Hide();
         }
@@ -65,7 +72,7 @@ namespace taxi4
         private void AdmButtonPromotion_Click(object sender, EventArgs e)
         {
             AdminPromotionForm promotionForm = new AdminPromotionForm();
-            promotionForm.Closed += (s, args) => this.Show();
+            promotionForm.Closed += (s, args) => promotionForm.OnClosed();
             promotionForm.Show();
             this.Hide();
         }
@@ -73,9 +80,10 @@ namespace taxi4
         private void AdmButtonClient_Click_1(object sender, EventArgs e)
         {
             AdminClientForm clientForm = new AdminClientForm();
-            clientForm.Closed += (s, args) => this.Show();
+            clientForm.Closed += (s, args) => clientForm.OnClosed();
             clientForm.Show();
             this.Hide();
+            
         }
     }
 }

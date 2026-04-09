@@ -10,7 +10,7 @@ namespace taxi4
         public int AccountId { get; private set; }
         public string UserLogin { get; set; }
         public int ClientId { get; private set; }
-
+        private bool back = false;
         public ClientMenu(int accountId)
         {
             InitializeComponent();
@@ -26,6 +26,13 @@ namespace taxi4
         public ClientMenu()
         {
             InitializeComponent();
+        }
+
+        public void OnClosed()
+        {
+            if (back)
+            { back = false; }
+            else { Application.Exit(); }
         }
 
         private void LoadClientId()
@@ -50,7 +57,7 @@ namespace taxi4
         private void btnNewOrder_Click(object sender, EventArgs e)
         {
             ClientOrderForm orderForm = new ClientOrderForm(this.AccountId);
-            orderForm.Closed += (s, args) => this.Show();
+            orderForm.Closed += (s, args) => orderForm.OnClosed();
             orderForm.Show();
             this.Hide();
         }
@@ -63,8 +70,8 @@ namespace taxi4
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            ClientTrackOrderForm trackForm = new ClientTrackOrderForm(this.ClientId);
-            trackForm.Closed += (s, args) => this.Show();
+            ClientTrackOrderForm trackForm = new ClientTrackOrderForm(this.ClientId, this.AccountId);
+            trackForm.Closed += (s, args) => trackForm.OnClosed();
             trackForm.Show();
             this.Hide();
         }
@@ -78,8 +85,8 @@ namespace taxi4
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            ClientOrderHistoryForm historyForm = new ClientOrderHistoryForm(this.ClientId);
-            historyForm.Closed += (s, args) => this.Show();
+            ClientOrderHistoryForm historyForm = new ClientOrderHistoryForm(this.ClientId, this.AccountId);
+            historyForm.Closed += (s, args) => historyForm.OnClosed();
             historyForm.Show();
             this.Hide();
         }
@@ -92,8 +99,8 @@ namespace taxi4
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            ClientPointForm pointForm = new ClientPointForm(this.ClientId);
-            pointForm.Closed += (s, args) => this.Show();
+            ClientPointForm pointForm = new ClientPointForm(this.ClientId, this.AccountId);
+            pointForm.Closed += (s, args) => pointForm.OnClosed();
             pointForm.Show();
             this.Hide();
         }
@@ -106,8 +113,8 @@ namespace taxi4
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            ClientPromotionForm promoForm = new ClientPromotionForm(this.ClientId);
-            promoForm.Closed += (s, args) => this.Show();
+            ClientPromotionForm promoForm = new ClientPromotionForm(this.ClientId, this.AccountId);
+            promoForm.Closed += (s, args) => promoForm.OnClosed();
             promoForm.Show();
             this.Hide();
         }
@@ -115,9 +122,9 @@ namespace taxi4
         private void btnBack_Click(object sender, EventArgs e)
         {
             LoginForm loginForm = new LoginForm();
-            loginForm.Closed += (s, args) => this.Show();
+            back = true;
             loginForm.Show();
-            this.Hide();
+            this.Close();
         }
     }
 }

@@ -23,72 +23,129 @@ namespace taxi4
 
         private void InitializeComponent()
         {
-            // Настройка формы
-            this.Text = "📋 История смен";
-            this.WindowState = FormWindowState.Maximized;
-            this.FormBorderStyle = FormBorderStyle.Sizable;
-            this.BackColor = Color.FromArgb(240, 240, 240);
-            this.MinimumSize = new Size(800, 500);
-            this.StartPosition = FormStartPosition.CenterScreen;
-
-            // Верхняя панель
-            this.topPanel = new Panel();
-            this.topPanel.Dock = DockStyle.Top;
-            this.topPanel.Height = 60;
-            this.topPanel.BackColor = Color.FromArgb(52, 73, 94);
-
-            // Заголовок
-            this.lblTitle = new Label();
-            this.lblTitle.Text = "📋 История смен";
-            this.lblTitle.Font = new Font("Segoe UI", 18F, FontStyle.Bold);
-            this.lblTitle.ForeColor = Color.White;
-            this.lblTitle.Location = new Point(20, 12);
-            this.lblTitle.Size = new Size(300, 35);
-            this.lblTitle.TextAlign = ContentAlignment.MiddleLeft;
-
-            // Кнопка "Назад"
-            this.btnBack = new Button();
-            this.btnBack.Text = "◀ Назад";
-            this.btnBack.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-            this.btnBack.Size = new Size(100, 35);
-            this.btnBack.BackColor = Color.FromArgb(231, 76, 60);
-            this.btnBack.ForeColor = Color.White;
-            this.btnBack.FlatStyle = FlatStyle.Flat;
-            this.btnBack.FlatAppearance.BorderSize = 0;
-            this.btnBack.Cursor = Cursors.Hand;
-            this.btnBack.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-
-            // Добавляем элементы на верхнюю панель
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            this.topPanel = new System.Windows.Forms.Panel();
+            this.lblTitle = new System.Windows.Forms.Label();
+            this.btnBack = new System.Windows.Forms.Button();
+            this.dgvHistory = new System.Windows.Forms.DataGridView();
+            this.dataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn3 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn4 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.topPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvHistory)).BeginInit();
+            this.SuspendLayout();
+            // 
+            // topPanel
+            // 
+            this.topPanel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(52)))), ((int)(((byte)(73)))), ((int)(((byte)(94)))));
             this.topPanel.Controls.Add(this.lblTitle);
             this.topPanel.Controls.Add(this.btnBack);
-
-            // Настройка DataGridView
-            this.dgvHistory = new DataGridView();
-            this.dgvHistory.Dock = DockStyle.Fill;
-            this.dgvHistory.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            this.topPanel.Dock = System.Windows.Forms.DockStyle.Top;
+            this.topPanel.Location = new System.Drawing.Point(0, 0);
+            this.topPanel.Name = "topPanel";
+            this.topPanel.Size = new System.Drawing.Size(1203, 60);
+            this.topPanel.TabIndex = 1;
+            // 
+            // lblTitle
+            // 
+            this.lblTitle.Font = new System.Drawing.Font("Segoe UI", 18F, System.Drawing.FontStyle.Bold);
+            this.lblTitle.ForeColor = System.Drawing.Color.White;
+            this.lblTitle.Location = new System.Drawing.Point(20, 12);
+            this.lblTitle.Name = "lblTitle";
+            this.lblTitle.Size = new System.Drawing.Size(300, 35);
+            this.lblTitle.TabIndex = 0;
+            this.lblTitle.Text = "📋 История смен";
+            this.lblTitle.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // btnBack
+            // 
+            this.btnBack.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnBack.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(231)))), ((int)(((byte)(76)))), ((int)(((byte)(60)))));
+            this.btnBack.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnBack.FlatAppearance.BorderSize = 0;
+            this.btnBack.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnBack.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
+            this.btnBack.ForeColor = System.Drawing.Color.White;
+            this.btnBack.Location = new System.Drawing.Point(1026, 12);
+            this.btnBack.Name = "btnBack";
+            this.btnBack.Size = new System.Drawing.Size(100, 35);
+            this.btnBack.TabIndex = 1;
+            this.btnBack.Text = "Назад";
+            this.btnBack.UseVisualStyleBackColor = false;
+            // 
+            // dgvHistory
+            // 
+            this.dgvHistory.AllowUserToAddRows = false;
+            dataGridViewCellStyle1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(245)))), ((int)(((byte)(245)))));
+            this.dgvHistory.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
+            this.dgvHistory.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.dgvHistory.BackgroundColor = System.Drawing.Color.White;
+            this.dgvHistory.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.dgvHistory.ColumnHeadersHeight = 29;
+            this.dgvHistory.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.dataGridViewTextBoxColumn1,
+            this.dataGridViewTextBoxColumn2,
+            this.dataGridViewTextBoxColumn3,
+            this.dataGridViewTextBoxColumn4});
+            this.dgvHistory.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dgvHistory.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.dgvHistory.Location = new System.Drawing.Point(0, 60);
+            this.dgvHistory.Name = "dgvHistory";
             this.dgvHistory.ReadOnly = true;
             this.dgvHistory.RowHeadersVisible = false;
-            this.dgvHistory.AllowUserToAddRows = false;
-            this.dgvHistory.BackgroundColor = Color.White;
-            this.dgvHistory.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(245, 245, 245);
-            this.dgvHistory.BorderStyle = BorderStyle.None;
-            this.dgvHistory.Font = new Font("Segoe UI", 10F);
-
-            // Колонки
-            this.dgvHistory.Columns.Add("StartDateTime", "🕐 Начало смены");
-            this.dgvHistory.Columns.Add("EndDateTime", "🏁 Конец смены");
-            this.dgvHistory.Columns.Add("Duration", "⏱ Длительность");
-            this.dgvHistory.Columns.Add("Status", "📌 Статус");
-
-            // Настройка выравнивания
-            if (this.dgvHistory.Columns["Duration"] != null)
-                this.dgvHistory.Columns["Duration"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            if (this.dgvHistory.Columns["Status"] != null)
-                this.dgvHistory.Columns["Status"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
-
-            // Добавляем элементы на форму
+            this.dgvHistory.RowHeadersWidth = 51;
+            this.dgvHistory.Size = new System.Drawing.Size(1203, 583);
+            this.dgvHistory.TabIndex = 0;
+            // 
+            // dataGridViewTextBoxColumn1
+            // 
+            this.dataGridViewTextBoxColumn1.HeaderText = "🕐 Начало смены";
+            this.dataGridViewTextBoxColumn1.MinimumWidth = 6;
+            this.dataGridViewTextBoxColumn1.Name = "dataGridViewTextBoxColumn1";
+            this.dataGridViewTextBoxColumn1.ReadOnly = true;
+            // 
+            // dataGridViewTextBoxColumn2
+            // 
+            this.dataGridViewTextBoxColumn2.HeaderText = "🏁 Конец смены";
+            this.dataGridViewTextBoxColumn2.MinimumWidth = 6;
+            this.dataGridViewTextBoxColumn2.Name = "dataGridViewTextBoxColumn2";
+            this.dataGridViewTextBoxColumn2.ReadOnly = true;
+            // 
+            // dataGridViewTextBoxColumn3
+            // 
+            this.dataGridViewTextBoxColumn3.HeaderText = "⏱ Длительность";
+            this.dataGridViewTextBoxColumn3.MinimumWidth = 6;
+            this.dataGridViewTextBoxColumn3.Name = "dataGridViewTextBoxColumn3";
+            this.dataGridViewTextBoxColumn3.ReadOnly = true;
+            // 
+            // dataGridViewTextBoxColumn4
+            // 
+            this.dataGridViewTextBoxColumn4.HeaderText = "📌 Статус";
+            this.dataGridViewTextBoxColumn4.MinimumWidth = 6;
+            this.dataGridViewTextBoxColumn4.Name = "dataGridViewTextBoxColumn4";
+            this.dataGridViewTextBoxColumn4.ReadOnly = true;
+            // 
+            // DriverShiftsForm
+            // 
+            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
+            this.ClientSize = new System.Drawing.Size(1203, 643);
             this.Controls.Add(this.dgvHistory);
             this.Controls.Add(this.topPanel);
+            this.MinimumSize = new System.Drawing.Size(800, 500);
+            this.Name = "DriverShiftsForm";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.Text = "📋 История смен";
+            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
+            this.topPanel.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.dgvHistory)).EndInit();
+            this.ResumeLayout(false);
+
         }
+
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn1;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn2;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn3;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn4;
     }
 }

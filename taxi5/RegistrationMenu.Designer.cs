@@ -2,50 +2,49 @@
 {
     partial class RegistrationMenu
     {
-        /// <summary>
-        /// Required designer variable.
-        /// </summary>
         private System.ComponentModel.IContainer components = null;
+        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.TextBox txtVerificationCode;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.TextBox txtPhone;
+        private System.Windows.Forms.Button btnSendCode;
+        private System.Windows.Forms.Button btnRegister;
+        private System.Windows.Forms.Button btnVerifyCode;
+        private System.Windows.Forms.TextBox txtConfirmPassword;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.TextBox txtPassword;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.TextBox txtLogin;
+        private System.Windows.Forms.TextBox txtFirstName;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.TextBox txtLastName;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.TextBox txtPatronymic;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Button BtnCancel;
+        private System.Windows.Forms.Label label13;
+        private System.Windows.Forms.ComboBox cmbAddress;
 
-        /// <summary>
-        /// Clean up any resources being used.
-        /// </summary>
-        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
-            {
                 components.Dispose();
-            }
             base.Dispose(disposing);
         }
 
-    
-
-        #region Windows Form Designer generated code
-
-            /// <summary>
-            /// Required method for Designer support - do not modify
-            /// the contents of this method with the code editor.
-            /// </summary>
         private void InitializeComponent()
         {
             this.panel1 = new System.Windows.Forms.Panel();
             this.label13 = new System.Windows.Forms.Label();
-            this.textCity = new System.Windows.Forms.TextBox();
-            this.label9 = new System.Windows.Forms.Label();
+            this.cmbAddress = new System.Windows.Forms.ComboBox();
             this.BtnCancel = new System.Windows.Forms.Button();
-            this.textStreet = new System.Windows.Forms.TextBox();
             this.txtFirstName = new System.Windows.Forms.TextBox();
-            this.label10 = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
-            this.textHouse = new System.Windows.Forms.TextBox();
             this.txtLastName = new System.Windows.Forms.TextBox();
-            this.label11 = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
-            this.textEntrance = new System.Windows.Forms.TextBox();
             this.txtPatronymic = new System.Windows.Forms.TextBox();
-            this.label12 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.txtConfirmPassword = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
@@ -67,20 +66,13 @@
             // 
             this.panel1.BackColor = System.Drawing.Color.White;
             this.panel1.Controls.Add(this.label13);
-            this.panel1.Controls.Add(this.textCity);
-            this.panel1.Controls.Add(this.label9);
+            this.panel1.Controls.Add(this.cmbAddress);
             this.panel1.Controls.Add(this.BtnCancel);
-            this.panel1.Controls.Add(this.textStreet);
             this.panel1.Controls.Add(this.txtFirstName);
-            this.panel1.Controls.Add(this.label10);
             this.panel1.Controls.Add(this.label8);
-            this.panel1.Controls.Add(this.textHouse);
             this.panel1.Controls.Add(this.txtLastName);
-            this.panel1.Controls.Add(this.label11);
             this.panel1.Controls.Add(this.label7);
-            this.panel1.Controls.Add(this.textEntrance);
             this.panel1.Controls.Add(this.txtPatronymic);
-            this.panel1.Controls.Add(this.label12);
             this.panel1.Controls.Add(this.label6);
             this.panel1.Controls.Add(this.txtConfirmPassword);
             this.panel1.Controls.Add(this.label5);
@@ -107,32 +99,22 @@
             this.label13.AutoSize = true;
             this.label13.Font = new System.Drawing.Font("Noto Sans Georgian", 16.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label13.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(4)))), ((int)(((byte)(0)))), ((int)(((byte)(66)))));
-            this.label13.Location = new System.Drawing.Point(879, 291);
+            this.label13.Location = new System.Drawing.Point(800, 330);
             this.label13.Name = "label13";
             this.label13.Size = new System.Drawing.Size(227, 38);
             this.label13.TabIndex = 27;
             this.label13.Text = "Введите адрес";
             // 
-            // textCity
+            // cmbAddress
             // 
-            this.textCity.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.textCity.Location = new System.Drawing.Point(929, 363);
-            this.textCity.Multiline = true;
-            this.textCity.Name = "textCity";
-            this.textCity.Size = new System.Drawing.Size(211, 39);
-            this.textCity.TabIndex = 26;
-            // 
-            // label9
-            // 
-            this.label9.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.label9.AutoSize = true;
-            this.label9.Font = new System.Drawing.Font("Noto Sans Georgian", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label9.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(4)))), ((int)(((byte)(0)))), ((int)(((byte)(66)))));
-            this.label9.Location = new System.Drawing.Point(772, 368);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(96, 34);
-            this.label9.TabIndex = 25;
-            this.label9.Text = "Город";
+            this.cmbAddress.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.cmbAddress.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.cmbAddress.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
+            this.cmbAddress.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
+            this.cmbAddress.Location = new System.Drawing.Point(800, 380);
+            this.cmbAddress.Name = "cmbAddress";
+            this.cmbAddress.Size = new System.Drawing.Size(400, 33);
+            this.cmbAddress.TabIndex = 28;
             // 
             // BtnCancel
             // 
@@ -141,22 +123,13 @@
             this.BtnCancel.FlatAppearance.BorderSize = 0;
             this.BtnCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.BtnCancel.Font = new System.Drawing.Font("Noto Sans Georgian", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.BtnCancel.Location = new System.Drawing.Point(804, 734);
+            this.BtnCancel.Location = new System.Drawing.Point(800, 734);
             this.BtnCancel.Name = "BtnCancel";
             this.BtnCancel.Size = new System.Drawing.Size(166, 50);
             this.BtnCancel.TabIndex = 19;
             this.BtnCancel.Text = "Отмена";
             this.BtnCancel.UseVisualStyleBackColor = false;
             this.BtnCancel.Click += new System.EventHandler(this.BtnCancel_Click);
-            // 
-            // textStreet
-            // 
-            this.textStreet.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.textStreet.Location = new System.Drawing.Point(929, 421);
-            this.textStreet.Multiline = true;
-            this.textStreet.Name = "textStreet";
-            this.textStreet.Size = new System.Drawing.Size(211, 39);
-            this.textStreet.TabIndex = 24;
             // 
             // txtFirstName
             // 
@@ -166,18 +139,6 @@
             this.txtFirstName.Name = "txtFirstName";
             this.txtFirstName.Size = new System.Drawing.Size(234, 38);
             this.txtFirstName.TabIndex = 18;
-            // 
-            // label10
-            // 
-            this.label10.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.label10.AutoSize = true;
-            this.label10.Font = new System.Drawing.Font("Noto Sans Georgian", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label10.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(4)))), ((int)(((byte)(0)))), ((int)(((byte)(66)))));
-            this.label10.Location = new System.Drawing.Point(772, 426);
-            this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(100, 34);
-            this.label10.TabIndex = 23;
-            this.label10.Text = "Улица";
             // 
             // label8
             // 
@@ -191,15 +152,6 @@
             this.label8.TabIndex = 17;
             this.label8.Text = "Введите имя";
             // 
-            // textHouse
-            // 
-            this.textHouse.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.textHouse.Location = new System.Drawing.Point(929, 479);
-            this.textHouse.Multiline = true;
-            this.textHouse.Name = "textHouse";
-            this.textHouse.Size = new System.Drawing.Size(211, 39);
-            this.textHouse.TabIndex = 22;
-            // 
             // txtLastName
             // 
             this.txtLastName.Anchor = System.Windows.Forms.AnchorStyles.None;
@@ -208,18 +160,6 @@
             this.txtLastName.Name = "txtLastName";
             this.txtLastName.Size = new System.Drawing.Size(234, 38);
             this.txtLastName.TabIndex = 16;
-            // 
-            // label11
-            // 
-            this.label11.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.label11.AutoSize = true;
-            this.label11.Font = new System.Drawing.Font("Noto Sans Georgian", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label11.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(4)))), ((int)(((byte)(0)))), ((int)(((byte)(66)))));
-            this.label11.Location = new System.Drawing.Point(772, 484);
-            this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(74, 34);
-            this.label11.TabIndex = 21;
-            this.label11.Text = "Дом";
             // 
             // label7
             // 
@@ -233,15 +173,6 @@
             this.label7.TabIndex = 15;
             this.label7.Text = "Введите фамилию";
             // 
-            // textEntrance
-            // 
-            this.textEntrance.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.textEntrance.Location = new System.Drawing.Point(929, 534);
-            this.textEntrance.Multiline = true;
-            this.textEntrance.Name = "textEntrance";
-            this.textEntrance.Size = new System.Drawing.Size(211, 39);
-            this.textEntrance.TabIndex = 20;
-            // 
             // txtPatronymic
             // 
             this.txtPatronymic.Anchor = System.Windows.Forms.AnchorStyles.None;
@@ -250,18 +181,6 @@
             this.txtPatronymic.Name = "txtPatronymic";
             this.txtPatronymic.Size = new System.Drawing.Size(234, 38);
             this.txtPatronymic.TabIndex = 14;
-            // 
-            // label12
-            // 
-            this.label12.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.label12.AutoSize = true;
-            this.label12.Font = new System.Drawing.Font("Noto Sans Georgian", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label12.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(4)))), ((int)(((byte)(0)))), ((int)(((byte)(66)))));
-            this.label12.Location = new System.Drawing.Point(772, 539);
-            this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(135, 34);
-            this.label12.TabIndex = 19;
-            this.label12.Text = "Подъезд";
             // 
             // label6
             // 
@@ -442,41 +361,6 @@
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.ResumeLayout(false);
-
         }
-
-        #endregion
-
-        private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.TextBox txtVerificationCode;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.TextBox txtPhone;
-        private System.Windows.Forms.Button btnSendCode;
-        private System.Windows.Forms.Button btnRegister;
-        private System.Windows.Forms.Button btnVerifyCode;
-        private System.Windows.Forms.TextBox txtConfirmPassword;
-        private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.TextBox txtPassword;
-        private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.TextBox txtLogin;
-        private System.Windows.Forms.TextBox txtFirstName;
-        private System.Windows.Forms.Label label8;
-        private System.Windows.Forms.TextBox txtLastName;
-        private System.Windows.Forms.Label label7;
-        private System.Windows.Forms.TextBox txtPatronymic;
-        private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Button BtnCancel;
-        private System.Windows.Forms.TextBox textCity;
-        private System.Windows.Forms.Label label9;
-        private System.Windows.Forms.TextBox textStreet;
-        private System.Windows.Forms.Label label10;
-        private System.Windows.Forms.TextBox textHouse;
-        private System.Windows.Forms.Label label11;
-        private System.Windows.Forms.TextBox textEntrance;
-        private System.Windows.Forms.Label label12;
-        private System.Windows.Forms.Label label13;
-
     }
 }

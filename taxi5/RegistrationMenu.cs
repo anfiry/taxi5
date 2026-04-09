@@ -1,5 +1,6 @@
 ﻿using Npgsql;
 using System;
+using System.Data;
 using System.Windows.Forms;
 
 namespace taxi4
@@ -9,17 +10,65 @@ namespace taxi4
         public RegistrationMenu()
         {
             InitializeComponent();
+            LoadAddresses();
+            SetupAddressAutoComplete();
         }
+
+        
+
+        private bool back = false;
+        private string connectionString = "Server=localhost;Port=5432;Database=taxi4;User Id=postgres;Password=123";
+        private string currentPhoneNumber;
+        private string currentVerificationCode;
+        private DataTable allAddresses;
+
+
         public void OnClosed()
         {
             if (back)
             { back = false; }
             else { Application.Exit(); }
         }
-        private bool back = false;
-        private string connectionString = "Server=localhost;Port=5432;Database=taxi4;User Id=postgres;Password=123";
-        private string currentPhoneNumber;
-        private string currentVerificationCode;
+
+        // Загрузка всех адресов из БД
+        private void LoadAddresses()
+        {
+            using (var conn = new NpgsqlConnection(connectionString))
+            {
+                conn.Open();
+                string query = @"
+                    SELECT 
+                        CONCAT(city, ', ', street, ', д.', house,
+                               CASE WHEN entrance IS NOT NULL AND entrance != '' 
+                                    THEN ', подъезд ' || entrance ELSE '' END) AS full_address,
+                        address_id,
+                        city,
+                        street,
+                        house,
+                        entrance
+                    FROM address
+                    ORDER BY city, street, house";
+                using (var adapter = new NpgsqlDataAdapter(query, conn))
+                {
+                    allAddresses = new DataTable();
+                    adapter.Fill(allAddresses);
+                }
+            }
+        }
+
+        // Настройка автодополнения для ComboBox
+        private void SetupAddressAutoComplete()
+        {
+            var autoCompleteList = new AutoCompleteStringCollection();
+            foreach (DataRow row in allAddresses.Rows)
+            {
+                autoCompleteList.Add(row["full_address"].ToString());
+            }
+
+            cmbAddress.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+            cmbAddress.AutoCompleteSource = AutoCompleteSource.CustomSource;
+            cmbAddress.AutoCompleteCustomSource = autoCompleteList;
+        }
 
         // Кнопка "Получить код"
         private void btnSendCode_Click(object sender, EventArgs e)
@@ -33,10 +82,8 @@ namespace taxi4
                 return;
             }
 
-            // Проверка регистрации телефона
             try
             {
-                // Используем локальное соединение
                 using (var connection = new NpgsqlConnection(connectionString))
                 {
                     connection.Open();
@@ -55,17 +102,14 @@ namespace taxi4
                     }
                 }
 
-                // Генерация кода
                 currentVerificationCode = new Random().Next(100000, 999999).ToString();
                 currentPhoneNumber = phone_number;
 
-                // Показываем код подтверждения в MessageBox
                 MessageBox.Show($"Код подтверждения: {currentVerificationCode}\nДля номера: {phone_number}",
                     "Код подтверждения",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Information);
 
-                // Активируем поле для кода
                 txtVerificationCode.Enabled = true;
                 btnVerifyCode.Enabled = true;
                 txtVerificationCode.Focus();
@@ -87,20 +131,15 @@ namespace taxi4
                 MessageBox.Show("Номер телефона подтвержден", "Успех",
                     MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                // Активируем поля для регистрации
                 txtFirstName.Enabled = true;
                 txtLastName.Enabled = true;
                 txtPatronymic.Enabled = true;
                 txtLogin.Enabled = true;
                 txtPassword.Enabled = true;
                 txtConfirmPassword.Enabled = true;
-                textCity.Enabled = true;
-                textStreet.Enabled = true;
-                textHouse.Enabled = true;
-                textEntrance.Enabled = true;
+                cmbAddress.Enabled = true;
                 btnRegister.Enabled = true;
 
-                // Фокусируемся на первом поле
                 txtFirstName.Focus();
             }
             else
@@ -166,14 +205,56 @@ namespace taxi4
                 return;
             }
 
-            // Проверка полей адреса
-            if (string.IsNullOrWhiteSpace(textCity.Text) ||
-                string.IsNullOrWhiteSpace(textStreet.Text) ||
-                string.IsNullOrWhiteSpace(textHouse.Text) ||
-                string.IsNullOrWhiteSpace(textEntrance.Text))
+            // Проверка адреса
+            string fullAddress = cmbAddress.Text.Trim();
+            if (string.IsNullOrWhiteSpace(fullAddress))
             {
-                MessageBox.Show("Заполните все поля адреса", "Ошибка",
+                MessageBox.Show("Введите адрес", "Ошибка",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                cmbAddress.Focus();
+                return;
+            }
+
+            // Разбор адреса
+            string city = "";
+            string street = "";
+            string house = "";
+            string entrance = "";
+
+            try
+            {
+                string[] parts = fullAddress.Split(',');
+                if (parts.Length >= 3)
+                {
+                    city = parts[0].Trim();
+                    street = parts[1].Trim();
+
+                    string housePart = parts[2].Trim();
+                    if (housePart.StartsWith("д.") || housePart.StartsWith("д"))
+                    {
+                        house = housePart.Replace("д.", "").Replace("д", "").Trim();
+                    }
+                    else
+                    {
+                        house = housePart;
+                    }
+
+                    if (parts.Length >= 4 && parts[3].Trim().Contains("подъезд"))
+                    {
+                        entrance = parts[3].Trim().Replace("подъезд", "").Trim();
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Неверный формат адреса. Используйте формат: Город, улица, д. номер, подъезд номер",
+                        "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при разборе адреса: {ex.Message}\n\nИспользуйте формат: Город, улица, д. номер, подъезд номер",
+                    "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -183,7 +264,6 @@ namespace taxi4
                 {
                     connection.Open();
 
-                    // Начинаем транзакцию
                     using (var transaction = connection.BeginTransaction())
                     {
                         try
@@ -225,7 +305,7 @@ namespace taxi4
                                 accountId = Convert.ToInt32(cmd.ExecuteScalar());
                             }
 
-                            // 3. СОЗДАНИЕ АДРЕСА (НОВАЯ ЧАСТЬ)
+                            // 3. СОЗДАНИЕ АДРЕСА
                             int addressId;
                             string addressQuery = @"
                                 INSERT INTO address 
@@ -237,15 +317,15 @@ namespace taxi4
                             using (NpgsqlCommand addressCmd = new NpgsqlCommand(addressQuery, connection))
                             {
                                 addressCmd.Transaction = transaction;
-                                addressCmd.Parameters.AddWithValue("@city", textCity.Text.Trim());
-                                addressCmd.Parameters.AddWithValue("@street", textStreet.Text.Trim());
-                                addressCmd.Parameters.AddWithValue("@house", textHouse.Text.Trim());
-                                addressCmd.Parameters.AddWithValue("@entrance", textEntrance.Text.Trim());
+                                addressCmd.Parameters.AddWithValue("@city", city);
+                                addressCmd.Parameters.AddWithValue("@street", street);
+                                addressCmd.Parameters.AddWithValue("@house", house);
+                                addressCmd.Parameters.AddWithValue("@entrance", string.IsNullOrEmpty(entrance) ? (object)DBNull.Value : entrance);
 
                                 addressId = Convert.ToInt32(addressCmd.ExecuteScalar());
                             }
 
-                            // 4. Регистрация в таблице client (ИСПРАВЛЕНА ОПЕЧАТКА)
+                            // 4. Регистрация в таблице client
                             string clientQuery = @"
                                 INSERT INTO client 
                                 (clent_status_id, account_id, address_id, first_name, last_name, patronymic, phone_number) 
@@ -259,23 +339,20 @@ namespace taxi4
                             {
                                 clientCmd.Transaction = transaction;
                                 clientCmd.Parameters.AddWithValue("@account_id", accountId);
-                                clientCmd.Parameters.AddWithValue("@address_id", addressId); // Используем созданный адрес
+                                clientCmd.Parameters.AddWithValue("@address_id", addressId);
                                 clientCmd.Parameters.AddWithValue("@first_name", txtFirstName.Text);
                                 clientCmd.Parameters.AddWithValue("@last_name", txtLastName.Text);
 
-                                // Обработка отчества
                                 if (!string.IsNullOrWhiteSpace(txtPatronymic.Text))
                                     clientCmd.Parameters.AddWithValue("@patronymic", txtPatronymic.Text);
                                 else
                                     clientCmd.Parameters.AddWithValue("@patronymic", DBNull.Value);
 
-                                // Используем номер с "+"
                                 clientCmd.Parameters.AddWithValue("@phone_number", currentPhoneNumber);
 
                                 clientId = Convert.ToInt32(clientCmd.ExecuteScalar());
                             }
 
-                            // 5. Фиксируем транзакцию
                             transaction.Commit();
 
                             MessageBox.Show(
@@ -285,7 +362,7 @@ namespace taxi4
                                 $"Телефон: {currentPhoneNumber}\n" +
                                 $"Имя: {txtFirstName.Text} {txtLastName.Text} " +
                                 (string.IsNullOrWhiteSpace(txtPatronymic.Text) ? "" : " " + txtPatronymic.Text) +
-                                $"\nАдрес: {textCity.Text}, {textStreet.Text}, д.{textHouse.Text}, подъезд {textEntrance.Text}",
+                                $"\nАдрес: {fullAddress}",
                                 "Регистрация завершена",
                                 MessageBoxButtons.OK,
                                 MessageBoxIcon.Information);
@@ -296,7 +373,6 @@ namespace taxi4
                         }
                         catch (Exception ex)
                         {
-                            // Откат транзакции при ошибке
                             try
                             {
                                 transaction.Rollback();
@@ -307,7 +383,6 @@ namespace taxi4
                                     "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             }
 
-                            // Проверка на конкретную ошибку
                             if (ex.Message.Contains("client_status_id"))
                             {
                                 MessageBox.Show($"Ошибка: столбец 'client_status_id' не найден. Проверьте структуру таблицы 'client' в базе данных.",
@@ -336,7 +411,6 @@ namespace taxi4
             loginForm.Show();
             back = true;
             this.Close();
-
         }
     }
 }

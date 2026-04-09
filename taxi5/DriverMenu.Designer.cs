@@ -12,7 +12,7 @@ namespace taxi4
         private Button Orders;
         private Button Statistics;
         private Button Shifts;
-        private Button button4;
+        private Button buttonBack;
         private Panel panelTop;
         private Label labelTitle;
         private Label labelWelcome;
@@ -31,7 +31,7 @@ namespace taxi4
             this.Orders = new System.Windows.Forms.Button();
             this.Statistics = new System.Windows.Forms.Button();
             this.Shifts = new System.Windows.Forms.Button();
-            this.button4 = new System.Windows.Forms.Button();
+            this.buttonBack = new System.Windows.Forms.Button();
             this.panelTop = new System.Windows.Forms.Panel();
             this.labelTitle = new System.Windows.Forms.Label();
             this.labelWelcome = new System.Windows.Forms.Label();
@@ -115,20 +115,20 @@ namespace taxi4
             this.Shifts.UseVisualStyleBackColor = false;
             this.Shifts.Click += new System.EventHandler(this.Shifts_Click);
             // 
-            // button4
+            // buttonBack
             // 
-            this.button4.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.button4.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(227)))), ((int)(((byte)(227)))));
-            this.button4.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.button4.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold);
-            this.button4.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(4)))), ((int)(((byte)(0)))), ((int)(((byte)(66)))));
-            this.button4.Location = new System.Drawing.Point(720, 200);
-            this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(220, 60);
-            this.button4.TabIndex = 7;
-            this.button4.Text = "Выход";
-            this.button4.UseVisualStyleBackColor = false;
-            this.button4.Click += new System.EventHandler(this.button4_Click);
+            this.buttonBack.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.buttonBack.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(227)))), ((int)(((byte)(227)))));
+            this.buttonBack.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.buttonBack.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold);
+            this.buttonBack.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(4)))), ((int)(((byte)(0)))), ((int)(((byte)(66)))));
+            this.buttonBack.Location = new System.Drawing.Point(720, 200);
+            this.buttonBack.Name = "buttonBack";
+            this.buttonBack.Size = new System.Drawing.Size(220, 60);
+            this.buttonBack.TabIndex = 7;
+            this.buttonBack.Text = "Выход";
+            this.buttonBack.UseVisualStyleBackColor = false;
+            this.buttonBack.Click += new System.EventHandler(this.button4_Click);
             // 
             // panelTop
             // 
@@ -169,7 +169,7 @@ namespace taxi4
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(1100, 500);
-            this.Controls.Add(this.button4);
+            this.Controls.Add(this.buttonBack);
             this.Controls.Add(this.Shifts);
             this.Controls.Add(this.Statistics);
             this.Controls.Add(this.Orders);

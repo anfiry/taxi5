@@ -10,14 +10,18 @@ namespace taxi4
     public partial class DriverStatisticsRatingForm : Form
     {
         private int driverId;
+        private int accountId;
         private string connectionString;
         private int totalOrdersForPeriod = 0;
         private bool isLoading = false;
+        private bool back = false;
 
-        public DriverStatisticsRatingForm(int driverId, string connectionString)
+        public DriverStatisticsRatingForm(int driverId, string connectionString, int accountId)
         {
             this.driverId = driverId;
             this.connectionString = connectionString;
+            this.accountId = accountId;
+
             InitializeComponent();
 
             // Создание карточек статистики
@@ -33,9 +37,6 @@ namespace taxi4
             this.lstComments.DrawMode = DrawMode.OwnerDrawFixed;
             this.lstComments.DrawItem += LstComments_DrawItem;
 
-            // Создание и настройка кнопки "Назад"
-            InitializeBackButton();
-
             cmbPeriod.SelectedIndexChanged += CmbPeriod_SelectedIndexChanged;
             cmbPeriod.SelectedIndex = 4;
 
@@ -43,28 +44,30 @@ namespace taxi4
             this.Resize += DriverStatisticsRatingForm_Resize;
         }
 
+        public void OnClosed()
+        {
+            if (back)
+            { back = false; }
+            else { Application.Exit(); }
+        }
+
         private void InitializeStatCards()
         {
-            // Очищаем панель
             indicatorsPanel.Controls.Clear();
 
-            // Создаем карточки
             cardEarnings = CreateStatCard("💰 Общий заработок", "0 ₽", Color.FromArgb(200, 230, 200));
             cardOrders = CreateStatCard("📦 Выполнено заказов", "0", Color.FromArgb(200, 210, 240));
             cardAvgBill = CreateStatCard("💳 Средний чек", "0 ₽", Color.FromArgb(250, 240, 200));
 
-            // Устанавливаем позиции
             int cardWidth = 350;
             cardEarnings.Location = new Point(0, 0);
             cardOrders.Location = new Point(cardWidth + 10, 0);
             cardAvgBill.Location = new Point((cardWidth + 10) * 2, 0);
 
-            // Добавляем на панель
             indicatorsPanel.Controls.Add(cardEarnings);
             indicatorsPanel.Controls.Add(cardOrders);
             indicatorsPanel.Controls.Add(cardAvgBill);
 
-            // Получаем ссылки на лейблы со значениями
             lblTotalEarnings = (Label)cardEarnings.Controls[1];
             lblOrdersCount = (Label)cardOrders.Controls[1];
             lblAvgBill = (Label)cardAvgBill.Controls[1];
@@ -108,7 +111,6 @@ namespace taxi4
 
         private void InitializeRatingDistributionControls()
         {
-            // Инициализируем массивы
             ratingProgressBars = new ProgressBar[5];
             ratingCountLabels = new Label[5];
 
@@ -160,43 +162,15 @@ namespace taxi4
             }
         }
 
-        private void InitializeBackButton()
-        {
-            this.btnBack = new Button();
-            this.btnBack.Text = "◀ Назад";
-            this.btnBack.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-            this.btnBack.Size = new Size(100, 35);
-            this.btnBack.BackColor = Color.FromArgb(52, 73, 94);
-            this.btnBack.ForeColor = Color.White;
-            this.btnBack.FlatStyle = FlatStyle.Flat;
-            this.btnBack.FlatAppearance.BorderSize = 0;
-            this.btnBack.Cursor = Cursors.Hand;
-            this.btnBack.Click += BtnBack_Click;
-
-            this.Controls.Add(this.btnBack);
-            UpdateBackButtonPosition();
-        }
-
-        private void UpdateBackButtonPosition()
-        {
-            if (btnBack != null)
-            {
-                btnBack.Location = new Point(this.ClientSize.Width - 120, 12);
-                btnBack.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            }
-        }
-
         private void DriverStatisticsRatingForm_Load(object sender, EventArgs e)
         {
             LoadAllData();
             AdjustLayout();
-            UpdateBackButtonPosition();
         }
 
         private void DriverStatisticsRatingForm_Resize(object sender, EventArgs e)
         {
             AdjustLayout();
-            UpdateBackButtonPosition();
         }
 
         private void AdjustLayout()
@@ -535,8 +509,12 @@ namespace taxi4
             }
         }
 
-        private void BtnBack_Click(object sender, EventArgs e)
+        private void button1_Click(object sender, EventArgs e)
         {
+            DriverMenu driverMenu = new DriverMenu(accountId);
+            back = true;
+
+            driverMenu.Show();
             this.Close();
         }
     }

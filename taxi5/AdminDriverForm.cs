@@ -12,6 +12,8 @@ namespace taxi4
     {
         private AdminDriver adminDriver;
         private DataTable driversData;
+        private bool back = false;
+
 
         public AdminDriverForm()
         {
@@ -22,6 +24,13 @@ namespace taxi4
             ClearForm();
             groupBoxDriverData.Visible = false;
             buttonViewCars.Visible = true;
+        }
+
+        public void OnClosed()
+        {
+            if (back)
+            { back = false; }
+            else { Application.Exit(); }
         }
 
         // ---------- ЗАГРУЗКА ДАННЫХ ----------
@@ -672,7 +681,9 @@ namespace taxi4
         {
             AdminMenu menu = new AdminMenu();
             menu.Show();
-            this.Hide();
+            back = true;
+            this.Close();
+
         }
 
         // ---------- ОГРАНИЧЕНИЯ ВВОДА ----------

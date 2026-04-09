@@ -9,6 +9,7 @@ namespace taxi4
     {
         private AdminOrder adminOrder;
         private DataTable ordersData;
+        private bool back = false;
 
         public AdminOrderForm()
         {
@@ -20,6 +21,13 @@ namespace taxi4
             dataGridViewOrders.CellClick += DataGridViewOrders_CellClick;
         }
 
+        public void OnClosed()
+        {
+            if (back)
+            { back = false; }
+            else { Application.Exit(); }
+        }
+
         // ---------- ЗАГРУЗКА СТАТУСОВ ДЛЯ ФИЛЬТРА ----------
         private void LoadOrderStatuses()
         {
@@ -27,7 +35,6 @@ namespace taxi4
             {
                 DataTable statuses = adminOrder.GetOrderStatuses();
 
-                // Добавляем "Все статусы"
                 DataRow allRow = statuses.NewRow();
                 allRow["order_status_id"] = 0;
                 allRow["name"] = "Все статусы";
@@ -58,7 +65,6 @@ namespace taxi4
 
                 ordersData = adminOrder.GetOrders(statusIdFilter);
                 dataGridViewOrders.DataSource = ordersData;
-                ConfigureDataGridView();
             }
             catch (Exception ex)
             {
@@ -70,59 +76,69 @@ namespace taxi4
         // ---------- НАСТРОЙКА ТАБЛИЦЫ ----------
         private void ConfigureDataGridView()
         {
+            if (dataGridViewOrders.Columns.Count == 0) return;
+
             // Удаляем старые колонки кнопок, если они есть
             if (dataGridViewOrders.Columns.Contains("ReviewButton"))
                 dataGridViewOrders.Columns.Remove("ReviewButton");
             if (dataGridViewOrders.Columns.Contains("RouteButton"))
                 dataGridViewOrders.Columns.Remove("RouteButton");
 
-            if (dataGridViewOrders.Columns.Count == 0) return;
-
-            dataGridViewOrders.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
-
-            SetColumn("order_id", "ID", 60, true);
-            SetColumn("client_name", "Клиент", 150, true);
-            SetColumn("driver_name", "Водитель", 150, false);
-            SetColumn("tariff_name", "Тариф", 100, false);
-            SetColumn("order_status_name", "Статус", 100, false);
-            SetColumn("payment_method_name", "Оплата", 100, false);
-            SetColumn("address_from_text", "Откуда", 200, false);
-            SetColumn("address_to_text", "Куда", 200, false);
-            SetColumn("order_datetime", "Дата и время", 130, false);
-            SetColumn("final_cost", "Стоимость", 90, false);
-
-            if (dataGridViewOrders.Columns["status_id"] != null)
-                dataGridViewOrders.Columns["status_id"].Visible = false;
-            if (dataGridViewOrders.Columns["driver_id"] != null)
-                dataGridViewOrders.Columns["driver_id"].Visible = false;
-            if (dataGridViewOrders.Columns["order_id"] != null)
+            // Скрываем служебные колонки
+            if (dataGridViewOrders.Columns.Contains("order_id"))
                 dataGridViewOrders.Columns["order_id"].Visible = false;
+            if (dataGridViewOrders.Columns.Contains("order_status"))
+                dataGridViewOrders.Columns["order_status"].Visible = false;
+            if (dataGridViewOrders.Columns.Contains("driver_id"))
+                dataGridViewOrders.Columns["driver_id"].Visible = false;
 
-            if (dataGridViewOrders.Columns["order_datetime"] != null)
+            // Настройка колонок с датами (меняем заголовки)
+            if (dataGridViewOrders.Columns.Contains("order_datetime"))
             {
+                dataGridViewOrders.Columns["order_datetime"].HeaderText = "Дата создания";
                 dataGridViewOrders.Columns["order_datetime"].DefaultCellStyle.Format = "dd.MM.yyyy HH:mm";
                 dataGridViewOrders.Columns["order_datetime"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
             }
 
-            if (dataGridViewOrders.Columns["final_cost"] != null)
+            if (dataGridViewOrders.Columns.Contains("start_trip_time"))
             {
+                dataGridViewOrders.Columns["start_trip_time"].HeaderText = "Начало поездки";
+                dataGridViewOrders.Columns["start_trip_time"].DefaultCellStyle.Format = "dd.MM.yyyy HH:mm";
+                dataGridViewOrders.Columns["start_trip_time"].DefaultCellStyle.NullValue = "—";
+                dataGridViewOrders.Columns["start_trip_time"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            }
+
+            if (dataGridViewOrders.Columns.Contains("end_trip_time"))
+            {
+                dataGridViewOrders.Columns["end_trip_time"].HeaderText = "Завершение поездки";
+                dataGridViewOrders.Columns["end_trip_time"].DefaultCellStyle.Format = "dd.MM.yyyy HH:mm";
+                dataGridViewOrders.Columns["end_trip_time"].DefaultCellStyle.NullValue = "—";
+                dataGridViewOrders.Columns["end_trip_time"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            }
+
+            // Настройка остальных колонок
+            if (dataGridViewOrders.Columns.Contains("client_name"))
+                dataGridViewOrders.Columns["client_name"].HeaderText = "Клиент";
+            if (dataGridViewOrders.Columns.Contains("driver_name"))
+                dataGridViewOrders.Columns["driver_name"].HeaderText = "Водитель";
+            if (dataGridViewOrders.Columns.Contains("tariff_name"))
+                dataGridViewOrders.Columns["tariff_name"].HeaderText = "Тариф";
+            if (dataGridViewOrders.Columns.Contains("order_status_name"))
+                dataGridViewOrders.Columns["order_status_name"].HeaderText = "Статус";
+            if (dataGridViewOrders.Columns.Contains("payment_method_name"))
+                dataGridViewOrders.Columns["payment_method_name"].HeaderText = "Оплата";
+            if (dataGridViewOrders.Columns.Contains("address_from_text"))
+                dataGridViewOrders.Columns["address_from_text"].HeaderText = "Откуда";
+            if (dataGridViewOrders.Columns.Contains("address_to_text"))
+                dataGridViewOrders.Columns["address_to_text"].HeaderText = "Куда";
+            if (dataGridViewOrders.Columns.Contains("final_cost"))
+            {
+                dataGridViewOrders.Columns["final_cost"].HeaderText = "Стоимость";
                 dataGridViewOrders.Columns["final_cost"].DefaultCellStyle.Format = "N2";
                 dataGridViewOrders.Columns["final_cost"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
             }
 
-            int index = 0;
-            string[] order = {
-                "order_id", "client_name", "driver_name", "tariff_name",
-                "order_status_name", "payment_method_name", "address_from_text",
-                "address_to_text", "order_datetime", "final_cost"
-            };
-            foreach (string colName in order)
-            {
-                if (dataGridViewOrders.Columns[colName] != null)
-                    dataGridViewOrders.Columns[colName].DisplayIndex = index++;
-            }
-
-            // Добавляем кнопку "Отзыв"
+            // Добавляем кнопки
             DataGridViewButtonColumn reviewButton = new DataGridViewButtonColumn();
             reviewButton.Name = "ReviewButton";
             reviewButton.HeaderText = "Отзыв";
@@ -131,7 +147,6 @@ namespace taxi4
             reviewButton.Width = 70;
             dataGridViewOrders.Columns.Add(reviewButton);
 
-            // Добавляем кнопку "Маршрут"
             DataGridViewButtonColumn routeButton = new DataGridViewButtonColumn();
             routeButton.Name = "RouteButton";
             routeButton.HeaderText = "Маршрут";
@@ -140,13 +155,15 @@ namespace taxi4
             routeButton.Width = 80;
             dataGridViewOrders.Columns.Add(routeButton);
 
-            dataGridViewOrders.ColumnHeadersDefaultCellStyle.Font = new Font("Microsoft Sans Serif", 9, FontStyle.Bold);
+            // Стиль заголовков
+            dataGridViewOrders.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 10, FontStyle.Bold);
             dataGridViewOrders.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(52, 73, 94);
             dataGridViewOrders.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
             dataGridViewOrders.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewOrders.ColumnHeadersHeight = 40;
+            dataGridViewOrders.ColumnHeadersHeight = 45;
 
-            dataGridViewOrders.DefaultCellStyle.Font = new Font("Microsoft Sans Serif", 9);
+            // Стиль строк
+            dataGridViewOrders.DefaultCellStyle.Font = new Font("Segoe UI", 9);
             dataGridViewOrders.DefaultCellStyle.ForeColor = Color.Black;
             dataGridViewOrders.DefaultCellStyle.SelectionBackColor = Color.FromArgb(52, 152, 219);
             dataGridViewOrders.DefaultCellStyle.SelectionForeColor = Color.White;
@@ -155,17 +172,11 @@ namespace taxi4
             dataGridViewOrders.AllowUserToResizeRows = false;
             dataGridViewOrders.ReadOnly = true;
             dataGridViewOrders.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-        }
+            dataGridViewOrders.AllowUserToAddRows = false;
+            dataGridViewOrders.AllowUserToDeleteRows = false;
 
-        private void SetColumn(string columnName, string headerText, int width, bool frozen)
-        {
-            if (dataGridViewOrders.Columns[columnName] != null)
-            {
-                dataGridViewOrders.Columns[columnName].HeaderText = headerText;
-                dataGridViewOrders.Columns[columnName].Width = width;
-                dataGridViewOrders.Columns[columnName].Frozen = frozen;
-                dataGridViewOrders.Columns[columnName].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            }
+            // Автоматическая ширина колонок
+            dataGridViewOrders.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
         }
 
         // ---------- ОБРАБОТЧИК КЛИКА ПО КНОПКАМ В ТАБЛИЦЕ ----------
@@ -221,6 +232,12 @@ namespace taxi4
                 return;
             }
 
+            if (ordersData == null)
+            {
+                LoadOrders();
+                return;
+            }
+
             DataView dv = new DataView(ordersData);
             dv.RowFilter = $"client_name LIKE '%{search}%' OR driver_name LIKE '%{search}%' OR " +
                            $"address_from_text LIKE '%{search}%' OR address_to_text LIKE '%{search}%'";
@@ -231,7 +248,8 @@ namespace taxi4
         {
             AdminMenu adminMenu = new AdminMenu();
             adminMenu.Show();
-            this.Hide();
+            back = true;
+            this.Close();
         }
 
         private void textBoxSearch_KeyDown(object sender, KeyEventArgs e)

@@ -17,6 +17,8 @@ namespace taxi4
         private DataTable allAddresses;
         private DataTable originalClientsData;
         private bool columnsConfigured = false; // Флаг для отслеживания настройки колонок
+        private bool back = false;
+
 
         public AdminClientForm()
         {
@@ -56,6 +58,13 @@ namespace taxi4
             // Скрываем поле аккаунта (оно будет видно только при добавлении)
             label7.Visible = false;
             textBoxAccountId.Visible = false;
+        }
+
+        public void OnClosed()
+        {
+            if (back)
+            { back = false; }
+            else { Application.Exit(); }
         }
 
         private void SetupAutoComplete()
@@ -683,7 +692,8 @@ namespace taxi4
         {
             AdminMenu adminMenu = new AdminMenu();
             adminMenu.Show();
-            this.Hide();
+            back = true;
+            this.Close();
         }
 
         private void textBoxPhone_KeyPress(object sender, KeyPressEventArgs e)
