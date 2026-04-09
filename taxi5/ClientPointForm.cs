@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Npgsql;
+using System;
 using System.Data;
 using System.Drawing;
 using System.Windows.Forms;
@@ -9,17 +10,79 @@ namespace taxi4
     {
         private ClientPoint clientPoint;
         private DataTable pointsData;
+        private DataTable allAddresses;
         private int clientId;
+        private int accountId;
+        private bool back = false;
 
-        public ClientPointForm(int clientId)
+
+        public ClientPointForm(int clientId, int accountId)
         {
             InitializeComponent();
             this.clientId = clientId;
+            this.accountId = accountId;
+
             clientPoint = new ClientPoint();
+
+            // Настройка полноэкранного режима
+            this.WindowState = FormWindowState.Maximized;
+            this.StartPosition = FormStartPosition.CenterScreen;
+            this.FormBorderStyle = FormBorderStyle.Sizable;
+            this.MinimumSize = new Size(1200, 672);
+
+            LoadAllAddresses();
             LoadPoints();
             LoadPointTypes();
+            SetupAutoComplete();
             ClearForm();
             SetupPlaceholderTexts();
+
+            // Скрываем правую панель
+            groupBoxPointData.Visible = false;
+        }
+
+        public void OnClosed()
+        {
+            if (back)
+            { back = false; }
+            else { Application.Exit(); }
+        }
+
+        // ---------- ЗАГРУЗКА АДРЕСОВ ДЛЯ АВТОДОПОЛНЕНИЯ ----------
+        private void LoadAllAddresses()
+        {
+            string connStr = "Host=localhost;Port=5432;Database=taxi4;Username=postgres;Password=123";
+            using (var conn = new NpgsqlConnection(connStr))
+            {
+                conn.Open();
+                string query = @"
+                    SELECT 
+                        CONCAT(city, ', ', street, ', д.', house,
+                               CASE WHEN entrance IS NOT NULL AND entrance != '' 
+                                    THEN ', подъезд ' || entrance ELSE '' END) AS full_address,
+                        address_id
+                    FROM address
+                    ORDER BY city, street, house";
+                using (var adapter = new NpgsqlDataAdapter(query, conn))
+                {
+                    allAddresses = new DataTable();
+                    adapter.Fill(allAddresses);
+                }
+            }
+        }
+
+        // ---------- НАСТРОЙКА АВТОДОПОЛНЕНИЯ ----------
+        private void SetupAutoComplete()
+        {
+            var autoCompleteList = new AutoCompleteStringCollection();
+            foreach (DataRow row in allAddresses.Rows)
+            {
+                autoCompleteList.Add(row["full_address"].ToString());
+            }
+
+            txtAddress.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+            txtAddress.AutoCompleteSource = AutoCompleteSource.CustomSource;
+            txtAddress.AutoCompleteCustomSource = autoCompleteList;
         }
 
         // ---------- ПЛЕЙСХОЛДЕРЫ ----------
@@ -27,10 +90,7 @@ namespace taxi4
         {
             SetPlaceholder(txtNewType, "Название типа");
             SetPlaceholder(txtPointName, "Название точки");
-            SetPlaceholder(txtCity, "Город");
-            SetPlaceholder(txtStreet, "Улица");
-            SetPlaceholder(txtHouse, "Дом");
-            SetPlaceholder(txtEntrance, "Подъезд");
+            SetPlaceholder(txtAddress, "Воронеж, улица, д. номер, подъезд");
         }
 
         private void SetPlaceholder(TextBox textBox, string placeholder)
@@ -98,49 +158,126 @@ namespace taxi4
         {
             if (dataGridViewPoints.Columns.Count == 0) return;
 
-            dataGridViewPoints.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
+            dataGridViewPoints.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
 
-            SetColumn("point_id", "ID", 40, true);
-            SetColumn("point_name", "Название", 150, false);
-            SetColumn("type_name", "Тип", 100, false);
-            SetColumn("city", "Город", 120, false);
-            SetColumn("street", "Улица", 150, false);
-            SetColumn("house", "Дом", 60, false);
-            SetColumn("entrance", "Подъезд", 70, false);
-            if (dataGridViewPoints.Columns["address_id"] != null)
+            // Скрываем служебные колонки
+            if (dataGridViewPoints.Columns.Contains("address_id"))
                 dataGridViewPoints.Columns["address_id"].Visible = false;
+            if (dataGridViewPoints.Columns.Contains("point_id"))
+                dataGridViewPoints.Columns["point_id"].Visible = false;
 
-            int index = 0;
-            string[] order = { "point_id", "point_name", "type_name", "city", "street", "house", "entrance" };
-            foreach (string colName in order)
-                if (dataGridViewPoints.Columns[colName] != null)
-                    dataGridViewPoints.Columns[colName].DisplayIndex = index++;
+            // Настройка колонок
+            SetColumnFill("point_name", "Название", 20);
+            SetColumnFill("type_name", "Тип", 15);
+            SetColumnFill("full_address", "Адрес", 60);  // ОДИН СТОЛБЕЦ ДЛЯ АДРЕСА
 
+            // Стиль заголовков
             dataGridViewPoints.ColumnHeadersDefaultCellStyle.Font = new Font("Microsoft Sans Serif", 9, FontStyle.Bold);
             dataGridViewPoints.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(52, 73, 94);
             dataGridViewPoints.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
             dataGridViewPoints.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
             dataGridViewPoints.ColumnHeadersHeight = 40;
 
+            // Стиль строк
             dataGridViewPoints.DefaultCellStyle.Font = new Font("Microsoft Sans Serif", 9);
-            dataGridViewPoints.DefaultCellStyle.ForeColor = Color.Black;
-            dataGridViewPoints.DefaultCellStyle.SelectionBackColor = Color.FromArgb(52, 152, 219);
-            dataGridViewPoints.DefaultCellStyle.SelectionForeColor = Color.White;
             dataGridViewPoints.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(248, 249, 249);
             dataGridViewPoints.RowHeadersVisible = false;
-            dataGridViewPoints.AllowUserToResizeRows = false;
             dataGridViewPoints.ReadOnly = true;
             dataGridViewPoints.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dataGridViewPoints.AllowUserToAddRows = false;
+            dataGridViewPoints.AllowUserToDeleteRows = false;
         }
 
-        private void SetColumn(string columnName, string headerText, int width, bool frozen)
+        private void SetColumnFill(string columnName, string headerText, int fillWeight)
         {
             if (dataGridViewPoints.Columns[columnName] != null)
             {
                 dataGridViewPoints.Columns[columnName].HeaderText = headerText;
-                dataGridViewPoints.Columns[columnName].Width = width;
-                dataGridViewPoints.Columns[columnName].Frozen = frozen;
-                dataGridViewPoints.Columns[columnName].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+                dataGridViewPoints.Columns[columnName].FillWeight = fillWeight;
+                dataGridViewPoints.Columns[columnName].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            }
+        }
+
+        // ---------- ПОЛУЧЕНИЕ ID АДРЕСА ----------
+        private int GetOrCreateAddressId(string addressText)
+        {
+            if (string.IsNullOrWhiteSpace(addressText))
+                return -1;
+
+            // Проверяем существующий адрес
+            foreach (DataRow row in allAddresses.Rows)
+            {
+                if (row["full_address"].ToString().Equals(addressText, StringComparison.OrdinalIgnoreCase))
+                    return Convert.ToInt32(row["address_id"]);
+            }
+
+            // Парсим адрес
+            string[] parts = addressText.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length < 3)
+            {
+                MessageBox.Show("Адрес должен содержать город, улицу и номер дома.\nПример: Воронеж, Ленина, д.10",
+                    "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return -1;
+            }
+
+            string city = parts[0].Trim();
+            string street = parts[1].Trim();
+            string house = "";
+            string entrance = "";
+
+            for (int i = 2; i < parts.Length; i++)
+            {
+                string part = parts[i].Trim().ToLower();
+                if (part.Contains("подъезд") || part.Contains("под.") || part.Contains("под"))
+                {
+                    entrance = part.Replace("подъезд", "").Replace("под.", "").Replace("под", "").Trim();
+                }
+                else if (string.IsNullOrEmpty(house))
+                {
+                    string tempHouse = part.Replace("д.", "").Replace("д", "").Replace("дом", "").Trim();
+                    if (!string.IsNullOrEmpty(tempHouse))
+                    {
+                        house = tempHouse;
+                    }
+                }
+            }
+
+            if (string.IsNullOrEmpty(house))
+            {
+                MessageBox.Show("Не удалось определить номер дома.\nИспользуйте формат: Воронеж, Ленина, д.10",
+                    "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return -1;
+            }
+
+            if (!city.Equals("Воронеж", StringComparison.OrdinalIgnoreCase))
+            {
+                MessageBox.Show("Доставка осуществляется только по городу Воронеж",
+                    "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return -1;
+            }
+
+            // Добавляем новый адрес
+            string connStr = "Host=localhost;Port=5432;Database=taxi4;Username=postgres;Password=123";
+            using (var conn = new NpgsqlConnection(connStr))
+            {
+                conn.Open();
+                string insertQuery = @"
+                    INSERT INTO address (city, street, house, entrance) 
+                    VALUES (@city, @street, @house, @entrance) 
+                    RETURNING address_id";
+                using (var cmd = new NpgsqlCommand(insertQuery, conn))
+                {
+                    cmd.Parameters.AddWithValue("@city", city);
+                    cmd.Parameters.AddWithValue("@street", street);
+                    cmd.Parameters.AddWithValue("@house", house);
+                    cmd.Parameters.AddWithValue("@entrance", string.IsNullOrEmpty(entrance) ? (object)DBNull.Value : entrance);
+                    int newId = Convert.ToInt32(cmd.ExecuteScalar());
+
+                    // Обновляем список адресов
+                    LoadAllAddresses();
+                    SetupAutoComplete();
+                    return newId;
+                }
             }
         }
 
@@ -148,9 +285,11 @@ namespace taxi4
         private void buttonAdd_Click(object sender, EventArgs e)
         {
             ClearForm();
+            groupBoxPointData.Visible = true;
             groupBoxPointData.Text = "Добавление новой точки";
             textBoxPointId.Visible = false;
             labelPointId.Visible = false;
+            txtAddressId.Visible = false;
         }
 
         private void buttonEdit_Click(object sender, EventArgs e)
@@ -164,9 +303,11 @@ namespace taxi4
 
             DataGridViewRow row = dataGridViewPoints.SelectedRows[0];
             LoadPointToForm(row);
+            groupBoxPointData.Visible = true;
             groupBoxPointData.Text = "Редактирование точки";
-            textBoxPointId.Visible = true;
-            labelPointId.Visible = true;
+            textBoxPointId.Visible = false;
+            labelPointId.Visible = false;
+            txtAddressId.Visible = false;
         }
 
         private void LoadPointToForm(DataGridViewRow row)
@@ -184,10 +325,8 @@ namespace taxi4
                         break;
                     }
 
-                txtCity.Text = row.Cells["city"].Value.ToString();
-                txtStreet.Text = row.Cells["street"].Value.ToString();
-                txtHouse.Text = row.Cells["house"].Value.ToString();
-                txtEntrance.Text = row.Cells["entrance"].Value.ToString();
+                // Адрес уже в одном столбце
+                txtAddress.Text = row.Cells["full_address"].Value.ToString();
 
                 if (row.Cells["address_id"].Value != DBNull.Value)
                     txtAddressId.Text = row.Cells["address_id"].Value.ToString();
@@ -211,10 +350,30 @@ namespace taxi4
                 bool success;
                 string pointName = GetRealText(txtPointName);
                 int typeId = (int)comboBoxType.SelectedValue;
-                string city = GetRealText(txtCity);
-                string street = GetRealText(txtStreet);
-                string house = GetRealText(txtHouse);
-                string entrance = GetRealText(txtEntrance);
+                string addressText = GetRealText(txtAddress);
+
+                int addressId = GetOrCreateAddressId(addressText);
+                if (addressId == -1) return;
+
+                // Парсим адрес для сохранения в таблицу point (из одного поля)
+                string[] parts = addressText.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                string city = parts.Length > 0 ? parts[0].Trim() : "Воронеж";
+                string street = parts.Length > 1 ? parts[1].Trim() : "";
+                string house = "";
+                string entrance = "";
+
+                for (int i = 2; i < parts.Length; i++)
+                {
+                    string part = parts[i].Trim().ToLower();
+                    if (part.Contains("подъезд") || part.Contains("под.") || part.Contains("под"))
+                    {
+                        entrance = part.Replace("подъезд", "").Replace("под.", "").Replace("под", "").Trim();
+                    }
+                    else if (string.IsNullOrEmpty(house))
+                    {
+                        house = part.Replace("д.", "").Replace("д", "").Replace("дом", "").Trim();
+                    }
+                }
 
                 if (string.IsNullOrEmpty(textBoxPointId.Text)) // добавление
                 {
@@ -226,7 +385,6 @@ namespace taxi4
                 else // редактирование
                 {
                     int pointId = int.Parse(textBoxPointId.Text);
-                    int addressId = int.Parse(txtAddressId.Text);
                     success = clientPoint.UpdatePoint(pointId, pointName, typeId, city, street, house, entrance, addressId);
                     if (success)
                         MessageBox.Show("Данные точки обновлены", "Успех",
@@ -238,6 +396,9 @@ namespace taxi4
                     ClearForm();
                     LoadPoints();
                     LoadPointTypes();
+                    LoadAllAddresses();
+                    SetupAutoComplete();
+                    groupBoxPointData.Visible = false;
                 }
             }
             catch (Exception ex)
@@ -269,15 +430,21 @@ namespace taxi4
                     MessageBox.Show("Точка удалена", "Успех",
                         MessageBoxButtons.OK, MessageBoxIcon.Information);
                     LoadPoints();
+                    LoadAllAddresses();
+                    SetupAutoComplete();
                 }
             }
         }
+
 
         private void buttonRefresh_Click(object sender, EventArgs e)
         {
             LoadPoints();
             LoadPointTypes();
+            LoadAllAddresses();
+            SetupAutoComplete();
             ClearForm();
+            groupBoxPointData.Visible = false;
             MessageBox.Show("Данные обновлены", "Информация",
                 MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
@@ -298,7 +465,10 @@ namespace taxi4
 
         private void buttonBack_Click(object sender, EventArgs e)
         {
-            this.Close(); // просто закрываем форму – ClientMenu покажется через событие Closed
+            ClientMenu ClientMenu = new ClientMenu(accountId);
+            ClientMenu.Show();
+            back = true;
+            this.Close();
         }
 
         private void ClearForm()
@@ -306,11 +476,8 @@ namespace taxi4
             textBoxPointId.Clear();
             txtAddressId.Clear();
             txtPointName.Clear();
+            txtAddress.Clear();
             if (comboBoxType.Items.Count > 0) comboBoxType.SelectedIndex = 0;
-            txtCity.Clear();
-            txtStreet.Clear();
-            txtHouse.Clear();
-            txtEntrance.Clear();
             textBoxSearch.Clear();
             groupBoxPointData.Text = "Данные точки";
 
@@ -336,12 +503,26 @@ namespace taxi4
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
-            if (string.IsNullOrWhiteSpace(GetRealText(txtCity)) ||
-                string.IsNullOrWhiteSpace(GetRealText(txtStreet)) ||
-                string.IsNullOrWhiteSpace(GetRealText(txtHouse)))
+            if (string.IsNullOrWhiteSpace(GetRealText(txtAddress)))
             {
-                MessageBox.Show("Заполните город, улицу и дом", "Ошибка",
+                MessageBox.Show("Введите адрес", "Ошибка",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
+                txtAddress.Focus();
+                return false;
+            }
+            string address = GetRealText(txtAddress);
+            if (!address.Contains("Воронеж"))
+            {
+                MessageBox.Show("Адрес должен начинаться с города Воронеж", "Ошибка",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                txtAddress.Focus();
+                return false;
+            }
+            if (!address.Contains("д.") && !address.Contains("д "))
+            {
+                MessageBox.Show("Укажите номер дома (пример: д.10)", "Ошибка",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                txtAddress.Focus();
                 return false;
             }
             return true;
@@ -409,32 +590,11 @@ namespace taxi4
                 SetPlaceholder(txtPointName, "Название");
         }
 
-        private void txtCity_Enter(object sender, EventArgs e) => RemovePlaceholder(txtCity);
-        private void txtCity_Leave(object sender, EventArgs e)
+        private void txtAddress_Enter(object sender, EventArgs e) => RemovePlaceholder(txtAddress);
+        private void txtAddress_Leave(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(txtCity.Text))
-                SetPlaceholder(txtCity, "Город");
-        }
-
-        private void txtStreet_Enter(object sender, EventArgs e) => RemovePlaceholder(txtStreet);
-        private void txtStreet_Leave(object sender, EventArgs e)
-        {
-            if (string.IsNullOrWhiteSpace(txtStreet.Text))
-                SetPlaceholder(txtStreet, "Улица");
-        }
-
-        private void txtHouse_Enter(object sender, EventArgs e) => RemovePlaceholder(txtHouse);
-        private void txtHouse_Leave(object sender, EventArgs e)
-        {
-            if (string.IsNullOrWhiteSpace(txtHouse.Text))
-                SetPlaceholder(txtHouse, "Дом");
-        }
-
-        private void txtEntrance_Enter(object sender, EventArgs e) => RemovePlaceholder(txtEntrance);
-        private void txtEntrance_Leave(object sender, EventArgs e)
-        {
-            if (string.IsNullOrWhiteSpace(txtEntrance.Text))
-                SetPlaceholder(txtEntrance, "Подъезд");
+            if (string.IsNullOrWhiteSpace(txtAddress.Text))
+                SetPlaceholder(txtAddress, "Воронеж, улица, д. номер, подъезд");
         }
 
         // ---------- ОГРАНИЧЕНИЯ ВВОДА ----------
@@ -450,9 +610,11 @@ namespace taxi4
             {
                 DataGridViewRow row = dataGridViewPoints.Rows[e.RowIndex];
                 LoadPointToForm(row);
+                groupBoxPointData.Visible = true;
                 groupBoxPointData.Text = "Редактирование точки";
-                textBoxPointId.Visible = true;
-                labelPointId.Visible = true;
+                textBoxPointId.Visible = false;
+                labelPointId.Visible = false;
+                txtAddressId.Visible = false;
             }
         }
     }

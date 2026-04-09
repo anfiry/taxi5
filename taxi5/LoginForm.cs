@@ -8,15 +8,24 @@ namespace taxi4
     public partial class LoginForm : Form
     {
         private string connectionString = "Server=localhost;Port=5432;Database=taxi4;User Id=postgres;Password=123";
-
+        private bool back = false;
         public LoginForm()
         {
             InitializeComponent();
             this.PassField.AutoSize = false;
             this.PassField.Size = new Size(this.PassField.Size.Width, 44);
+
+            this.Closed += (s, args) => OnClosed();
         }
 
-        private void CloseButton_Click(object sender, EventArgs e)
+        public void OnClosed()
+        {
+            if (back)
+            { back = false; }
+            else { Application.Exit(); }
+        }
+
+        private void InButton_Click(object sender, EventArgs e)
         {
             string login = LoginField.Text.Trim();
             string password = PassField.Text.Trim();
@@ -32,7 +41,7 @@ namespace taxi4
                 using (var connection = new NpgsqlConnection(connectionString))
                 {
                     connection.Open();
-
+                                        
                     string query = @"
                         SELECT role_id, account_id 
                         FROM account 
@@ -58,29 +67,29 @@ namespace taxi4
                                     adminMenu.Role = "Администратор";
                                     adminMenu.AccountId = accountId;
                                     adminMenu.UserLogin = login;
-                                    adminMenu.Closed += (s, args) => Close();
+                                    adminMenu.Closed += (s, args) => adminMenu.OnClosed();
+
                                     adminMenu.Show();
-                                    Hide();
+                                    this.Hide();
                                 }
                                 else if (roleId == 2) // клиент
                                 {
-                                    // Передаём accountId в конструктор
-                                    ClientMenu clientMenu = new ClientMenu(accountId);
+                                    ClientMenu clientMenu = new ClientMenu(accountId); // ← передаём accountId в конструктор
                                     clientMenu.Role = "Клиент";
                                     clientMenu.UserLogin = login;
-                                    clientMenu.Closed += (s, args) => Close();
+                                    clientMenu.Closed += (s, args) => clientMenu.OnClosed();
+
                                     clientMenu.Show();
-                                    Hide();
+                                    this.Hide();
                                 }
                                 else if (roleId == 3) // водитель
                                 {
-                                    DriverMenu driverMenu = new DriverMenu();
+                                    DriverMenu driverMenu = new DriverMenu(accountId); // ← передаём accountId в конструктор
                                     driverMenu.Role = "Водитель";
-                                    driverMenu.AccountId = accountId;
                                     driverMenu.UserLogin = login;
-                                    driverMenu.Closed += (s, args) => Close();
+                                    driverMenu.Closed += (s, args) => driverMenu.OnClosed();
                                     driverMenu.Show();
-                                    Hide();
+                                    this.Hide();
                                 }
                                 else
                                 {
@@ -101,9 +110,10 @@ namespace taxi4
             }
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void RegButton_Click(object sender, EventArgs e)
         {
             RegistrationMenu registrationMenu = new RegistrationMenu();
+            registrationMenu.Closed += (s, args) => registrationMenu.OnClosed();
             registrationMenu.Show();
             this.Hide();
         }

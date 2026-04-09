@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
 using System.Windows.Forms;
+using taxi4;
+using System.Linq;
 
 namespace taxi4
 {
@@ -9,6 +12,8 @@ namespace taxi4
     {
         private AdminDriver adminDriver;
         private DataTable driversData;
+        private bool back = false;
+
 
         public AdminDriverForm()
         {
@@ -17,6 +22,15 @@ namespace taxi4
             LoadDrivers();
             LoadComboBoxData();
             ClearForm();
+            groupBoxDriverData.Visible = false;
+            buttonViewCars.Visible = true;
+        }
+
+        public void OnClosed()
+        {
+            if (back)
+            { back = false; }
+            else { Application.Exit(); }
         }
 
         // ---------- ЗАГРУЗКА ДАННЫХ ----------
@@ -57,78 +71,89 @@ namespace taxi4
             if (dataGridViewDrivers.Columns.Count == 0) return;
 
             // Скрываем технические колонки
-            if (dataGridViewDrivers.Columns["driver_status_id"] != null)
-                dataGridViewDrivers.Columns["driver_status_id"].Visible = false;
-            if (dataGridViewDrivers.Columns["account_id"] != null)
-                dataGridViewDrivers.Columns["account_id"].Visible = false;
-
-            // Настройка отображаемых колонок
-            SetColumn("driver_id", "ID", 50, true);
-            SetColumn("last_name", "Фамилия", 120, true);
-            SetColumn("first_name", "Имя", 100, true);
-            SetColumn("patronymic", "Отчество", 120, false);
-            SetColumn("phone_number", "Телефон", 130, false);
-            SetColumn("status_name", "Статус", 100, false);
-            SetColumn("work_experience", "Стаж", 70, false);
-            SetColumn("license_series", "Серия", 80, false);
-            SetColumn("license_number", "Номер прав", 110, false);
-            SetColumn("login", "Логин", 130, false);
-
-            // Порядок колонок
-            int index = 0;
-            string[] order = {
-                "driver_id", "last_name", "first_name", "patronymic", "phone_number",
-                "status_name", "work_experience", "license_series", "license_number", "login"
+            string[] hiddenColumns = {
+                "driver_id", "driver_status_id", "account_id"
             };
-            foreach (string colName in order)
+            foreach (string col in hiddenColumns)
+                if (dataGridViewDrivers.Columns.Contains(col))
+                    dataGridViewDrivers.Columns[col].Visible = false;
+
+            // Настройка отображения колонок с указанием порядка
+            var columnsConfig = new List<(string Name, string Header, int FillWeight, int DisplayIndex)>
             {
-                if (dataGridViewDrivers.Columns[colName] != null)
-                    dataGridViewDrivers.Columns[colName].DisplayIndex = index++;
+                ("last_name", "Фамилия", 2, 0),
+                ("first_name", "Имя", 2, 1),
+                ("patronymic", "Отчество", 2, 2),
+                ("phone_number", "Телефон", 2, 3),
+                ("status_name", "Статус водителя", 1, 4),
+                ("shift_status_name", "Статус смены", 1, 5),
+                ("work_experience", "Стаж (лет)", 1, 6),
+                ("license_series", "Серия прав", 1, 7),
+                ("license_number", "Номер прав", 1, 8),
+                ("login", "Логин", 2, 9),
+                ("password", "Пароль", 2, 10)
+            };
+
+            // Настраиваем каждую колонку
+            foreach (var col in columnsConfig)
+            {
+                if (dataGridViewDrivers.Columns[col.Name] != null)
+                {
+                    dataGridViewDrivers.Columns[col.Name].HeaderText = col.Header;
+                    dataGridViewDrivers.Columns[col.Name].FillWeight = col.FillWeight;
+                    dataGridViewDrivers.Columns[col.Name].Visible = true;
+                    dataGridViewDrivers.Columns[col.Name].DisplayIndex = col.DisplayIndex;
+                    dataGridViewDrivers.Columns[col.Name].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
+                }
             }
 
-            // Стиль заголовков
+            // Настройка внешнего вида
+            dataGridViewDrivers.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dataGridViewDrivers.ColumnHeadersDefaultCellStyle.Font = new Font("Microsoft Sans Serif", 9, FontStyle.Bold);
             dataGridViewDrivers.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(52, 73, 94);
             dataGridViewDrivers.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
             dataGridViewDrivers.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
             dataGridViewDrivers.ColumnHeadersHeight = 40;
 
-            // Стиль строк
             dataGridViewDrivers.DefaultCellStyle.Font = new Font("Microsoft Sans Serif", 9);
             dataGridViewDrivers.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(248, 249, 249);
             dataGridViewDrivers.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dataGridViewDrivers.ReadOnly = true;
             dataGridViewDrivers.RowHeadersVisible = false;
-        }
-
-        private void SetColumn(string columnName, string headerText, int width, bool frozen)
-        {
-            if (dataGridViewDrivers.Columns[columnName] != null)
-            {
-                dataGridViewDrivers.Columns[columnName].HeaderText = headerText;
-                dataGridViewDrivers.Columns[columnName].Width = width;
-                dataGridViewDrivers.Columns[columnName].Frozen = frozen;
-                dataGridViewDrivers.Columns[columnName].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            }
+            dataGridViewDrivers.AllowUserToAddRows = false;
+            dataGridViewDrivers.AllowUserToDeleteRows = false;
         }
 
         // ---------- ДЕЙСТВИЯ С ВОДИТЕЛЯМИ ----------
         private void buttonAdd_Click(object sender, EventArgs e)
         {
             ClearForm();
+            groupBoxDriverData.Visible = true;
             groupBoxDriverData.Text = "Добавление нового водителя";
-            int newAccountId = adminDriver.CreateAccountForDriver();
+
+            label7.Visible = false;
+            textBoxAccountId.Visible = false;
+
+            string timestamp = DateTime.Now.ToString("yyyyMMddHHmmssfff");
+            string generatedLogin = $"driver_{timestamp}";
+            string generatedPassword = GenerateRandomPassword(8);
+
+            int newAccountId = adminDriver.CreateAccountForDriver(generatedLogin, generatedPassword);
             if (newAccountId != -1)
             {
                 textBoxAccountId.Text = newAccountId.ToString();
                 textBoxAccountId.ReadOnly = true;
                 textBoxAccountId.BackColor = Color.LightGreen;
-      
+
+                MessageBox.Show($"Создан аккаунт:\nЛогин: {generatedLogin}\nПароль: {generatedPassword}\n\n" +
+                                "Сохраните эти данные для передачи водителю.",
+                                "Данные для входа",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information);
             }
             else
             {
-                MessageBox.Show("Не удалось создать аккаунт", "Ошибка",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Не удалось создать аккаунт", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -143,6 +168,7 @@ namespace taxi4
 
             DataGridViewRow row = dataGridViewDrivers.SelectedRows[0];
             LoadDriverToForm(row);
+            groupBoxDriverData.Visible = true;
             groupBoxDriverData.Text = "Редактирование водителя";
         }
 
@@ -182,6 +208,7 @@ namespace taxi4
             {
                 bool success;
                 int accountId = Convert.ToInt32(textBoxAccountId.Text.Trim());
+                int selectedStatusId = (int)comboBoxStatus.SelectedValue;
 
                 if (string.IsNullOrEmpty(textBoxID.Text)) // добавление
                 {
@@ -197,7 +224,7 @@ namespace taxi4
                         textBoxLastName.Text.Trim(),
                         textBoxPatronymic.Text.Trim(),
                         textBoxPhone.Text.Trim(),
-                        (int)comboBoxStatus.SelectedValue,
+                        selectedStatusId,
                         accountId,
                         decimal.Parse(textBoxWorkExperience.Text),
                         textBoxLicenseSeries.Text.Trim(),
@@ -206,18 +233,43 @@ namespace taxi4
                 }
                 else // обновление
                 {
+                    int driverId = Convert.ToInt32(textBoxID.Text);
+                    int oldStatusId = adminDriver.GetDriverStatusId(driverId);
+
                     success = adminDriver.UpdateDriver(
-                        Convert.ToInt32(textBoxID.Text),
+                        driverId,
                         textBoxFirstName.Text.Trim(),
                         textBoxLastName.Text.Trim(),
                         textBoxPatronymic.Text.Trim(),
                         textBoxPhone.Text.Trim(),
-                        (int)comboBoxStatus.SelectedValue,
+                        selectedStatusId,
                         accountId,
                         decimal.Parse(textBoxWorkExperience.Text),
                         textBoxLicenseSeries.Text.Trim(),
                         textBoxLicenseNumber.Text.Trim()
                     );
+
+                    // Если статус изменился на "Заблокирован" (2), добавляем в blacklist
+                    if (success && oldStatusId != 2 && selectedStatusId == 2)
+                    {
+                        DataTable reasons = adminDriver.GetBlockReasons();
+                        if (reasons.Rows.Count > 0)
+                        {
+                            using (var blockDialog = new BlockUserDialog(reasons))
+                            {
+                                if (blockDialog.ShowDialog() == DialogResult.OK)
+                                {
+                                    adminDriver.BlockDriver(driverId, blockDialog.SelectedReasonId,
+                                        blockDialog.StartDate, blockDialog.EndDate);
+                                }
+                            }
+                        }
+                    }
+                    // Если статус изменился с "Заблокирован" на другой, убираем из blacklist
+                    else if (success && oldStatusId == 2 && selectedStatusId != 2)
+                    {
+                        adminDriver.UnblockDriver(driverId);
+                    }
                 }
 
                 if (success)
@@ -225,6 +277,8 @@ namespace taxi4
                     MessageBox.Show(string.IsNullOrEmpty(textBoxID.Text) ?
                         "Водитель успешно добавлен" : "Данные водителя обновлены",
                         "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    groupBoxDriverData.Visible = false;
+                    buttonViewCars.Visible = true;
                     ClearForm();
                     LoadDrivers();
                 }
@@ -235,6 +289,115 @@ namespace taxi4
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
+        private string GenerateRandomPassword(int length)
+        {
+            const string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            Random random = new Random();
+            return new string(Enumerable.Repeat(chars, length)
+                .Select(s => s[random.Next(s.Length)]).ToArray());
+        }
+
+        // ---------- БЛОКИРОВКА/РАЗБЛОКИРОВКА ----------
+        /*
+        private void buttonBlock_Click(object sender, EventArgs e)
+        {
+            if (dataGridViewDrivers.SelectedRows.Count == 0)
+            {
+                MessageBox.Show("Выберите водителя для блокировки", "Информация",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            DataGridViewRow row = dataGridViewDrivers.SelectedRows[0];
+            int driverId = Convert.ToInt32(row.Cells["driver_id"].Value);
+            string driverName = $"{row.Cells["last_name"].Value} {row.Cells["first_name"].Value}";
+
+            if (adminDriver.IsDriverBlocked(driverId))
+            {
+                MessageBox.Show("Водитель уже заблокирован", "Информация",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            DataTable reasons = adminDriver.GetBlockReasons();
+            if (reasons.Rows.Count == 0)
+            {
+                MessageBox.Show("Нет доступных причин для блокировки", "Ошибка",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            using (var blockDialog = new BlockUserDialog(reasons))
+            {
+                if (blockDialog.ShowDialog() == DialogResult.OK)
+                {
+                    try
+                    {
+                        bool success = adminDriver.BlockDriver(
+                            driverId,
+                            blockDialog.SelectedReasonId,
+                            blockDialog.StartDate,
+                            blockDialog.EndDate
+                        );
+                        if (success)
+                        {
+                            MessageBox.Show($"Водитель {driverName} заблокирован", "Успех",
+                                MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            LoadDrivers();
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Ошибка блокировки: {ex.Message}", "Ошибка",
+                            MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+            }
+        }
+
+        private void buttonUnblock_Click(object sender, EventArgs e)
+        {
+            if (dataGridViewDrivers.SelectedRows.Count == 0)
+            {
+                MessageBox.Show("Выберите водителя для разблокировки", "Информация",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            DataGridViewRow row = dataGridViewDrivers.SelectedRows[0];
+            int driverId = Convert.ToInt32(row.Cells["driver_id"].Value);
+            string driverName = $"{row.Cells["last_name"].Value} {row.Cells["first_name"].Value}";
+
+            if (!adminDriver.IsDriverBlocked(driverId))
+            {
+                MessageBox.Show("Водитель не заблокирован", "Информация",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            DialogResult result = MessageBox.Show($"Разблокировать водителя {driverName}?", "Подтверждение",
+                MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (result == DialogResult.Yes)
+            {
+                try
+                {
+                    bool success = adminDriver.UnblockDriver(driverId);
+                    if (success)
+                    {
+                        MessageBox.Show("Водитель разблокирован", "Успех",
+                            MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        LoadDrivers();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Ошибка разблокировки: {ex.Message}", "Ошибка",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+        
 
         private void buttonDelete_Click(object sender, EventArgs e)
         {
@@ -261,11 +424,13 @@ namespace taxi4
                 }
             }
         }
+        */
 
         private void buttonRefresh_Click(object sender, EventArgs e)
         {
             LoadDrivers();
             LoadComboBoxData();
+            groupBoxDriverData.Visible = false;
             ClearForm();
             MessageBox.Show("Данные обновлены", "Информация",
                 MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -293,82 +458,8 @@ namespace taxi4
                 DataGridViewRow row = dataGridViewDrivers.Rows[e.RowIndex];
                 LoadDriverToForm(row);
                 groupBoxDriverData.Text = "Редактирование водителя";
+                groupBoxDriverData.Visible = true;
             }
-        }
-
-        // ---------- ВАЛИДАЦИЯ ----------
-        private bool ValidateForm()
-        {
-            if (string.IsNullOrWhiteSpace(textBoxFirstName.Text))
-            {
-                MessageBox.Show("Введите имя", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                textBoxFirstName.Focus();
-                return false;
-            }
-            if (string.IsNullOrWhiteSpace(textBoxLastName.Text))
-            {
-                MessageBox.Show("Введите фамилию", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                textBoxLastName.Focus();
-                return false;
-            }
-            if (string.IsNullOrWhiteSpace(textBoxPhone.Text))
-            {
-                MessageBox.Show("Введите телефон", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                textBoxPhone.Focus();
-                return false;
-            }
-            if (string.IsNullOrWhiteSpace(textBoxAccountId.Text) || !int.TryParse(textBoxAccountId.Text, out _))
-            {
-                MessageBox.Show("ID аккаунта должен быть числом", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                textBoxAccountId.Focus();
-                return false;
-            }
-            if (!decimal.TryParse(textBoxWorkExperience.Text, out _))
-            {
-                MessageBox.Show("Стаж должен быть числом", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                textBoxWorkExperience.Focus();
-                return false;
-            }
-            if (string.IsNullOrWhiteSpace(textBoxLicenseSeries.Text))
-            {
-                MessageBox.Show("Введите серию прав", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                textBoxLicenseSeries.Focus();
-                return false;
-            }
-            if (string.IsNullOrWhiteSpace(textBoxLicenseNumber.Text))
-            {
-                MessageBox.Show("Введите номер прав", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                textBoxLicenseNumber.Focus();
-                return false;
-            }
-            if (comboBoxStatus.SelectedValue == null)
-            {
-                MessageBox.Show("Выберите статус", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                comboBoxStatus.Focus();
-                return false;
-            }
-            return true;
-        }
-
-        private void ClearForm()
-        {
-            textBoxID.Clear();
-            textBoxFirstName.Clear();
-            textBoxLastName.Clear();
-            textBoxPatronymic.Clear();
-            textBoxPhone.Clear();
-            textBoxAccountId.Clear();
-            textBoxWorkExperience.Clear();
-            textBoxLicenseSeries.Clear();
-            textBoxLicenseNumber.Clear();
-            textBoxAccountId.ReadOnly = false;
-            textBoxAccountId.BackColor = Color.White;
-
-            if (comboBoxStatus.Items.Count > 0)
-                comboBoxStatus.SelectedIndex = 0;
-
-            groupBoxDriverData.Text = "Данные водителя";
-            dataGridViewDrivers.DataSource = driversData;
         }
 
         // ---------- ПРОСМОТР АВТОМОБИЛЕЙ ----------
@@ -405,12 +496,194 @@ namespace taxi4
             }
         }
 
+
+        private bool IsOnlyLetters(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text)) return true;
+            foreach (char c in text)
+            {
+                if (!char.IsLetter(c) && c != '-' && c != ' ')
+                    return false;
+            }
+            return true;
+        }
+
+
+        private bool IsValidPhone(string phone)
+        {
+            string digits = new string(phone.Where(char.IsDigit).ToArray());
+            if (digits.Length != 11) return false;
+            if (!digits.StartsWith("79")) return false;
+            return true;
+        }
+
+        private bool IsOnlyDigits(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text)) return false;
+            foreach (char c in text)
+            {
+                if (!char.IsDigit(c))
+                    return false;
+            }
+            return true;
+        }
+        // ---------- ВАЛИДАЦИЯ ----------
+        private bool ValidateForm()
+        {
+            // Проверка имени (только буквы)
+            if (string.IsNullOrWhiteSpace(textBoxFirstName.Text))
+            {
+                MessageBox.Show("Введите имя водителя", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                textBoxFirstName.Focus();
+                return false;
+            }
+            if (!IsOnlyLetters(textBoxFirstName.Text))
+            {
+                MessageBox.Show("Имя должно содержать только буквы", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                textBoxFirstName.Focus();
+                textBoxFirstName.SelectAll();
+                return false;
+            }
+
+            // Проверка фамилии (только буквы)
+            if (string.IsNullOrWhiteSpace(textBoxLastName.Text))
+            {
+                MessageBox.Show("Введите фамилию водителя", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                textBoxLastName.Focus();
+                return false;
+            }
+            if (!IsOnlyLetters(textBoxLastName.Text))
+            {
+                MessageBox.Show("Фамилия должна содержать только буквы", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                textBoxLastName.Focus();
+                textBoxLastName.SelectAll();
+                return false;
+            }
+
+            // Проверка отчества (если заполнено, то только буквы)
+            if (!string.IsNullOrWhiteSpace(textBoxPatronymic.Text) && !IsOnlyLetters(textBoxPatronymic.Text))
+            {
+                MessageBox.Show("Отчество должно содержать только буквы", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                textBoxPatronymic.Focus();
+                textBoxPatronymic.SelectAll();
+                return false;
+            }
+
+            // Проверка телефона
+            if (string.IsNullOrWhiteSpace(textBoxPhone.Text))
+            {
+                MessageBox.Show("Введите телефон водителя", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                textBoxPhone.Focus();
+                return false;
+            }
+            if (!IsValidPhone(textBoxPhone.Text))
+            {
+                MessageBox.Show("Введите корректный номер телефона в формате: +79001234567", "Ошибка",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                textBoxPhone.Focus();
+                textBoxPhone.SelectAll();
+                return false;
+            }
+
+            // Проверка стажа
+            if (string.IsNullOrWhiteSpace(textBoxWorkExperience.Text))
+            {
+                MessageBox.Show("Введите стаж водителя", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                textBoxWorkExperience.Focus();
+                return false;
+            }
+            if (!decimal.TryParse(textBoxWorkExperience.Text, out decimal experience) || experience < 0 || experience > 50)
+            {
+                MessageBox.Show("Введите корректный стаж (0-50 лет)", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                textBoxWorkExperience.Focus();
+                textBoxWorkExperience.SelectAll();
+                return false;
+            }
+
+            // Проверка серии прав (только ЦИФРЫ, 4 цифры)
+            if (string.IsNullOrWhiteSpace(textBoxLicenseSeries.Text))
+            {
+                MessageBox.Show("Введите серию прав", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                textBoxLicenseSeries.Focus();
+                return false;
+            }
+            if (!IsOnlyDigits(textBoxLicenseSeries.Text))
+            {
+                MessageBox.Show("Серия прав должна содержать только цифры", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                textBoxLicenseSeries.Focus();
+                textBoxLicenseSeries.SelectAll();
+                return false;
+            }
+            if (textBoxLicenseSeries.Text.Length != 4)
+            {
+                MessageBox.Show("Серия прав должна содержать 4 цифры", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                textBoxLicenseSeries.Focus();
+                textBoxLicenseSeries.SelectAll();
+                return false;
+            }
+
+            // Проверка номера прав (только ЦИФРЫ, 6 цифр)
+            if (string.IsNullOrWhiteSpace(textBoxLicenseNumber.Text))
+            {
+                MessageBox.Show("Введите номер прав", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                textBoxLicenseNumber.Focus();
+                return false;
+            }
+            if (!IsOnlyDigits(textBoxLicenseNumber.Text))
+            {
+                MessageBox.Show("Номер прав должен содержать только цифры", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                textBoxLicenseNumber.Focus();
+                textBoxLicenseNumber.SelectAll();
+                return false;
+            }
+            if (textBoxLicenseNumber.Text.Length != 6)
+            {
+                MessageBox.Show("Номер прав должен содержать 6 цифр", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                textBoxLicenseNumber.Focus();
+                textBoxLicenseNumber.SelectAll();
+                return false;
+            }
+
+            // Проверка статуса
+            if (comboBoxStatus.SelectedValue == null)
+            {
+                MessageBox.Show("Выберите статус", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                comboBoxStatus.Focus();
+                return false;
+            }
+
+            return true;
+        }
+
+        private void ClearForm()
+        {
+            textBoxID.Clear();
+            textBoxFirstName.Clear();
+            textBoxLastName.Clear();
+            textBoxPatronymic.Clear();
+            textBoxPhone.Clear();
+            textBoxAccountId.Clear();
+            textBoxWorkExperience.Clear();
+            textBoxLicenseSeries.Clear();
+            textBoxLicenseNumber.Clear();
+            textBoxAccountId.ReadOnly = false;
+            textBoxAccountId.BackColor = Color.White;
+
+            if (comboBoxStatus.Items.Count > 0)
+                comboBoxStatus.SelectedIndex = 0;
+
+            groupBoxDriverData.Text = "Данные водителя";
+            dataGridViewDrivers.DataSource = driversData;
+        }
+
         // ---------- НАЗАД ----------
         private void buttonBack_Click(object sender, EventArgs e)
         {
             AdminMenu menu = new AdminMenu();
             menu.Show();
-            this.Hide();
+            back = true;
+            this.Close();
+
         }
 
         // ---------- ОГРАНИЧЕНИЯ ВВОДА ----------

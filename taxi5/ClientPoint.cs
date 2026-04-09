@@ -18,21 +18,20 @@ namespace taxi4
                 {
                     conn.Open();
                     string query = @"
-                        SELECT 
-                            p.point_id,
-                            p.name AS point_name,
-                            pt.name AS type_name,
-                            a.city,
-                            a.street,
-                            a.house,
-                            a.entrance,
-                            a.address_id
-                        FROM point p
-                        JOIN clent_point cp ON p.point_id = cp.point_id
-                        JOIN point_tupe pt ON p.type_id = pt.point_tupe
-                        JOIN address a ON p.address_id = a.address_id
-                        WHERE cp.clent_id = @clientId
-                        ORDER BY p.point_id";
+                SELECT 
+                    p.point_id,
+                    p.name AS point_name,
+                    pt.name AS type_name,
+                    CONCAT(a.city, ', ', a.street, ', д.', a.house,
+                           CASE WHEN a.entrance IS NOT NULL AND a.entrance != '' 
+                                THEN ', подъезд ' || a.entrance ELSE '' END) AS full_address,
+                    a.address_id
+                FROM point p
+                JOIN clent_point cp ON p.point_id = cp.point_id
+                JOIN point_tupe pt ON p.type_id = pt.point_tupe
+                JOIN address a ON p.address_id = a.address_id
+                WHERE cp.clent_id = @clientId
+                ORDER BY p.point_id";
 
                     using (var cmd = new NpgsqlCommand(query, conn))
                     {
@@ -199,14 +198,7 @@ namespace taxi4
                 {
                     conn.Open();
 
-                    string getAddrQuery = "SELECT address_id FROM point WHERE point_id = @pointId";
-                    int addressId;
-                    using (var getCmd = new NpgsqlCommand(getAddrQuery, conn))
-                    {
-                        getCmd.Parameters.AddWithValue("@pointId", pointId);
-                        addressId = Convert.ToInt32(getCmd.ExecuteScalar());
-                    }
-
+                    // Только удаляем связь с клиентом
                     string deleteLink = "DELETE FROM clent_point WHERE point_id = @pointId";
                     using (var linkCmd = new NpgsqlCommand(deleteLink, conn))
                     {
@@ -214,27 +206,12 @@ namespace taxi4
                         linkCmd.ExecuteNonQuery();
                     }
 
+                    // Удаляем саму точку (адрес останется в БД)
                     string deletePoint = "DELETE FROM point WHERE point_id = @pointId";
                     using (var pointCmd = new NpgsqlCommand(deletePoint, conn))
                     {
                         pointCmd.Parameters.AddWithValue("@pointId", pointId);
                         pointCmd.ExecuteNonQuery();
-                    }
-
-                    string checkOther = "SELECT COUNT(*) FROM point WHERE address_id = @addressId";
-                    using (var checkCmd = new NpgsqlCommand(checkOther, conn))
-                    {
-                        checkCmd.Parameters.AddWithValue("@addressId", addressId);
-                        int cnt = Convert.ToInt32(checkCmd.ExecuteScalar());
-                        if (cnt == 0)
-                        {
-                            string deleteAddr = "DELETE FROM address WHERE address_id = @addressId";
-                            using (var addrCmd = new NpgsqlCommand(deleteAddr, conn))
-                            {
-                                addrCmd.Parameters.AddWithValue("@addressId", addressId);
-                                addrCmd.ExecuteNonQuery();
-                            }
-                        }
                     }
 
                     return true;

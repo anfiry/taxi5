@@ -9,7 +9,7 @@ namespace taxi4
     {
         private AdminOrder adminOrder;
         private DataTable ordersData;
-        private string currentStatusFilter = null; // для отслеживания применённого статуса
+        private bool back = false;
 
         public AdminOrderForm()
         {
@@ -18,6 +18,14 @@ namespace taxi4
             LoadOrderStatuses();
             LoadOrders();
             ConfigureDataGridView();
+            dataGridViewOrders.CellClick += DataGridViewOrders_CellClick;
+        }
+
+        public void OnClosed()
+        {
+            if (back)
+            { back = false; }
+            else { Application.Exit(); }
         }
 
         // ---------- ЗАГРУЗКА СТАТУСОВ ДЛЯ ФИЛЬТРА ----------
@@ -26,12 +34,14 @@ namespace taxi4
             try
             {
                 DataTable statuses = adminOrder.GetOrderStatuses();
+
                 DataRow allRow = statuses.NewRow();
                 allRow["order_status_id"] = 0;
                 allRow["name"] = "Все статусы";
                 statuses.Rows.InsertAt(allRow, 0);
+
                 comboBoxStatusFilter.DisplayMember = "name";
-                comboBoxStatusFilter.ValueMember = "name";
+                comboBoxStatusFilter.ValueMember = "order_status_id";
                 comboBoxStatusFilter.DataSource = statuses;
                 comboBoxStatusFilter.SelectedIndex = 0;
             }
@@ -42,19 +52,19 @@ namespace taxi4
             }
         }
 
-        // ---------- ЗАГРУЗКА ЗАКАЗОВ С ПРИМЕНЕНИЕМ ФИЛЬТРА ПО СТАТУСУ ----------
+        // ---------- ЗАГРУЗКА ЗАКАЗОВ ----------
         private void LoadOrders()
         {
             try
             {
-                // Получаем выбранный статус из комбобокса (если не "Все статусы")
-                string selectedStatus = comboBoxStatusFilter.SelectedIndex > 0
-                    ? comboBoxStatusFilter.SelectedValue.ToString()
-                    : null;
+                int? statusIdFilter = null;
+                if (comboBoxStatusFilter.SelectedIndex > 0)
+                {
+                    statusIdFilter = Convert.ToInt32(comboBoxStatusFilter.SelectedValue);
+                }
 
-                ordersData = adminOrder.GetOrders(selectedStatus);
+                ordersData = adminOrder.GetOrders(statusIdFilter);
                 dataGridViewOrders.DataSource = ordersData;
-                ConfigureDataGridView();
             }
             catch (Exception ex)
             {
@@ -68,53 +78,92 @@ namespace taxi4
         {
             if (dataGridViewOrders.Columns.Count == 0) return;
 
-            dataGridViewOrders.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
+            // Удаляем старые колонки кнопок, если они есть
+            if (dataGridViewOrders.Columns.Contains("ReviewButton"))
+                dataGridViewOrders.Columns.Remove("ReviewButton");
+            if (dataGridViewOrders.Columns.Contains("RouteButton"))
+                dataGridViewOrders.Columns.Remove("RouteButton");
 
-            SetColumn("order_id", "ID", 60, true);
-            SetColumn("client_name", "Клиент", 180, true);
-            SetColumn("driver_name", "Водитель", 180, false);
-            SetColumn("tariff_name", "Тариф", 120, false);
-            SetColumn("order_status_name", "Статус", 120, false);
-            SetColumn("payment_method_name", "Оплата", 120, false);
-            SetColumn("address_from_text", "Откуда", 200, false);
-            SetColumn("address_to_text", "Куда", 200, false);
-            SetColumn("order_datetime", "Дата и время", 150, false);
-            SetColumn("final_cost", "Стоимость", 100, false);
+            // Скрываем служебные колонки
+            if (dataGridViewOrders.Columns.Contains("order_id"))
+                dataGridViewOrders.Columns["order_id"].Visible = false;
+            if (dataGridViewOrders.Columns.Contains("order_status"))
+                dataGridViewOrders.Columns["order_status"].Visible = false;
+            if (dataGridViewOrders.Columns.Contains("driver_id"))
+                dataGridViewOrders.Columns["driver_id"].Visible = false;
 
-            if (dataGridViewOrders.Columns["status_id"] != null)
-                dataGridViewOrders.Columns["status_id"].Visible = false;
-
-            if (dataGridViewOrders.Columns["order_datetime"] != null)
+            // Настройка колонок с датами (меняем заголовки)
+            if (dataGridViewOrders.Columns.Contains("order_datetime"))
             {
+                dataGridViewOrders.Columns["order_datetime"].HeaderText = "Дата создания";
                 dataGridViewOrders.Columns["order_datetime"].DefaultCellStyle.Format = "dd.MM.yyyy HH:mm";
                 dataGridViewOrders.Columns["order_datetime"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
             }
 
-            if (dataGridViewOrders.Columns["final_cost"] != null)
+            if (dataGridViewOrders.Columns.Contains("start_trip_time"))
             {
+                dataGridViewOrders.Columns["start_trip_time"].HeaderText = "Начало поездки";
+                dataGridViewOrders.Columns["start_trip_time"].DefaultCellStyle.Format = "dd.MM.yyyy HH:mm";
+                dataGridViewOrders.Columns["start_trip_time"].DefaultCellStyle.NullValue = "—";
+                dataGridViewOrders.Columns["start_trip_time"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            }
+
+            if (dataGridViewOrders.Columns.Contains("end_trip_time"))
+            {
+                dataGridViewOrders.Columns["end_trip_time"].HeaderText = "Завершение поездки";
+                dataGridViewOrders.Columns["end_trip_time"].DefaultCellStyle.Format = "dd.MM.yyyy HH:mm";
+                dataGridViewOrders.Columns["end_trip_time"].DefaultCellStyle.NullValue = "—";
+                dataGridViewOrders.Columns["end_trip_time"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            }
+
+            // Настройка остальных колонок
+            if (dataGridViewOrders.Columns.Contains("client_name"))
+                dataGridViewOrders.Columns["client_name"].HeaderText = "Клиент";
+            if (dataGridViewOrders.Columns.Contains("driver_name"))
+                dataGridViewOrders.Columns["driver_name"].HeaderText = "Водитель";
+            if (dataGridViewOrders.Columns.Contains("tariff_name"))
+                dataGridViewOrders.Columns["tariff_name"].HeaderText = "Тариф";
+            if (dataGridViewOrders.Columns.Contains("order_status_name"))
+                dataGridViewOrders.Columns["order_status_name"].HeaderText = "Статус";
+            if (dataGridViewOrders.Columns.Contains("payment_method_name"))
+                dataGridViewOrders.Columns["payment_method_name"].HeaderText = "Оплата";
+            if (dataGridViewOrders.Columns.Contains("address_from_text"))
+                dataGridViewOrders.Columns["address_from_text"].HeaderText = "Откуда";
+            if (dataGridViewOrders.Columns.Contains("address_to_text"))
+                dataGridViewOrders.Columns["address_to_text"].HeaderText = "Куда";
+            if (dataGridViewOrders.Columns.Contains("final_cost"))
+            {
+                dataGridViewOrders.Columns["final_cost"].HeaderText = "Стоимость";
                 dataGridViewOrders.Columns["final_cost"].DefaultCellStyle.Format = "N2";
                 dataGridViewOrders.Columns["final_cost"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
             }
 
-            int index = 0;
-            string[] order = {
-                "order_id", "client_name", "driver_name", "tariff_name",
-                "order_status_name", "payment_method_name", "address_from_text",
-                "address_to_text", "order_datetime", "final_cost"
-            };
-            foreach (string colName in order)
-            {
-                if (dataGridViewOrders.Columns[colName] != null)
-                    dataGridViewOrders.Columns[colName].DisplayIndex = index++;
-            }
+            // Добавляем кнопки
+            DataGridViewButtonColumn reviewButton = new DataGridViewButtonColumn();
+            reviewButton.Name = "ReviewButton";
+            reviewButton.HeaderText = "Отзыв";
+            reviewButton.Text = "Просмотр";
+            reviewButton.UseColumnTextForButtonValue = true;
+            reviewButton.Width = 70;
+            dataGridViewOrders.Columns.Add(reviewButton);
 
-            dataGridViewOrders.ColumnHeadersDefaultCellStyle.Font = new Font("Microsoft Sans Serif", 9, FontStyle.Bold);
+            DataGridViewButtonColumn routeButton = new DataGridViewButtonColumn();
+            routeButton.Name = "RouteButton";
+            routeButton.HeaderText = "Маршрут";
+            routeButton.Text = "На карте";
+            routeButton.UseColumnTextForButtonValue = true;
+            routeButton.Width = 80;
+            dataGridViewOrders.Columns.Add(routeButton);
+
+            // Стиль заголовков
+            dataGridViewOrders.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 10, FontStyle.Bold);
             dataGridViewOrders.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(52, 73, 94);
             dataGridViewOrders.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
             dataGridViewOrders.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewOrders.ColumnHeadersHeight = 40;
+            dataGridViewOrders.ColumnHeadersHeight = 45;
 
-            dataGridViewOrders.DefaultCellStyle.Font = new Font("Microsoft Sans Serif", 9);
+            // Стиль строк
+            dataGridViewOrders.DefaultCellStyle.Font = new Font("Segoe UI", 9);
             dataGridViewOrders.DefaultCellStyle.ForeColor = Color.Black;
             dataGridViewOrders.DefaultCellStyle.SelectionBackColor = Color.FromArgb(52, 152, 219);
             dataGridViewOrders.DefaultCellStyle.SelectionForeColor = Color.White;
@@ -123,30 +172,54 @@ namespace taxi4
             dataGridViewOrders.AllowUserToResizeRows = false;
             dataGridViewOrders.ReadOnly = true;
             dataGridViewOrders.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dataGridViewOrders.AllowUserToAddRows = false;
+            dataGridViewOrders.AllowUserToDeleteRows = false;
+
+            // Автоматическая ширина колонок
+            dataGridViewOrders.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
         }
 
-        private void SetColumn(string columnName, string headerText, int width, bool frozen)
+        // ---------- ОБРАБОТЧИК КЛИКА ПО КНОПКАМ В ТАБЛИЦЕ ----------
+        private void DataGridViewOrders_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-            if (dataGridViewOrders.Columns[columnName] != null)
+            if (e.RowIndex < 0) return;
+
+            string columnName = dataGridViewOrders.Columns[e.ColumnIndex].Name;
+            int orderId = Convert.ToInt32(dataGridViewOrders.Rows[e.RowIndex].Cells["order_id"].Value);
+
+            if (columnName == "RouteButton")
             {
-                dataGridViewOrders.Columns[columnName].HeaderText = headerText;
-                dataGridViewOrders.Columns[columnName].Width = width;
-                dataGridViewOrders.Columns[columnName].Frozen = frozen;
-                dataGridViewOrders.Columns[columnName].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
+                string from = dataGridViewOrders.Rows[e.RowIndex].Cells["address_from_text"].Value.ToString();
+                string to = dataGridViewOrders.Rows[e.RowIndex].Cells["address_to_text"].Value.ToString();
+                RouteViewForm routeForm = new RouteViewForm(from, to);
+                routeForm.ShowDialog();
+            }
+            else if (columnName == "ReviewButton")
+            {
+                DataRow review = adminOrder.GetReview(orderId);
+                if (review != null)
+                {
+                    MessageBox.Show($"Оценка: {review["rating"]}\nКомментарий: {review["comment"]}", "Отзыв",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                {
+                    MessageBox.Show("Отзыв по данному заказу отсутствует.", "Информация",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
             }
         }
 
-        // ---------- ОБРАБОТЧИКИ ----------
+        // ---------- ОБРАБОТЧИКИ КНОПОК ----------
         private void buttonRefresh_Click(object sender, EventArgs e)
         {
-            LoadOrders(); // перезагружает с текущим выбранным статусом
+            LoadOrders();
             MessageBox.Show("Данные обновлены", "Информация",
                 MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void buttonApplyFilter_Click(object sender, EventArgs e)
         {
-            // Применяем фильтр по статусу – просто перезагружаем данные с выбранным статусом
             LoadOrders();
         }
 
@@ -155,12 +228,16 @@ namespace taxi4
             string search = textBoxSearch.Text.Trim().ToLower();
             if (string.IsNullOrEmpty(search))
             {
-                // Если поиск пуст, возвращаем исходные данные (текущий статус)
                 LoadOrders();
                 return;
             }
 
-            // Фильтруем уже загруженные данные по тексту
+            if (ordersData == null)
+            {
+                LoadOrders();
+                return;
+            }
+
             DataView dv = new DataView(ordersData);
             dv.RowFilter = $"client_name LIKE '%{search}%' OR driver_name LIKE '%{search}%' OR " +
                            $"address_from_text LIKE '%{search}%' OR address_to_text LIKE '%{search}%'";
@@ -171,9 +248,9 @@ namespace taxi4
         {
             AdminMenu adminMenu = new AdminMenu();
             adminMenu.Show();
-            this.Hide();
+            back = true;
+            this.Close();
         }
-
 
         private void textBoxSearch_KeyDown(object sender, KeyEventArgs e)
         {

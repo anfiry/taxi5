@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.Drawing;
+using System.Reflection.Emit;
 using System.Windows.Forms;
 
 namespace taxi4
@@ -9,6 +10,8 @@ namespace taxi4
     {
         private AdminPromotion adminPromotion;
         private DataTable promotionsData;
+        private bool back = false;
+
 
         public AdminPromotionForm()
         {
@@ -16,6 +19,17 @@ namespace taxi4
             adminPromotion = new AdminPromotion();
             LoadPromotions();
             ClearForm();
+
+            labelPromotionId.Visible = false;
+            textBoxPromotionId.Visible = false;
+            groupBoxPromotionData.Visible = false;
+        }
+
+        public void OnClosed()
+        {
+            if (back)
+            { back = false; }
+            else { Application.Exit(); }
         }
 
         // ---------- ЗАГРУЗКА АКЦИЙ ----------
@@ -38,6 +52,8 @@ namespace taxi4
         private void ConfigureDataGridView()
         {
             if (dataGridViewPromotions.Columns.Count == 0) return;
+            if (dataGridViewPromotions.Columns["promotion_id"] != null)
+                dataGridViewPromotions.Columns["promotion_id"].Visible = false;
 
             dataGridViewPromotions.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
 
@@ -105,13 +121,23 @@ namespace taxi4
         private void buttonAdd_Click(object sender, EventArgs e)
         {
             ClearForm();
+            groupBoxPromotionData.Visible = true;
+
             groupBoxPromotionData.Text = "Добавление новой акции";
-            textBoxPromotionId.Visible = false;
+          
             labelPromotionId.Visible = false;
+            textBoxPromotionId.Visible = false;
         }
 
         private void buttonEdit_Click(object sender, EventArgs e)
         {
+
+
+            labelPromotionId.Visible = false;
+            textBoxPromotionId.Visible = false;
+            groupBoxPromotionData.Visible = true;
+
+
             if (dataGridViewPromotions.SelectedRows.Count == 0)
             {
                 MessageBox.Show("Выберите акцию для редактирования", "Информация",
@@ -124,6 +150,9 @@ namespace taxi4
             groupBoxPromotionData.Text = "Редактирование акции";
             textBoxPromotionId.Visible = true;
             labelPromotionId.Visible = true;
+
+            labelPromotionId.Visible = false;
+            textBoxPromotionId.Visible = false;
         }
 
         private void LoadPromotionToForm(DataGridViewRow row)
@@ -190,6 +219,8 @@ namespace taxi4
 
                 if (success)
                 {
+                    groupBoxPromotionData.Visible = false;
+
                     ClearForm();
                     LoadPromotions();
                 }
@@ -203,6 +234,9 @@ namespace taxi4
 
         private void buttonDelete_Click(object sender, EventArgs e)
         {
+            labelPromotionId.Visible = false;
+            textBoxPromotionId.Visible = false;
+
             if (dataGridViewPromotions.SelectedRows.Count == 0)
             {
                 MessageBox.Show("Выберите акцию для удаления", "Информация",
@@ -234,8 +268,13 @@ namespace taxi4
 
         private void buttonRefresh_Click(object sender, EventArgs e)
         {
+            labelPromotionId.Visible = false;
+            textBoxPromotionId.Visible = false;
+
             LoadPromotions();
             ClearForm();
+            groupBoxPromotionData.Visible = false;
+
             MessageBox.Show("Данные обновлены", "Информация",
                 MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
@@ -258,7 +297,9 @@ namespace taxi4
         {
             AdminMenu adminMenu = new AdminMenu();
             adminMenu.Show();
-            this.Hide();
+            back = true;
+            this.Close();
+
         }
 
         private void ClearForm()

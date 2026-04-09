@@ -10,29 +10,30 @@ namespace taxi4
         private string connectionString = "Host=localhost;Port=5432;Database=taxi4;Username=postgres;Password=123";
 
         // ---------- ПОЛУЧЕНИЕ СПИСКА ЗАКАЗОВ ----------
-        public DataTable GetOrders(string statusFilter = null, DateTime? dateFrom = null, DateTime? dateTo = null)
+        public DataTable GetOrders(int? statusIdFilter = null, DateTime? dateFrom = null, DateTime? dateTo = null)
         {
             var dt = new DataTable();
-
             using (var conn = new NpgsqlConnection(connectionString))
             {
                 try
                 {
                     conn.Open();
-
                     string query = @"
                         SELECT 
                             o.order_id,
                             c.last_name || ' ' || c.first_name AS client_name,
-                            d.last_name || ' ' || d.first_name AS driver_name,
+                            COALESCE(d.last_name || ' ' || d.first_name, 'Не назначен') AS driver_name,
                             t.name AS tariff_name,
                             os.name AS order_status_name,
                             pm.method_name AS payment_method_name,
                             (SELECT city || ', ' || street || ', д.' || house FROM address WHERE address_id = o.address_from) AS address_from_text,
                             (SELECT city || ', ' || street || ', д.' || house FROM address WHERE address_id = o.address_to) AS address_to_text,
-                            o.order_datetime,
+                            o.order_datetime,  -- ← ИСПРАВЛЕНО: order_datetime
+                            o.start_trip_time,
+                            o.end_trip_time,
                             o.final_cost,
-                            o.order_status AS status_id
+                            o.order_status,
+                            o.driver_id
                         FROM ""Order"" o
                         LEFT JOIN client c ON o.client_id = c.client_id
                         LEFT JOIN driver d ON o.driver_id = d.driver_id
@@ -44,26 +45,25 @@ namespace taxi4
                     var cmd = new NpgsqlCommand();
                     cmd.Connection = conn;
 
-                    if (!string.IsNullOrEmpty(statusFilter))
+                    if (statusIdFilter.HasValue && statusIdFilter.Value > 0)
                     {
-                        query += " AND os.name = @status";
-                        cmd.Parameters.AddWithValue("@status", statusFilter);
+                        query += " AND o.order_status = @statusId";
+                        cmd.Parameters.AddWithValue("@statusId", statusIdFilter.Value);
                     }
 
                     if (dateFrom.HasValue)
                     {
-                        query += " AND o.order_datetime >= @dateFrom";
+                        query += " AND o.order_datetime >= @dateFrom";  // ← ИСПРАВЛЕНО: order_datetime
                         cmd.Parameters.AddWithValue("@dateFrom", dateFrom.Value);
                     }
 
                     if (dateTo.HasValue)
                     {
-                        query += " AND o.order_datetime <= @dateTo";
-                        cmd.Parameters.AddWithValue("@dateTo", dateTo.Value.AddDays(1).AddSeconds(-1)); // конец дня
+                        query += " AND o.order_datetime <= @dateTo";  // ← ИСПРАВЛЕНО: order_datetime
+                        cmd.Parameters.AddWithValue("@dateTo", dateTo.Value.AddDays(1).AddSeconds(-1));
                     }
 
-                    query += " ORDER BY o.order_datetime DESC";
-
+                    query += " ORDER BY o.order_datetime DESC";  // ← ИСПРАВЛЕНО: order_datetime
                     cmd.CommandText = query;
 
                     using (var adapter = new NpgsqlDataAdapter(cmd))
@@ -100,6 +100,35 @@ namespace taxi4
                 }
             }
             return dt;
+        }
+
+        // ---------- ПОЛУЧЕНИЕ ОТЗЫВА ПО ЗАКАЗУ ----------
+        public DataRow GetReview(int orderId)
+        {
+            using (var conn = new NpgsqlConnection(connectionString))
+            {
+                try
+                {
+                    conn.Open();
+                    string query = "SELECT rating, comment FROM review WHERE orber_id = @orderId";
+                    using (var cmd = new NpgsqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@orderId", orderId);
+                        using (var adapter = new NpgsqlDataAdapter(cmd))
+                        {
+                            DataTable dt = new DataTable();
+                            adapter.Fill(dt);
+                            return dt.Rows.Count > 0 ? dt.Rows[0] : null;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Ошибка загрузки отзыва:\n{ex.Message}", "Ошибка",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return null;
+                }
+            }
         }
     }
 }

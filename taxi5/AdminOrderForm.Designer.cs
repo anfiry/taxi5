@@ -1,4 +1,8 @@
-﻿namespace taxi4
+﻿using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+namespace taxi4
 {
     partial class AdminOrderForm
     {
@@ -39,9 +43,7 @@
             this.dataGridViewOrders.AllowUserToAddRows = false;
             this.dataGridViewOrders.AllowUserToDeleteRows = false;
             this.dataGridViewOrders.AllowUserToResizeRows = false;
-            this.dataGridViewOrders.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.dataGridViewOrders.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.dataGridViewOrders.BackgroundColor = System.Drawing.Color.White;
             this.dataGridViewOrders.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.dataGridViewOrders.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
@@ -50,16 +52,17 @@
             this.dataGridViewOrders.ReadOnly = true;
             this.dataGridViewOrders.RowHeadersVisible = false;
             this.dataGridViewOrders.RowHeadersWidth = 51;
-            this.dataGridViewOrders.Size = new System.Drawing.Size(1160, 493);
+            this.dataGridViewOrders.Size = new System.Drawing.Size(1471, 713);
             this.dataGridViewOrders.TabIndex = 0;
             // 
             // buttonRefresh
             // 
-            this.buttonRefresh.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(251)))), ((int)(((byte)(228)))), ((int)(((byte)(255)))));
+            this.buttonRefresh.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.buttonRefresh.BackColor = System.Drawing.Color.FromArgb(251, 228, 255);
             this.buttonRefresh.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonRefresh.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
-            this.buttonRefresh.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(4)))), ((int)(((byte)(0)))), ((int)(((byte)(66)))));
-            this.buttonRefresh.Location = new System.Drawing.Point(12, 20);
+            this.buttonRefresh.ForeColor = System.Drawing.Color.FromArgb(4, 0, 66);
+            this.buttonRefresh.Location = new System.Drawing.Point(1102, 35);
             this.buttonRefresh.Name = "buttonRefresh";
             this.buttonRefresh.Size = new System.Drawing.Size(120, 40);
             this.buttonRefresh.TabIndex = 0;
@@ -69,11 +72,12 @@
             // 
             // buttonSearch
             // 
-            this.buttonSearch.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(227)))), ((int)(((byte)(255)))));
+            this.buttonSearch.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.buttonSearch.BackColor = System.Drawing.Color.FromArgb(230, 227, 255);
             this.buttonSearch.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonSearch.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
-            this.buttonSearch.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(4)))), ((int)(((byte)(0)))), ((int)(((byte)(66)))));
-            this.buttonSearch.Location = new System.Drawing.Point(880, 20);
+            this.buttonSearch.ForeColor = System.Drawing.Color.FromArgb(4, 0, 66);
+            this.buttonSearch.Location = new System.Drawing.Point(907, 35);
             this.buttonSearch.Name = "buttonSearch";
             this.buttonSearch.Size = new System.Drawing.Size(90, 40);
             this.buttonSearch.TabIndex = 4;
@@ -83,11 +87,12 @@
             // 
             // buttonBack
             // 
-            this.buttonBack.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(227)))), ((int)(((byte)(227)))));
+            this.buttonBack.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.buttonBack.BackColor = System.Drawing.Color.FromArgb(255, 227, 227);
             this.buttonBack.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonBack.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
-            this.buttonBack.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(4)))), ((int)(((byte)(0)))), ((int)(((byte)(66)))));
-            this.buttonBack.Location = new System.Drawing.Point(1052, 20);
+            this.buttonBack.ForeColor = System.Drawing.Color.FromArgb(4, 0, 66);
+            this.buttonBack.Location = new System.Drawing.Point(1316, 35);
             this.buttonBack.Name = "buttonBack";
             this.buttonBack.Size = new System.Drawing.Size(120, 40);
             this.buttonBack.TabIndex = 1;
@@ -97,13 +102,14 @@
             // 
             // buttonApplyFilter
             // 
-            this.buttonApplyFilter.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(227)))), ((int)(((byte)(255)))));
+            this.buttonApplyFilter.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.buttonApplyFilter.BackColor = System.Drawing.Color.FromArgb(230, 227, 255);
             this.buttonApplyFilter.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonApplyFilter.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
-            this.buttonApplyFilter.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(4)))), ((int)(((byte)(0)))), ((int)(((byte)(66)))));
-            this.buttonApplyFilter.Location = new System.Drawing.Point(340, 70);
+            this.buttonApplyFilter.ForeColor = System.Drawing.Color.FromArgb(4, 0, 66);
+            this.buttonApplyFilter.Location = new System.Drawing.Point(386, 35);
             this.buttonApplyFilter.Name = "buttonApplyFilter";
-            this.buttonApplyFilter.Size = new System.Drawing.Size(120, 35);
+            this.buttonApplyFilter.Size = new System.Drawing.Size(122, 40);
             this.buttonApplyFilter.TabIndex = 7;
             this.buttonApplyFilter.Text = "Применить";
             this.buttonApplyFilter.UseVisualStyleBackColor = false;
@@ -111,18 +117,19 @@
             // 
             // textBoxSearch
             // 
+            this.textBoxSearch.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.textBoxSearch.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
-            this.textBoxSearch.Location = new System.Drawing.Point(670, 27);
+            this.textBoxSearch.Location = new System.Drawing.Point(687, 43);
             this.textBoxSearch.Name = "textBoxSearch";
             this.textBoxSearch.Size = new System.Drawing.Size(200, 24);
             this.textBoxSearch.TabIndex = 3;
-            this.textBoxSearch.KeyDown += new System.Windows.Forms.KeyEventHandler(this.textBoxSearch_KeyDown);
             // 
             // label8
             // 
+            this.label8.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.label8.AutoSize = true;
             this.label8.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
-            this.label8.Location = new System.Drawing.Point(600, 30);
+            this.label8.Location = new System.Drawing.Point(603, 49);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(62, 18);
             this.label8.TabIndex = 2;
@@ -130,18 +137,20 @@
             // 
             // comboBoxStatusFilter
             // 
+            this.comboBoxStatusFilter.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.comboBoxStatusFilter.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBoxStatusFilter.FormattingEnabled = true;
-            this.comboBoxStatusFilter.Location = new System.Drawing.Point(135, 77);
+            this.comboBoxStatusFilter.Location = new System.Drawing.Point(181, 42);
             this.comboBoxStatusFilter.Name = "comboBoxStatusFilter";
             this.comboBoxStatusFilter.Size = new System.Drawing.Size(180, 24);
             this.comboBoxStatusFilter.TabIndex = 6;
             // 
             // labelStatusFilter
             // 
+            this.labelStatusFilter.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.labelStatusFilter.AutoSize = true;
             this.labelStatusFilter.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
-            this.labelStatusFilter.Location = new System.Drawing.Point(12, 80);
+            this.labelStatusFilter.Location = new System.Drawing.Point(30, 48);
             this.labelStatusFilter.Name = "labelStatusFilter";
             this.labelStatusFilter.Size = new System.Drawing.Size(126, 18);
             this.labelStatusFilter.TabIndex = 5;
@@ -152,7 +161,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(1184, 625);
+            this.ClientSize = new System.Drawing.Size(1495, 845);
             this.Controls.Add(this.buttonApplyFilter);
             this.Controls.Add(this.comboBoxStatusFilter);
             this.Controls.Add(this.labelStatusFilter);
@@ -167,10 +176,10 @@
             this.Name = "AdminOrderForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Просмотр заказов";
+            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewOrders)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
-
         }
     }
 }
