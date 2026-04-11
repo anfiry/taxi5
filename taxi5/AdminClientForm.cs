@@ -7,6 +7,7 @@ using System.Linq;
 using System.Windows.Forms;
 using taxi4;
 
+
 namespace taxi4
 {
     public partial class AdminClientForm : Form
@@ -16,14 +17,15 @@ namespace taxi4
         private DataTable clientsData;
         private DataTable allAddresses;
         private DataTable originalClientsData;
-        private bool columnsConfigured = false; // Флаг для отслеживания настройки колонок
+        private bool columnsConfigured = false;
         private bool back = false;
-
 
         public AdminClientForm()
         {
             InitializeComponent();
             adminClient = new AdminClient();
+
+            originalClientsData = new DataTable();
 
             // Включаем двойную буферизацию для DataGridView
             typeof(DataGridView).InvokeMember("DoubleBuffered",
@@ -55,7 +57,7 @@ namespace taxi4
             textBoxID.Visible = false;
             ID1.Visible = false;
 
-            // Скрываем поле аккаунта (оно будет видно только при добавлении)
+            // Скрываем поле аккаунта
             label7.Visible = false;
             textBoxAccountId.Visible = false;
         }
@@ -81,72 +83,149 @@ namespace taxi4
             cmbAddress.DropDownStyle = ComboBoxStyle.DropDown;
         }
 
+        private void ClearForm()
+        {
+            textBoxID.Clear();
+            textBoxFirstName.Clear();
+            textBoxLastName.Clear();
+            textBoxPatronymic.Clear();
+            textBoxPhone.Clear();
+            textBoxAccountId.Clear();
+            textBoxSearch.Clear();
+            textBoxAccountId.ReadOnly = false;
+            textBoxAccountId.BackColor = Color.White;
+            cmbAddress.Text = "";
+            if (comboBoxStatus.Items.Count > 0) comboBoxStatus.SelectedIndex = 0;
+            groupBoxClientData.Text = "Данные клиента";
+        }
         private void LoadAllAddresses()
         {
             allAddresses = adminClient.GetAddresses();
         }
 
+        // ---------- ЗАГРУЗКА КЛИЕНТОВ ----------
         private void LoadClients()
         {
             try
             {
-                // Сохраняем позицию прокрутки и выделение
-                int firstDisplayedScrollRow = 0;
-                int selectedRowIndex = -1;
-
-                if (dataGridViewClients.Rows.Count > 0)
-                {
-                    firstDisplayedScrollRow = dataGridViewClients.FirstDisplayedScrollingRowIndex;
-                    if (dataGridViewClients.SelectedRows.Count > 0)
-                        selectedRowIndex = dataGridViewClients.SelectedRows[0].Index;
-                }
-
                 clientsData = adminClient.GetClients();
-
-                if (clientsData == null || clientsData.Rows.Count == 0)
-                {
-                    MessageBox.Show("Нет данных для отображения. Проверьте подключение к БД.",
-                        "Информация", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    dataGridViewClients.DataSource = null;
-                    return;
-                }
-
-                // Отключаем визуальные обновления
-                dataGridViewClients.SuspendLayout();
-
-                // Сохраняем источник данных
-                originalClientsData = clientsData.Copy();
-
-                // Обновляем данные без сброса настроек
-                dataGridViewClients.DataSource = null;
+                originalClientsData = clientsData.Copy(); // ← СОХРАНЯЕМ КОПИЮ
                 dataGridViewClients.DataSource = clientsData;
-
-                // Настраиваем колонки только один раз
-                if (!columnsConfigured)
-                {
-                    ConfigureDataGridView();
-                }
-
-                // Восстанавливаем позицию прокрутки и выделение
-                if (firstDisplayedScrollRow >= 0 && firstDisplayedScrollRow < dataGridViewClients.Rows.Count)
-                {
-                    dataGridViewClients.FirstDisplayedScrollingRowIndex = firstDisplayedScrollRow;
-                }
-
-                if (selectedRowIndex >= 0 && selectedRowIndex < dataGridViewClients.Rows.Count)
-                {
-                    dataGridViewClients.Rows[selectedRowIndex].Selected = true;
-                }
-
-                // Включаем визуальные обновления
-                dataGridViewClients.ResumeLayout();
+                ConfigureDataGridView();
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка загрузки клиентов: {ex.Message}\n\n{ex.StackTrace}",
-                    "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                dataGridViewClients.DataSource = null;
+                MessageBox.Show($"Ошибка загрузки клиентов: {ex.Message}", "Ошибка",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        // ---------- НАСТРОЙКА ТАБЛИЦЫ ----------
+        private void ConfigureDataGridView()
+        {
+            if (columnsConfigured) return;
+            if (dataGridViewClients.Columns.Count == 0) return;
+
+            dataGridViewClients.SuspendLayout();
+
+            // Скрываем служебные колонки
+            string[] hiddenColumns = {
+        "client_id", "clent_status_id", "address_id",
+        "account_id", "city", "street", "house", "entrance"
+    };
+            foreach (string col in hiddenColumns)
+            {
+                if (dataGridViewClients.Columns.Contains(col))
+                {
+                    dataGridViewClients.Columns[col].Visible = false;
+                }
+            }
+
+            // Устанавливаем заголовки, порядок и ШИРИНУ колонок
+            int index = 0;
+
+            if (dataGridViewClients.Columns.Contains("last_name"))
+            {
+                dataGridViewClients.Columns["last_name"].HeaderText = "Фамилия";
+                dataGridViewClients.Columns["last_name"].DisplayIndex = index++;
+                dataGridViewClients.Columns["last_name"].Width = 150;
+            }
+
+            if (dataGridViewClients.Columns.Contains("first_name"))
+            {
+                dataGridViewClients.Columns["first_name"].HeaderText = "Имя";
+                dataGridViewClients.Columns["first_name"].DisplayIndex = index++;
+                dataGridViewClients.Columns["first_name"].Width = 150;
+            }
+
+            if (dataGridViewClients.Columns.Contains("patronymic"))
+            {
+                dataGridViewClients.Columns["patronymic"].HeaderText = "Отчество";
+                dataGridViewClients.Columns["patronymic"].DisplayIndex = index++;
+                dataGridViewClients.Columns["patronymic"].Width = 150;
+            }
+
+            if (dataGridViewClients.Columns.Contains("phone_number"))
+            {
+                dataGridViewClients.Columns["phone_number"].HeaderText = "Телефон";
+                dataGridViewClients.Columns["phone_number"].DisplayIndex = index++;
+                dataGridViewClients.Columns["phone_number"].Width = 150;
+            }
+
+            if (dataGridViewClients.Columns.Contains("status_name"))
+            {
+                dataGridViewClients.Columns["status_name"].HeaderText = "Статус";
+                dataGridViewClients.Columns["status_name"].DisplayIndex = index++;
+                dataGridViewClients.Columns["status_name"].Width = 120;
+            }
+
+            if (dataGridViewClients.Columns.Contains("full_address"))  // ← ИСПРАВЛЕНО: full_address
+            {
+                dataGridViewClients.Columns["full_address"].HeaderText = "Адрес";
+                dataGridViewClients.Columns["full_address"].DisplayIndex = index++;
+                dataGridViewClients.Columns["full_address"].Width = 450;  // ← ШИРОКАЯ КОЛОНКА
+            }
+
+            if (dataGridViewClients.Columns.Contains("login"))
+            {
+                dataGridViewClients.Columns["login"].HeaderText = "Логин";
+                dataGridViewClients.Columns["login"].DisplayIndex = index++;
+                dataGridViewClients.Columns["login"].Width = 150;
+            }
+
+            if (dataGridViewClients.Columns.Contains("password"))
+            {
+                dataGridViewClients.Columns["password"].HeaderText = "Пароль";
+                dataGridViewClients.Columns["password"].DisplayIndex = index++;
+                dataGridViewClients.Columns["password"].Width = 150;
+            }
+
+            // Настройка внешнего вида
+            dataGridViewClients.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
+            dataGridViewClients.ColumnHeadersDefaultCellStyle.Font = new Font("Microsoft Sans Serif", 9, FontStyle.Bold);
+            dataGridViewClients.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(52, 73, 94);
+            dataGridViewClients.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
+            dataGridViewClients.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewClients.ColumnHeadersHeight = 45;
+            dataGridViewClients.DefaultCellStyle.Font = new Font("Microsoft Sans Serif", 9);
+            dataGridViewClients.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(248, 249, 249);
+            dataGridViewClients.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dataGridViewClients.ReadOnly = true;
+            dataGridViewClients.RowHeadersVisible = false;
+            dataGridViewClients.AllowUserToAddRows = false;
+            dataGridViewClients.AllowUserToDeleteRows = false;
+            dataGridViewClients.ScrollBars = ScrollBars.Both;
+
+            columnsConfigured = true;
+            dataGridViewClients.ResumeLayout();
+        }
+
+        // ---------- МЕТОД ДЛЯ ОБНОВЛЕНИЯ ДАННЫХ БЕЗ СБРОСА НАСТРОЕК ----------
+        private void RefreshDataGridView(DataTable data)
+        {
+            dataGridViewClients.DataSource = null;
+            dataGridViewClients.DataSource = data;
+            // Настройки колонок НЕ сбрасываются, так как columnsConfigured = true
         }
 
         private void LoadComboBoxData()
@@ -165,126 +244,6 @@ namespace taxi4
             }
         }
 
-        private void ConfigureDataGridView()
-        {
-            if (columnsConfigured) return; // Уже настроено
-            if (dataGridViewClients.Columns.Count == 0) return;
-
-            // Отключаем обновления во время настройки
-            dataGridViewClients.SuspendLayout();
-
-            // Сначала показываем все нужные колонки
-            string[] visibleColumns = { "last_name", "first_name", "patronymic",
-                        "phone_number", "status_name", "address_info", "login", "password" };
-
-            foreach (string col in visibleColumns)
-            {
-                if (dataGridViewClients.Columns.Contains(col))
-                {
-                    dataGridViewClients.Columns[col].Visible = true;
-                }
-            }
-
-            // Скрываем служебные колонки
-            string[] hiddenColumns = {
-                "client_id", "clent_status_id", "address_id",
-                "account_id", "city", "street", "house", "entrance"
-            };
-            foreach (string col in hiddenColumns)
-            {
-                if (dataGridViewClients.Columns.Contains(col))
-                {
-                    dataGridViewClients.Columns[col].Visible = false;
-                }
-            }
-
-            // Устанавливаем заголовки и порядок колонок
-            int index = 0;
-
-            if (dataGridViewClients.Columns.Contains("last_name"))
-            {
-                dataGridViewClients.Columns["last_name"].HeaderText = "Фамилия";
-                dataGridViewClients.Columns["last_name"].FillWeight = 2;
-                dataGridViewClients.Columns["last_name"].DisplayIndex = index++;
-                dataGridViewClients.Columns["last_name"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            }
-
-            if (dataGridViewClients.Columns.Contains("first_name"))
-            {
-                dataGridViewClients.Columns["first_name"].HeaderText = "Имя";
-                dataGridViewClients.Columns["first_name"].FillWeight = 2;
-                dataGridViewClients.Columns["first_name"].DisplayIndex = index++;
-                dataGridViewClients.Columns["first_name"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            }
-
-            if (dataGridViewClients.Columns.Contains("patronymic"))
-            {
-                dataGridViewClients.Columns["patronymic"].HeaderText = "Отчество";
-                dataGridViewClients.Columns["patronymic"].FillWeight = 2;
-                dataGridViewClients.Columns["patronymic"].DisplayIndex = index++;
-                dataGridViewClients.Columns["patronymic"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            }
-
-            if (dataGridViewClients.Columns.Contains("phone_number"))
-            {
-                dataGridViewClients.Columns["phone_number"].HeaderText = "Телефон";
-                dataGridViewClients.Columns["phone_number"].FillWeight = 2;
-                dataGridViewClients.Columns["phone_number"].DisplayIndex = index++;
-                dataGridViewClients.Columns["phone_number"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            }
-
-            if (dataGridViewClients.Columns.Contains("status_name"))
-            {
-                dataGridViewClients.Columns["status_name"].HeaderText = "Статус";
-                dataGridViewClients.Columns["status_name"].FillWeight = 1;
-                dataGridViewClients.Columns["status_name"].DisplayIndex = index++;
-                dataGridViewClients.Columns["status_name"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            }
-
-            if (dataGridViewClients.Columns.Contains("address_info"))
-            {
-                dataGridViewClients.Columns["address_info"].HeaderText = "Адрес";
-                dataGridViewClients.Columns["address_info"].FillWeight = 4;
-                dataGridViewClients.Columns["address_info"].DisplayIndex = index++;
-                dataGridViewClients.Columns["address_info"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            }
-
-            if (dataGridViewClients.Columns.Contains("login"))
-            {
-                dataGridViewClients.Columns["login"].HeaderText = "Логин";
-                dataGridViewClients.Columns["login"].FillWeight = 2;
-                dataGridViewClients.Columns["login"].DisplayIndex = index++;
-                dataGridViewClients.Columns["login"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            }
-
-            // Добавляем колонку пароля
-            if (dataGridViewClients.Columns.Contains("password"))
-            {
-                dataGridViewClients.Columns["password"].HeaderText = "Пароль";
-                dataGridViewClients.Columns["password"].FillWeight = 2;
-                dataGridViewClients.Columns["password"].DisplayIndex = index++;
-                dataGridViewClients.Columns["password"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            }
-
-            // Настройка внешнего вида (только один раз)
-            dataGridViewClients.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-            dataGridViewClients.ColumnHeadersDefaultCellStyle.Font = new Font("Microsoft Sans Serif", 9, FontStyle.Bold);
-            dataGridViewClients.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(52, 73, 94);
-            dataGridViewClients.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
-            dataGridViewClients.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewClients.ColumnHeadersHeight = 40;
-            dataGridViewClients.DefaultCellStyle.Font = new Font("Microsoft Sans Serif", 9);
-            dataGridViewClients.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(248, 249, 249);
-            dataGridViewClients.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dataGridViewClients.ReadOnly = true;
-            dataGridViewClients.RowHeadersVisible = false;
-            dataGridViewClients.AllowUserToAddRows = false;
-            dataGridViewClients.AllowUserToDeleteRows = false;
-
-            columnsConfigured = true;
-            dataGridViewClients.ResumeLayout();
-        }
-
         private void LoadClientToForm(DataGridViewRow row)
         {
             try
@@ -298,9 +257,9 @@ namespace taxi4
                 textBoxAccountId.ReadOnly = true;
                 textBoxAccountId.BackColor = Color.LightGray;
 
-                // Загружаем адрес
-                if (row.Cells["address_info"].Value != DBNull.Value)
-                    cmbAddress.Text = row.Cells["address_info"].Value.ToString();
+                // Загружаем адрес - ИСПРАВЛЕНО: full_address
+                if (row.Cells["full_address"].Value != DBNull.Value)
+                    cmbAddress.Text = row.Cells["full_address"].Value.ToString();
 
                 if (row.Cells["clent_status_id"].Value != DBNull.Value)
                     comboBoxStatus.SelectedValue = Convert.ToInt32(row.Cells["clent_status_id"].Value);
@@ -312,196 +271,41 @@ namespace taxi4
             }
         }
 
-        private int GetOrCreateAddressId(string addressText)
+        // ... остальные методы (GetOrCreateAddressId, GenerateRandomPassword, ValidateForm, IsOnlyLetters, IsValidPhone, IsValidAddress, ClearForm) остаются без изменений ...
+
+        private void buttonSearch_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(addressText))
-                return -1;
+            string searchText = textBoxSearch.Text.Trim().ToLower();
 
-            // Проверяем, существует ли уже такой адрес
-            foreach (DataRow row in allAddresses.Rows)
+            if (string.IsNullOrEmpty(searchText))
             {
-                if (row["full_address"].ToString().Equals(addressText, StringComparison.OrdinalIgnoreCase))
-                    return Convert.ToInt32(row["id"]);
-            }
-
-            // Если адрес не найден, парсим его и добавляем
-            string[] parts = addressText.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-            string city = parts.Length > 0 ? parts[0].Trim() : "Воронеж";
-            string street = parts.Length > 1 ? parts[1].Trim() : "";
-            string house = "";
-            string entrance = "";
-
-            // Парсим дом и подъезд
-            for (int i = 2; i < parts.Length; i++)
-            {
-                string part = parts[i].Trim();
-                if (part.ToLower().Contains("подъезд") || part.ToLower().Contains("под."))
+                // Возвращаем оригинальные данные
+                if (originalClientsData != null)
                 {
-                    entrance = part.Replace("подъезд", "").Replace("под.", "").Replace("под", "").Trim();
+                    RefreshDataGridView(originalClientsData);
                 }
-                else if (string.IsNullOrEmpty(house))
-                {
-                    house = part.Replace("д.", "").Replace("д", "").Replace("дом", "").Trim();
-                }
+                return;
             }
 
-            // Проверка, что город - Воронеж
-            if (!city.Equals("Воронеж", StringComparison.OrdinalIgnoreCase))
-            {
-                MessageBox.Show("Город должен быть Воронеж", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return -1;
-            }
+            DataView dv = new DataView(originalClientsData.Copy()); // ← КОПИРУЕМ, ЧТОБЫ НЕ ПОРТИТЬ ОРИГИНАЛ
+            dv.RowFilter = $"first_name LIKE '%{searchText}%' OR " +
+                           $"last_name LIKE '%{searchText}%' OR " +
+                           $"patronymic LIKE '%{searchText}%' OR " +
+                           $"phone_number LIKE '%{searchText}%'";
 
-            if (string.IsNullOrEmpty(street) || string.IsNullOrEmpty(house))
-            {
-                MessageBox.Show("Не удалось распознать адрес. Используйте формат: Воронеж, Улица, д. Номер, подъезд 1",
-                    "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return -1;
-            }
-
-            // Добавляем адрес
-            int newAddressId = adminClient.AddAddress(city, street, house, entrance);
-            if (newAddressId != -1)
-            {
-                // Обновляем список адресов
-                LoadAllAddresses();
-                SetupAutoComplete();
-                MessageBox.Show($"Новый адрес добавлен: {city}, {street}, д.{house}" +
-                                (string.IsNullOrEmpty(entrance) ? "" : $", подъезд {entrance}"),
-                                "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-            return newAddressId;
+            DataTable filteredData = dv.ToTable();
+            RefreshDataGridView(filteredData);
         }
 
-        private string GenerateRandomPassword(int length)
+        private void buttonRefresh_Click(object sender, EventArgs e)
         {
-            const string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-            Random random = new Random();
-            return new string(Enumerable.Repeat(chars, length)
-                .Select(s => s[random.Next(s.Length)]).ToArray());
+            LoadClients(); // Перезагружаем с настройкой колонок
+            LoadComboBoxData();
+            LoadAllAddresses();
+            SetupAutoComplete();
+            ClearForm();
+            groupBoxClientData.Visible = false;
         }
-
-        private bool ValidateForm()
-        {
-            // Проверка имени
-            if (string.IsNullOrWhiteSpace(textBoxFirstName.Text))
-            {
-                MessageBox.Show("Введите имя клиента", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                textBoxFirstName.Focus();
-                return false;
-            }
-            if (!IsOnlyLetters(textBoxFirstName.Text))
-            {
-                MessageBox.Show("Имя должно содержать только буквы", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                textBoxFirstName.Focus();
-                return false;
-            }
-
-            // Проверка фамилии
-            if (string.IsNullOrWhiteSpace(textBoxLastName.Text))
-            {
-                MessageBox.Show("Введите фамилию клиента", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                textBoxLastName.Focus();
-                return false;
-            }
-            if (!IsOnlyLetters(textBoxLastName.Text))
-            {
-                MessageBox.Show("Фамилия должна содержать только буквы", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                textBoxLastName.Focus();
-                return false;
-            }
-
-            // Проверка отчества
-            if (!string.IsNullOrWhiteSpace(textBoxPatronymic.Text) && !IsOnlyLetters(textBoxPatronymic.Text))
-            {
-                MessageBox.Show("Отчество должно содержать только буквы", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                textBoxPatronymic.Focus();
-                return false;
-            }
-
-            // Проверка телефона
-            if (string.IsNullOrWhiteSpace(textBoxPhone.Text))
-            {
-                MessageBox.Show("Введите телефон клиента", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                textBoxPhone.Focus();
-                return false;
-            }
-            if (!IsValidPhone(textBoxPhone.Text))
-            {
-                MessageBox.Show("Введите корректный номер телефона в формате: +79001234567", "Ошибка",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-                textBoxPhone.Focus();
-                return false;
-            }
-
-            // Проверка адреса
-            if (string.IsNullOrEmpty(cmbAddress.Text))
-            {
-                MessageBox.Show("Введите адрес", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                cmbAddress.Focus();
-                return false;
-            }
-            if (!IsValidAddress(cmbAddress.Text))
-            {
-                MessageBox.Show("Адрес должен начинаться с города Воронеж", "Ошибка",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-                cmbAddress.Focus();
-                return false;
-            }
-
-            // Проверка статуса
-            if (comboBoxStatus.SelectedValue == null)
-            {
-                MessageBox.Show("Выберите статус", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                comboBoxStatus.Focus();
-                return false;
-            }
-
-            return true;
-        }
-
-        private bool IsOnlyLetters(string text)
-        {
-            if (string.IsNullOrWhiteSpace(text)) return true;
-            foreach (char c in text)
-            {
-                if (!char.IsLetter(c) && c != '-' && c != ' ')
-                    return false;
-            }
-            return true;
-        }
-
-        private bool IsValidPhone(string phone)
-        {
-            string digits = new string(phone.Where(char.IsDigit).ToArray());
-            if (digits.Length != 11) return false;
-            if (!digits.StartsWith("79")) return false;
-            return true;
-        }
-
-        private bool IsValidAddress(string address)
-        {
-            string trimmedAddress = address.Trim();
-            return trimmedAddress.StartsWith("Воронеж", StringComparison.OrdinalIgnoreCase);
-        }
-
-        private void ClearForm()
-        {
-            textBoxID.Clear();
-            textBoxFirstName.Clear();
-            textBoxLastName.Clear();
-            textBoxPatronymic.Clear();
-            textBoxPhone.Clear();
-            textBoxAccountId.Clear();
-            textBoxSearch.Clear();
-            textBoxAccountId.ReadOnly = false;
-            textBoxAccountId.BackColor = Color.White;
-            cmbAddress.Text = "";
-            if (comboBoxStatus.Items.Count > 0) comboBoxStatus.SelectedIndex = 0;
-            groupBoxClientData.Text = "Данные клиента";
-        }
-
-        // ---------- ОБРАБОТЧИКИ СОБЫТИЙ ----------
 
         private void buttonAdd_Click(object sender, EventArgs e)
         {
@@ -552,6 +356,89 @@ namespace taxi4
 
             DataGridViewRow selectedRow = dataGridViewClients.SelectedRows[0];
             LoadClientToForm(selectedRow);
+        }
+
+        private string GenerateRandomPassword(int length)
+        {
+            const string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            Random random = new Random();
+            return new string(Enumerable.Repeat(chars, length)
+                .Select(s => s[random.Next(s.Length)]).ToArray());
+        }
+
+        private bool ValidateForm()
+        {
+            if (string.IsNullOrWhiteSpace(textBoxFirstName.Text))
+            {
+                MessageBox.Show("Введите имя клиента", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                textBoxFirstName.Focus();
+                return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(textBoxLastName.Text))
+            {
+                MessageBox.Show("Введите фамилию клиента", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                textBoxLastName.Focus();
+                return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(textBoxPhone.Text))
+            {
+                MessageBox.Show("Введите телефон клиента", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                textBoxPhone.Focus();
+                return false;
+            }
+
+            if (comboBoxStatus.SelectedValue == null)
+            {
+                MessageBox.Show("Выберите статус", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                comboBoxStatus.Focus();
+                return false;
+            }
+
+            return true;
+        }
+
+        private int GetOrCreateAddressId(string addressText)
+        {
+            if (string.IsNullOrWhiteSpace(addressText))
+                return -1;
+
+            // Проверяем, существует ли уже такой адрес
+            foreach (DataRow row in allAddresses.Rows)
+            {
+                if (row["full_address"].ToString().Equals(addressText, StringComparison.OrdinalIgnoreCase))
+                    return Convert.ToInt32(row["id"]);
+            }
+
+            // Парсим адрес
+            string[] parts = addressText.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            string city = parts.Length > 0 ? parts[0].Trim() : "Воронеж";
+            string street = parts.Length > 1 ? parts[1].Trim() : "";
+            string house = "";
+            string entrance = "";
+
+            for (int i = 2; i < parts.Length; i++)
+            {
+                string part = parts[i].Trim();
+                if (part.ToLower().Contains("подъезд") || part.ToLower().Contains("под."))
+                {
+                    entrance = part.Replace("подъезд", "").Replace("под.", "").Replace("под", "").Trim();
+                }
+                else if (string.IsNullOrEmpty(house))
+                {
+                    house = part.Replace("д.", "").Replace("д", "").Replace("дом", "").Trim();
+                }
+            }
+
+            if (string.IsNullOrEmpty(street) || string.IsNullOrEmpty(house))
+            {
+                MessageBox.Show("Не удалось распознать адрес.", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return -1;
+            }
+
+            // Добавляем адрес
+            return adminClient.AddAddress(city, street, house, entrance);
         }
 
         private void buttonSave_Click(object sender, EventArgs e)
@@ -648,44 +535,6 @@ namespace taxi4
             {
                 MessageBox.Show($"Ошибка сохранения: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-        }
-
-        private void buttonSearch_Click(object sender, EventArgs e)
-        {
-            string searchText = textBoxSearch.Text.Trim().ToLower();
-
-            if (string.IsNullOrEmpty(searchText))
-            {
-                if (originalClientsData != null)
-                {
-                    dataGridViewClients.DataSource = null;
-                    dataGridViewClients.DataSource = originalClientsData;
-                    // НЕ вызываем ConfigureDataGridView() - настройки сохраняются
-                }
-                return;
-            }
-
-            DataView dv = new DataView(originalClientsData);
-            dv.RowFilter = $"first_name LIKE '%{searchText}%' OR " +
-                           $"last_name LIKE '%{searchText}%' OR " +
-                           $"patronymic LIKE '%{searchText}%' OR " +
-                           $"phone_number LIKE '%{searchText}%'";
-
-            dataGridViewClients.DataSource = null;
-            dataGridViewClients.DataSource = dv;
-            // НЕ вызываем ConfigureDataGridView() - настройки сохраняются
-        }
-
-        private void buttonRefresh_Click(object sender, EventArgs e)
-        {
-            LoadClients();
-            LoadComboBoxData();
-            LoadAllAddresses();
-            SetupAutoComplete();
-            ClearForm();
-            groupBoxClientData.Visible = false;
-            // Убираем лишнее сообщение
-            // MessageBox.Show("Данные обновлены", "Информация", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void buttonBack_Click(object sender, EventArgs e)

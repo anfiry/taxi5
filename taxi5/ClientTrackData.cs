@@ -31,17 +31,30 @@ namespace taxi4
                     COALESCE(t.name, 'Не указан') AS tariff_name,
                     COALESCE(os.name, 'Неизвестно') AS order_status,
                     COALESCE(d.last_name || ' ' || d.first_name, 'Не назначен') AS driver_name,
-                    COALESCE(d.phone_number, 'Не указан') AS driver_phone
+                    COALESCE(d.phone_number, 'Не указан') AS driver_phone,
+                    -- Информация об автомобиле
+                    CASE 
+                        WHEN c2.car_id IS NOT NULL THEN 
+                            COALESCE(b.name || ' ' || m.name, 'Неизвестно') || 
+                            ' (' || COALESCE(col.name, 'не указан') || ')' ||
+                            ' | ' || COALESCE(c2.license_number, '----') || 
+                            ' (' || COALESCE(c2.region_code, '00') || ')'
+                        ELSE 'Не назначен'
+                    END AS car_info
                 FROM ""Order"" o
                 LEFT JOIN address a_from ON o.address_from = a_from.address_id
                 LEFT JOIN address a_to ON o.address_to = a_to.address_id
                 LEFT JOIN tariff t ON o.tariff_id = t.tariff_id
                 LEFT JOIN order_status os ON o.order_status = os.order_status_id
                 LEFT JOIN driver d ON o.driver_id = d.driver_id
+                LEFT JOIN car c2 ON d.driver_id = c2.driver_id
+                LEFT JOIN brand b ON c2.brand_id = b.brand_id
+                LEFT JOIN model m ON c2.model_id = m.model_id
+                LEFT JOIN color col ON c2.color_id = col.color_id
                 WHERE o.client_id = @clientId
                   AND o.order_status IN (1, 2)
                 ORDER BY o.order_datetime DESC";
-                    
+
                     using (var cmd = new NpgsqlCommand(query, conn))
                     {
                         cmd.Parameters.AddWithValue("@clientId", clientId);

@@ -150,14 +150,11 @@ namespace taxi4
                                         connectionString,
                                         accountId
                                     );
+                                    detailsForm.Closed += (s, args) => detailsForm.OnClosed();
+                                    detailsForm.Show();
+                                    this.Hide();
 
-                                    if (detailsForm.ShowDialog() == DialogResult.OK)
-                                    {
-                                        if (!HasActiveOrder())
-                                            LoadAvailableOrders();
-                                        else
-                                            ShowActiveOrderMessage();
-                                    }
+                                    
                                 }
                                 else
                                 {
@@ -285,7 +282,7 @@ namespace taxi4
                             btnDetails.FlatAppearance.BorderSize = 0;
                             btnDetails.Click += (senderBtn, evtBtn) =>
                             {
-                                DriverOrderDetailsForm detailsForm = new DriverOrderDetailsForm(
+                                DriverOrderDetailsForm driverOrdersForm = new DriverOrderDetailsForm(
                                     orderId,
                                     from,
                                     to,
@@ -296,8 +293,8 @@ namespace taxi4
                                     accountId
                                 );
 
-                                detailsForm.Closed += (s, args) => detailsForm.OnClosed();
-                                detailsForm.Show();
+                                driverOrdersForm.Closed += (s, args) => driverOrdersForm.OnClosed();
+                                driverOrdersForm.Show();
                                 this.Hide();
                             };
 

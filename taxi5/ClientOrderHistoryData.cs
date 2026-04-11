@@ -37,7 +37,16 @@ namespace taxi4
                     COALESCE(op.promotion_name, '—') AS promotion_name,
                     COALESCE(op.promotion_percent, 0) AS promotion_percent,
                     COALESCE(op.promotion_amount, 0) AS promotion_amount,
-                    CASE WHEN r.review_id IS NOT NULL THEN 1 ELSE 0 END AS has_review
+                    CASE WHEN r.review_id IS NOT NULL THEN 1 ELSE 0 END AS has_review,
+                    -- Информация об автомобиле
+                    CASE 
+                        WHEN c2.car_id IS NOT NULL THEN 
+                            COALESCE(b.name || ' ' || m.name, 'Неизвестно') || 
+                            ' (' || COALESCE(col.name, 'не указан') || ')' ||
+                            ' | ' || COALESCE(c2.license_number, '----') || 
+                            ' (' || COALESCE(c2.region_code, '00') || ')'
+                        ELSE 'Не назначен'
+                    END AS car_info
                 FROM ""Order"" o
                 LEFT JOIN address a_from ON o.address_from = a_from.address_id
                 LEFT JOIN address a_to ON o.address_to = a_to.address_id
@@ -45,6 +54,10 @@ namespace taxi4
                 LEFT JOIN order_status os ON o.order_status = os.order_status_id
                 LEFT JOIN payment_method pm ON o.payment_method = pm.method_id
                 LEFT JOIN driver d ON o.driver_id = d.driver_id
+                LEFT JOIN car c2 ON d.driver_id = c2.driver_id
+                LEFT JOIN brand b ON c2.brand_id = b.brand_id
+                LEFT JOIN model m ON c2.model_id = m.model_id
+                LEFT JOIN color col ON c2.color_id = col.color_id
                 LEFT JOIN order_promotion op ON o.order_id = op.order_id
                 LEFT JOIN review r ON o.order_id = r.orber_id
                 WHERE o.client_id = @clientId

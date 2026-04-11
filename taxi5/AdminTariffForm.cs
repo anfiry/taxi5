@@ -205,36 +205,7 @@ namespace taxi4
             }
         }
 
-        private void buttonDelete_Click(object sender, EventArgs e)
-        {
-            if (dataGridViewTariffs.SelectedRows.Count == 0)
-            {
-                MessageBox.Show("Выберите тариф для удаления", "Информация",
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
-
-            DataGridViewRow row = dataGridViewTariffs.SelectedRows[0];
-            int tariffId = Convert.ToInt32(row.Cells["tariff_id"].Value);
-            string tariffName = row.Cells["name"].Value.ToString();
-
-            DialogResult result = MessageBox.Show(
-                $"Удалить тариф '{tariffName}'?",
-                "Подтверждение удаления",
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Question);
-
-            if (result == DialogResult.Yes)
-            {
-                if (adminTariff.DeleteTariff(tariffId))
-                {
-                    MessageBox.Show("Тариф удален", "Успех",
-                        MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    LoadTariffs();
-                    ClearForm();
-                }
-            }
-        }
+       
 
         private void buttonRefresh_Click(object sender, EventArgs e)
         {

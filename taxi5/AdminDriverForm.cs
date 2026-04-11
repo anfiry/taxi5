@@ -432,8 +432,7 @@ namespace taxi4
             LoadComboBoxData();
             groupBoxDriverData.Visible = false;
             ClearForm();
-            MessageBox.Show("Данные обновлены", "Информация",
-                MessageBoxButtons.OK, MessageBoxIcon.Information);
+            
         }
 
         private void buttonSearch_Click(object sender, EventArgs e)

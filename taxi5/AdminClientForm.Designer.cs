@@ -34,7 +34,7 @@ namespace taxi4
         private System.Windows.Forms.Button buttonBack;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.TextBox textBoxAccountId;
-
+        private System.Windows.Forms.Panel panelTop;
 
         protected override void Dispose(bool disposing)
         {
@@ -73,28 +73,48 @@ namespace taxi4
             this.label8 = new System.Windows.Forms.Label();
             this.buttonSearch = new System.Windows.Forms.Button();
             this.buttonBack = new System.Windows.Forms.Button();
+            this.panelTop = new System.Windows.Forms.Panel();
             this.groupBoxClientData.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewClients)).BeginInit();
+            this.panelTop.SuspendLayout();
             this.SuspendLayout();
 
-            // dataGridViewClients
+            // panelTop
+            this.panelTop.BackColor = System.Drawing.Color.White;
+            this.panelTop.Controls.Add(this.buttonAdd);
+            this.panelTop.Controls.Add(this.buttonEdit);
+            this.panelTop.Controls.Add(this.buttonRefresh);
+            this.panelTop.Controls.Add(this.label8);
+            this.panelTop.Controls.Add(this.textBoxSearch);
+            this.panelTop.Controls.Add(this.buttonSearch);
+            this.panelTop.Controls.Add(this.buttonBack);
+            this.panelTop.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panelTop.Location = new System.Drawing.Point(0, 0);
+            this.panelTop.Name = "panelTop";
+            this.panelTop.Size = new System.Drawing.Size(1510, 80);
+            this.panelTop.TabIndex = 10;
+
+            // dataGridViewClients - С ПРОКРУТКОЙ
             this.dataGridViewClients.AllowUserToAddRows = false;
             this.dataGridViewClients.AllowUserToDeleteRows = false;
             this.dataGridViewClients.AllowUserToResizeRows = false;
-            this.dataGridViewClients.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.dataGridViewClients.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.dataGridViewClients.BackgroundColor = System.Drawing.Color.White;
             this.dataGridViewClients.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.dataGridViewClients.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridViewClients.Location = new System.Drawing.Point(25, 116);
+            this.dataGridViewClients.Location = new System.Drawing.Point(25, 100);
             this.dataGridViewClients.Name = "dataGridViewClients";
             this.dataGridViewClients.ReadOnly = true;
             this.dataGridViewClients.RowHeadersVisible = false;
-            this.dataGridViewClients.Size = new System.Drawing.Size(999, 691);
+            this.dataGridViewClients.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.dataGridViewClients.Size = new System.Drawing.Size(1000, 700);
             this.dataGridViewClients.TabIndex = 0;
             this.dataGridViewClients.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridViewClients_CellDoubleClick);
 
             // groupBoxClientData
-            this.groupBoxClientData.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.groupBoxClientData.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)));
             this.groupBoxClientData.BackColor = System.Drawing.Color.WhiteSmoke;
             this.groupBoxClientData.Controls.Add(this.cmbAddress);
             this.groupBoxClientData.Controls.Add(this.textBoxAccountId);
@@ -114,9 +134,9 @@ namespace taxi4
             this.groupBoxClientData.Controls.Add(this.textBoxFirstName);
             this.groupBoxClientData.Controls.Add(this.label1);
             this.groupBoxClientData.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
-            this.groupBoxClientData.Location = new System.Drawing.Point(1065, 116);
+            this.groupBoxClientData.Location = new System.Drawing.Point(1065, 100);
             this.groupBoxClientData.Name = "groupBoxClientData";
-            this.groupBoxClientData.Size = new System.Drawing.Size(422, 691);
+            this.groupBoxClientData.Size = new System.Drawing.Size(422, 700);
             this.groupBoxClientData.TabIndex = 1;
             this.groupBoxClientData.TabStop = false;
             this.groupBoxClientData.Text = "Данные клиента";
@@ -166,7 +186,9 @@ namespace taxi4
             this.buttonSave.Location = new System.Drawing.Point(36, 548);
             this.buttonSave.Name = "buttonSave";
             this.buttonSave.Size = new System.Drawing.Size(360, 35);
+            this.buttonSave.TabIndex = 13;
             this.buttonSave.Text = "Сохранить";
+            this.buttonSave.UseVisualStyleBackColor = false;
             this.buttonSave.Click += new System.EventHandler(this.buttonSave_Click);
 
             // label6
@@ -195,6 +217,7 @@ namespace taxi4
             this.textBoxPhone.Location = new System.Drawing.Point(136, 248);
             this.textBoxPhone.Name = "textBoxPhone";
             this.textBoxPhone.Size = new System.Drawing.Size(200, 24);
+            this.textBoxPhone.TabIndex = 9;
             this.textBoxPhone.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textBoxPhone_KeyPress);
 
             // label4
@@ -208,6 +231,7 @@ namespace taxi4
             this.textBoxPatronymic.Location = new System.Drawing.Point(136, 208);
             this.textBoxPatronymic.Name = "textBoxPatronymic";
             this.textBoxPatronymic.Size = new System.Drawing.Size(200, 24);
+            this.textBoxPatronymic.TabIndex = 8;
 
             // label3
             this.label3.AutoSize = true;
@@ -220,6 +244,7 @@ namespace taxi4
             this.textBoxLastName.Location = new System.Drawing.Point(136, 168);
             this.textBoxLastName.Name = "textBoxLastName";
             this.textBoxLastName.Size = new System.Drawing.Size(200, 24);
+            this.textBoxLastName.TabIndex = 7;
 
             // label2
             this.label2.AutoSize = true;
@@ -232,6 +257,7 @@ namespace taxi4
             this.textBoxFirstName.Location = new System.Drawing.Point(136, 128);
             this.textBoxFirstName.Name = "textBoxFirstName";
             this.textBoxFirstName.Size = new System.Drawing.Size(200, 24);
+            this.textBoxFirstName.TabIndex = 6;
 
             // label1
             this.label1.AutoSize = true;
@@ -245,10 +271,12 @@ namespace taxi4
             this.buttonAdd.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonAdd.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
             this.buttonAdd.ForeColor = System.Drawing.Color.FromArgb(4, 0, 66);
-            this.buttonAdd.Location = new System.Drawing.Point(46, 42);
+            this.buttonAdd.Location = new System.Drawing.Point(20, 20);
             this.buttonAdd.Name = "buttonAdd";
             this.buttonAdd.Size = new System.Drawing.Size(120, 40);
+            this.buttonAdd.TabIndex = 2;
             this.buttonAdd.Text = "Добавить";
+            this.buttonAdd.UseVisualStyleBackColor = false;
             this.buttonAdd.Click += new System.EventHandler(this.buttonAdd_Click);
 
             // buttonEdit
@@ -256,10 +284,12 @@ namespace taxi4
             this.buttonEdit.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonEdit.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
             this.buttonEdit.ForeColor = System.Drawing.Color.FromArgb(4, 0, 66);
-            this.buttonEdit.Location = new System.Drawing.Point(201, 42);
+            this.buttonEdit.Location = new System.Drawing.Point(160, 20);
             this.buttonEdit.Name = "buttonEdit";
             this.buttonEdit.Size = new System.Drawing.Size(159, 40);
+            this.buttonEdit.TabIndex = 3;
             this.buttonEdit.Text = "Редактировать";
+            this.buttonEdit.UseVisualStyleBackColor = false;
             this.buttonEdit.Click += new System.EventHandler(this.buttonEdit_Click);
 
             // buttonRefresh
@@ -267,23 +297,26 @@ namespace taxi4
             this.buttonRefresh.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonRefresh.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
             this.buttonRefresh.ForeColor = System.Drawing.Color.FromArgb(4, 0, 66);
-            this.buttonRefresh.Location = new System.Drawing.Point(726, 42);
+            this.buttonRefresh.Location = new System.Drawing.Point(340, 20);
             this.buttonRefresh.Name = "buttonRefresh";
             this.buttonRefresh.Size = new System.Drawing.Size(120, 40);
+            this.buttonRefresh.TabIndex = 4;
             this.buttonRefresh.Text = "Обновить";
+            this.buttonRefresh.UseVisualStyleBackColor = false;
             this.buttonRefresh.Click += new System.EventHandler(this.buttonRefresh_Click);
 
             // textBoxSearch
             this.textBoxSearch.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
-            this.textBoxSearch.Location = new System.Drawing.Point(977, 50);
+            this.textBoxSearch.Location = new System.Drawing.Point(1050, 28);
             this.textBoxSearch.Name = "textBoxSearch";
             this.textBoxSearch.Size = new System.Drawing.Size(180, 24);
+            this.textBoxSearch.TabIndex = 5;
             this.textBoxSearch.KeyDown += new System.Windows.Forms.KeyEventHandler(this.textBoxSearch_KeyDown);
 
             // label8
             this.label8.AutoSize = true;
             this.label8.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
-            this.label8.Location = new System.Drawing.Point(906, 53);
+            this.label8.Location = new System.Drawing.Point(980, 31);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(62, 18);
             this.label8.Text = "Поиск:";
@@ -293,10 +326,12 @@ namespace taxi4
             this.buttonSearch.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonSearch.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
             this.buttonSearch.ForeColor = System.Drawing.Color.FromArgb(4, 0, 66);
-            this.buttonSearch.Location = new System.Drawing.Point(1181, 42);
+            this.buttonSearch.Location = new System.Drawing.Point(1245, 20);
             this.buttonSearch.Name = "buttonSearch";
             this.buttonSearch.Size = new System.Drawing.Size(90, 40);
+            this.buttonSearch.TabIndex = 6;
             this.buttonSearch.Text = "Найти";
+            this.buttonSearch.UseVisualStyleBackColor = false;
             this.buttonSearch.Click += new System.EventHandler(this.buttonSearch_Click);
 
             // buttonBack
@@ -304,28 +339,22 @@ namespace taxi4
             this.buttonBack.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonBack.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
             this.buttonBack.ForeColor = System.Drawing.Color.FromArgb(4, 0, 66);
-            this.buttonBack.Location = new System.Drawing.Point(1355, 42);
+            this.buttonBack.Location = new System.Drawing.Point(1360, 20);
             this.buttonBack.Name = "buttonBack";
             this.buttonBack.Size = new System.Drawing.Size(120, 40);
+            this.buttonBack.TabIndex = 7;
             this.buttonBack.Text = "Назад";
+            this.buttonBack.UseVisualStyleBackColor = false;
             this.buttonBack.Click += new System.EventHandler(this.buttonBack_Click);
-
 
             // AdminClientForm
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(1510, 848);
-            this.Controls.Add(this.buttonBack);
-            this.Controls.Add(this.buttonSearch);
-            this.Controls.Add(this.label8);
-            this.Controls.Add(this.textBoxSearch);
-            this.Controls.Add(this.buttonRefresh);
-
-            this.Controls.Add(this.buttonEdit);
-            this.Controls.Add(this.buttonAdd);
-            this.Controls.Add(this.groupBoxClientData);
             this.Controls.Add(this.dataGridViewClients);
+            this.Controls.Add(this.groupBoxClientData);
+            this.Controls.Add(this.panelTop);
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F);
             this.MinimumSize = new System.Drawing.Size(1200, 672);
             this.Name = "AdminClientForm";
@@ -335,8 +364,9 @@ namespace taxi4
             this.groupBoxClientData.ResumeLayout(false);
             this.groupBoxClientData.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewClients)).EndInit();
+            this.panelTop.ResumeLayout(false);
+            this.panelTop.PerformLayout();
             this.ResumeLayout(false);
-            this.PerformLayout();
         }
     }
 }

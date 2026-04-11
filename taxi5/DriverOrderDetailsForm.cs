@@ -41,7 +41,7 @@ namespace taxi4
             this.MinimumSize = new Size(1200, 672);
 
             LoadOrderDetails();
-            LoadMapWithRoute();
+            LoadClientInfo();      
             SetupUI();
         }
 
@@ -57,50 +57,101 @@ namespace taxi4
             if (orderStatus == "1") // Создан
             {
                 btnAction.Visible = true;
-                btnAction.Text = "✅ ПРИНЯТЬ ЗАКАЗ";
+                btnAction.Text = "ПРИНЯТЬ ЗАКАЗ";
                 btnAction.BackColor = Color.FromArgb(46, 204, 113);
                 btnCancel.Visible = false;
+                lblAcceptTime.Visible = false;
             }
             else if (orderStatus == "2") // В процессе
             {
-                btnAction.Visible = true;
-                btnAction.Text = "🏁 ЗАВЕРШИТЬ ЗАКАЗ";
-                btnAction.BackColor = Color.FromArgb(52, 152, 219);
-                btnCancel.Visible = true;
-                btnCancel.Text = "❌ ОТМЕНИТЬ ЗАКАЗ";
-                btnCancel.BackColor = Color.FromArgb(231, 76, 60);
-
                 // Получаем время принятия заказа из БД
                 LoadAcceptTime();
 
-                // Запускаем таймер для проверки возможности отмены
-                cancelTimer = new Timer();
-                cancelTimer.Interval = 1000; // Проверяем каждую секунду
-                cancelTimer.Tick += (s, e) =>
+                // Проверяем, прошло ли 2 минуты после принятия
+                bool isCancelable = false;
+
+                if (acceptTime.HasValue)
                 {
+                    TimeSpan elapsed = DateTime.Now - acceptTime.Value;
+                    isCancelable = elapsed.TotalMinutes < 2;
+                }
+
+                if (isCancelable)
+                {
+                    // Кнопка отмены видна только в первые 2 минуты
+                    btnAction.Visible = true;
+                    btnAction.Text = "Завершить";
+                    btnAction.BackColor = Color.FromArgb(52, 152, 219);
+
+                    btnCancel.Visible = true;
+                    btnCancel.Text = "Отменить";
+                    btnCancel.BackColor = Color.FromArgb(231, 76, 60);
+                    btnCancel.Enabled = true;
+
+                    // Показываем время принятия
+                    lblAcceptTime.Text = $"Принят: {acceptTime.Value:dd.MM.yyyy HH:mm:ss}";
+                    lblAcceptTime.Visible = true;
+
+                    // Запускаем таймер для обновления оставшегося времени
+                    cancelTimer = new Timer();
+                    cancelTimer.Interval = 1000;
+                    cancelTimer.Tick += (s, e) =>
+                    {
+                        if (acceptTime.HasValue)
+                        {
+                            TimeSpan elapsed = DateTime.Now - acceptTime.Value;
+                            int remainingSeconds = 120 - (int)elapsed.TotalSeconds;
+
+                            if (remainingSeconds <= 0)
+                            {
+                                // Время истекло - скрываем кнопку отмены
+                                btnCancel.Visible = false;
+                                btnCancel.Enabled = false;
+                                lblAcceptTime.Visible = false;
+                                cancelTimer.Stop();
+                            }
+                            else
+                            {
+                                btnCancel.Text = $"Отменить";
+                            }
+                        }
+                    };
+                    cancelTimer.Start();
+                }
+                else
+                {
+                    // Время отмены истекло - показываем только кнопку завершения
+                    btnAction.Visible = true;
+                    btnAction.Text = "Завершить";
+                    btnAction.BackColor = Color.FromArgb(52, 152, 219);
+                    btnCancel.Visible = false;
+
                     if (acceptTime.HasValue)
                     {
-                        TimeSpan elapsed = DateTime.Now - acceptTime.Value;
-                        if (elapsed.TotalMinutes >= 2)
-                        {
-                            btnCancel.Enabled = false;
-                            btnCancel.Text = "⏰ Время отмены истекло";
-                            btnCancel.BackColor = Color.FromArgb(150, 150, 150);
-                            cancelTimer.Stop();
-                        }
-                        else
-                        {
-                            int remainingSeconds = 120 - (int)elapsed.TotalSeconds;
-                            btnCancel.Text = $"❌ ОТМЕНИТЬ ЗАКАЗ ({remainingSeconds} сек)";
-                        }
+                        lblAcceptTime.Text = $"Принят: {acceptTime.Value:dd.MM.yyyy HH:mm:ss}";
+                        lblAcceptTime.Visible = true;
+                        lblAcceptTime.ForeColor = Color.Orange;
                     }
-                };
-                cancelTimer.Start();
+                    else
+                    {
+                        lblAcceptTime.Visible = false;
+                    }
+                }
             }
             else if (orderStatus == "3") // Завершен
             {
                 btnAction.Visible = false;
                 btnCancel.Visible = false;
+
+                if (acceptTime.HasValue)
+                {
+                    lblAcceptTime.Text = $"Принят: {acceptTime.Value:dd.MM.yyyy HH:mm:ss}";
+                    lblAcceptTime.Visible = true;
+                }
+                else
+                {
+                    lblAcceptTime.Visible = false;
+                }
             }
             else if (orderStatus == "4") // Отменен
             {
@@ -108,6 +159,7 @@ namespace taxi4
                 btnCancel.Visible = false;
                 lblStatus.Text = "Статус: Отменен";
                 lblStatus.ForeColor = Color.Red;
+                lblAcceptTime.Visible = false;
             }
         }
 
@@ -149,10 +201,10 @@ namespace taxi4
                 {
                     conn.Open();
                     string query = @"
-                        SELECT o.order_datetime, os.name as status_name
-                        FROM ""Order"" o
-                        JOIN order_status os ON o.order_status = os.order_status_id
-                        WHERE o.order_id = @orderId";
+                SELECT o.order_datetime, os.name as status_name, o.start_trip_time
+                FROM ""Order"" o
+                JOIN order_status os ON o.order_status = os.order_status_id
+                WHERE o.order_id = @orderId";
 
                     using (var cmd = new NpgsqlCommand(query, conn))
                     {
@@ -163,13 +215,25 @@ namespace taxi4
                             {
                                 orderDateTime = reader.GetDateTime(0);
                                 string statusName = reader.GetString(1);
+                                DateTime? startTripTime = reader.IsDBNull(2) ? (DateTime?)null : reader.GetDateTime(2);
 
                                 lblOrderId.Text = $"Заказ #{orderId}";
-                                lblFrom.Text = fromAddress;
-                                lblTo.Text = toAddress;
+                                lblFrom.Text = $"📍 Откуда: {fromAddress}";
+                                lblTo.Text = $"📍 Куда: {toAddress}";
                                 lblPrice.Text = $"💰 {price} ₽";
                                 lblTime.Text = $"🕐 Создан: {orderDateTime:dd.MM.yyyy HH:mm}";
                                 lblStatus.Text = $"Статус: {statusName}";
+
+                                // Отображение времени принятия
+                                if (startTripTime.HasValue)
+                                {
+                                    lblAcceptTime.Text = $"⏱ Принят: {startTripTime.Value:dd.MM.yyyy HH:mm}";
+                                    lblAcceptTime.Visible = true;
+                                }
+                                else
+                                {
+                                    lblAcceptTime.Visible = false;
+                                }
 
                                 // Цвет статуса
                                 if (statusName == "Создан")
@@ -192,21 +256,53 @@ namespace taxi4
             }
         }
 
-        private void LoadMapWithRoute()
+        private void LoadClientInfo()
         {
             try
             {
-                string encodedStart = Uri.EscapeDataString(fromAddress);
-                string encodedEnd = Uri.EscapeDataString(toAddress);
-                string yandexMapsUrl = $"https://yandex.ru/maps/?rtext={encodedStart}~{encodedEnd}&rtt=auto&z=13";
-                webBrowser1.Navigate(yandexMapsUrl);
+                using (var conn = new NpgsqlConnection(connectionString))
+                {
+                    conn.Open();
+                    string query = @"
+                SELECT 
+                    c.last_name || ' ' || c.first_name AS client_name,
+                    c.phone_number
+                FROM ""Order"" o
+                JOIN client c ON o.client_id = c.client_id
+                WHERE o.order_id = @orderId";
+
+                    using (var cmd = new NpgsqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@orderId", orderId);
+                        using (var reader = cmd.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                string clientName = reader.GetString(0);
+                                string clientPhone = reader.GetString(1);
+
+                                lblClientName.Text = $"👤 Клиент: {clientName}";
+                                lblClientPhone.Text = $"📞 Телефон: {clientPhone}";
+                            }
+                            else
+                            {
+                                lblClientName.Text = "👤 Клиент: Не указан";
+                                lblClientPhone.Text = "📞 Телефон: Не указан";
+                            }
+                        }
+                    }
+                }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка загрузки карты: {ex.Message}", "Ошибка",
+                MessageBox.Show($"Ошибка загрузки данных клиента: {ex.Message}", "Ошибка",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
+                lblClientName.Text = "👤 Клиент: Ошибка загрузки";
+                lblClientPhone.Text = "📞 Телефон: Ошибка загрузки";
             }
         }
+
+        
 
         // ---------- ЕДИНАЯ КНОПКА ДЕЙСТВИЯ ----------
         private void btnAction_Click(object sender, EventArgs e)
@@ -265,6 +361,10 @@ namespace taxi4
                             MessageBox.Show("Заказ уже занят другим водителем!", "Ошибка",
                                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
                             this.DialogResult = DialogResult.Cancel;
+                            DriverOrdersForm driverOrdersForm = new DriverOrdersForm(this.driverId, this.connectionString, this.accountId);
+                            back = true;
+
+                            driverOrdersForm.Show();
                             this.Close();
                             return;
                         }
@@ -295,7 +395,12 @@ namespace taxi4
                                            "Внимание: у вас есть 2 минуты, чтобы отменить заказ!",
                                 "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
                             this.DialogResult = DialogResult.OK;
+                            DriverOrdersForm driverOrdersForm = new DriverOrdersForm(this.driverId, this.connectionString, this.accountId);
+                            back = true;
+
+                            driverOrdersForm.Show();
                             this.Close();
+
                         }
                         else
                         {
@@ -387,6 +492,10 @@ namespace taxi4
                             MessageBox.Show("Заказ отменен", "Успех",
                                 MessageBoxButtons.OK, MessageBoxIcon.Information);
                             this.DialogResult = DialogResult.OK;
+                            DriverOrdersForm driverOrdersForm = new DriverOrdersForm(this.driverId, this.connectionString, this.accountId);
+                            back = true;
+
+                            driverOrdersForm.Show();
                             this.Close();
                         }
                         else
@@ -449,6 +558,10 @@ namespace taxi4
                             MessageBox.Show($"Заказ завершен!\nСтоимость: {finalCost:N2} ₽", "Успех",
                                 MessageBoxButtons.OK, MessageBoxIcon.Information);
                             this.DialogResult = DialogResult.OK;
+                            DriverOrdersForm driverOrdersForm = new DriverOrdersForm(this.driverId, this.connectionString, this.accountId);
+                            back = true;
+
+                            driverOrdersForm.Show();
                             this.Close();
                         }
                         else
@@ -490,10 +603,10 @@ namespace taxi4
         private void btnBack_Click(object sender, EventArgs e)
         {
             cancelTimer?.Stop();
-            DriverMenu driverMenu = new DriverMenu(accountId);
+            DriverOrdersForm driverOrdersForm = new DriverOrdersForm(this.driverId, this.connectionString, this.accountId);
             back = true;
 
-            driverMenu.Show();
+            driverOrdersForm.Show();
             this.Close();
         }
     }

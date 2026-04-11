@@ -384,10 +384,47 @@ namespace taxi4
                 return;
             }
 
+            // ПРОВЕРКА НАЛИЧИЯ АВТОМОБИЛЯ
+            if (!HasCarAssigned())
+            {
+                MessageBox.Show("У вас нет привязанного автомобиля!\n\n" +
+                                "Для получения заказов необходимо, чтобы администратор привязал к вашему аккаунту автомобиль.\n\n" +
+                                "Пожалуйста, обратитесь к администратору.",
+                                "Нет автомобиля",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Warning);
+                return;
+            }
+
             DriverOrdersForm ordersForm = new DriverOrdersForm(this.currentDriverId, this.connectionString, this.AccountId);
             ordersForm.Closed += (s, args) => ordersForm.OnClosed();
             ordersForm.Show();
             this.Hide();
+        }
+
+        // ДОБАВИТЬ ЭТОТ МЕТОД (проверка наличия автомобиля)
+        private bool HasCarAssigned()
+        {
+            try
+            {
+                using (var conn = new NpgsqlConnection(connectionString))
+                {
+                    conn.Open();
+                    string query = "SELECT COUNT(*) FROM car WHERE driver_id = @driverId";
+                    using (var cmd = new NpgsqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@driverId", currentDriverId);
+                        long count = (long)cmd.ExecuteScalar();
+                        return count > 0;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка проверки автомобиля: {ex.Message}", "Ошибка",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
         }
 
         private void Statistics_Click(object sender, EventArgs e)
