@@ -1,4 +1,8 @@
-﻿namespace taxi4
+﻿using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+namespace taxi4
 {
     partial class AdminTariffForm
     {
@@ -7,7 +11,6 @@
         private System.Windows.Forms.GroupBox groupBoxTariffData;
         private System.Windows.Forms.Button buttonAdd;
         private System.Windows.Forms.Button buttonEdit;
-        private System.Windows.Forms.Button buttonDelete;
         private System.Windows.Forms.Button buttonRefresh;
         private System.Windows.Forms.Button buttonSearch;
         private System.Windows.Forms.Button buttonBack;
@@ -46,7 +49,6 @@
             this.labelTariffId = new System.Windows.Forms.Label();
             this.buttonAdd = new System.Windows.Forms.Button();
             this.buttonEdit = new System.Windows.Forms.Button();
-            this.buttonDelete = new System.Windows.Forms.Button();
             this.buttonRefresh = new System.Windows.Forms.Button();
             this.buttonSearch = new System.Windows.Forms.Button();
             this.buttonBack = new System.Windows.Forms.Button();
@@ -213,26 +215,11 @@
             this.buttonEdit.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(4)))), ((int)(((byte)(0)))), ((int)(((byte)(66)))));
             this.buttonEdit.Location = new System.Drawing.Point(174, 20);
             this.buttonEdit.Name = "buttonEdit";
-            this.buttonEdit.Size = new System.Drawing.Size(120, 40);
+            this.buttonEdit.Size = new System.Drawing.Size(145, 40);
             this.buttonEdit.TabIndex = 3;
             this.buttonEdit.Text = "Редактировать";
             this.buttonEdit.UseVisualStyleBackColor = false;
             this.buttonEdit.Click += new System.EventHandler(this.buttonEdit_Click);
-            // 
-            // buttonDelete
-            // 
-            this.buttonDelete.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.buttonDelete.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(227)))), ((int)(((byte)(227)))));
-            this.buttonDelete.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.buttonDelete.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
-            this.buttonDelete.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(4)))), ((int)(((byte)(0)))), ((int)(((byte)(66)))));
-            this.buttonDelete.Location = new System.Drawing.Point(337, 20);
-            this.buttonDelete.Name = "buttonDelete";
-            this.buttonDelete.Size = new System.Drawing.Size(120, 40);
-            this.buttonDelete.TabIndex = 4;
-            this.buttonDelete.Text = "Удалить";
-            this.buttonDelete.UseVisualStyleBackColor = false;
-            this.buttonDelete.Click += new System.EventHandler(this.buttonDelete_Click);
             // 
             // buttonRefresh
             // 
@@ -311,7 +298,6 @@
             this.Controls.Add(this.label8);
             this.Controls.Add(this.textBoxSearch);
             this.Controls.Add(this.buttonRefresh);
-            this.Controls.Add(this.buttonDelete);
             this.Controls.Add(this.buttonEdit);
             this.Controls.Add(this.buttonAdd);
             this.Controls.Add(this.groupBoxTariffData);

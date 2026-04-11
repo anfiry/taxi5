@@ -55,8 +55,10 @@ namespace taxi4
                 DataTable dt = historyData.GetClientOrders(clientId);
 
                 // Добавляем вычисляемые колонки для отображения дат начала и завершения
-                dt.Columns.Add("start_trip_display", typeof(string));
-                dt.Columns.Add("end_trip_display", typeof(string));
+                if (!dt.Columns.Contains("start_trip_display"))
+                    dt.Columns.Add("start_trip_display", typeof(string));
+                if (!dt.Columns.Contains("end_trip_display"))
+                    dt.Columns.Add("end_trip_display", typeof(string));
 
                 foreach (DataRow row in dt.Rows)
                 {
@@ -83,7 +85,24 @@ namespace taxi4
                     }
                 }
 
+                // ПРИВЯЗЫВАЕМ ДАННЫЕ
                 dataGridViewOrders.DataSource = dt;
+
+                // ОТЛАДКА: проверяем, сколько строк загружено
+                System.Diagnostics.Debug.WriteLine($"Загружено строк: {dt.Rows.Count}");
+                System.Diagnostics.Debug.WriteLine($"Колонок в DataTable: {dt.Columns.Count}");
+
+                // Проверяем наличие колонки order_status
+                if (dt.Columns.Contains("order_status"))
+                {
+                    System.Diagnostics.Debug.WriteLine("Колонка order_status существует");
+                    if (dt.Rows.Count > 0)
+                        System.Diagnostics.Debug.WriteLine($"Первый статус: {dt.Rows[0]["order_status"]}");
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("Колонка order_status НЕ существует!");
+                }
             }
             catch (Exception ex)
             {
@@ -94,87 +113,195 @@ namespace taxi4
 
         private void ConfigureDataGridView()
         {
-            if (dataGridViewOrders.Columns.Count == 0) return;
+            // ОЧИЩАЕМ ВСЕ СУЩЕСТВУЮЩИЕ КОЛОНКИ
+            dataGridViewOrders.Columns.Clear();
+            dataGridViewOrders.AutoGenerateColumns = false;
 
-            // Растягиваем таблицу
-            dataGridViewOrders.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            dataGridViewOrders.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            // ========== СКРЫТАЯ КОЛОНКА ДЛЯ has_review (нужна для отображения кнопок) ==========
+            DataGridViewTextBoxColumn colHasReview = new DataGridViewTextBoxColumn();
+            colHasReview.Name = "has_review";
+            colHasReview.DataPropertyName = "has_review";
+            colHasReview.Visible = false;  // Скрываем, она нужна только для логики
+            dataGridViewOrders.Columns.Add(colHasReview);
 
-            // Скрываем служебные колонки
-            if (dataGridViewOrders.Columns.Contains("order_id"))
-                dataGridViewOrders.Columns["order_id"].Visible = false;
-            if (dataGridViewOrders.Columns.Contains("has_review"))
-                dataGridViewOrders.Columns["has_review"].Visible = false;
-            if (dataGridViewOrders.Columns.Contains("start_trip_time"))
-                dataGridViewOrders.Columns["start_trip_time"].Visible = false;
-            if (dataGridViewOrders.Columns.Contains("end_trip_time"))
-                dataGridViewOrders.Columns["end_trip_time"].Visible = false;
+            // ========== СКРЫТАЯ КОЛОНКА ДЛЯ order_id ==========
+            DataGridViewTextBoxColumn colOrderId = new DataGridViewTextBoxColumn();
+            colOrderId.Name = "order_id";
+            colOrderId.DataPropertyName = "order_id";
+            colOrderId.Visible = false;  // Скрываем
+            dataGridViewOrders.Columns.Add(colOrderId);
 
-            // Настройка колонок с весами (ТРИ колонки для дат)
-            SetColumnFill("order_datetime", "Дата создания", 10);
-            SetColumnFill("start_trip_display", "Начало поездки", 10);
-            SetColumnFill("end_trip_display", "Завершение поездки", 10);
-            SetColumnFill("address_from", "Откуда", 12);
-            SetColumnFill("address_to", "Куда", 12);
-            SetColumnFill("tariff_name", "Тариф", 6);
-            SetColumnFill("order_status", "Статус", 6);
-            SetColumnFill("payment_method", "Оплата", 6);
-            SetColumnFill("final_cost", "Стоимость", 8);
-            SetColumnFill("driver_name", "Водитель", 10);
-            SetColumnFill("promotion_name", "Акция", 8);
-            SetColumnFill("promotion_percent", "Скидка, %", 5);
-            SetColumnFill("promotion_amount", "Сумма скидки", 7);
+            // 1. Дата создания
+            DataGridViewTextBoxColumn colOrderDateTime = new DataGridViewTextBoxColumn();
+            colOrderDateTime.Name = "order_datetime";
+            colOrderDateTime.HeaderText = "Дата создания";
+            colOrderDateTime.DataPropertyName = "order_datetime";
+            colOrderDateTime.DefaultCellStyle.Format = "dd.MM.yyyy HH:mm";
+            colOrderDateTime.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            colOrderDateTime.Width = 140;
+            dataGridViewOrders.Columns.Add(colOrderDateTime);
 
-            // Форматирование дат и чисел
-            if (dataGridViewOrders.Columns["order_datetime"] != null)
-                dataGridViewOrders.Columns["order_datetime"].DefaultCellStyle.Format = "dd.MM.yyyy HH:mm";
-            if (dataGridViewOrders.Columns["final_cost"] != null)
-                dataGridViewOrders.Columns["final_cost"].DefaultCellStyle.Format = "F2";
-            if (dataGridViewOrders.Columns["promotion_amount"] != null)
-                dataGridViewOrders.Columns["promotion_amount"].DefaultCellStyle.Format = "F2";
-            if (dataGridViewOrders.Columns["promotion_percent"] != null)
-                dataGridViewOrders.Columns["promotion_percent"].DefaultCellStyle.Format = "F0";
+            // 2. Начало поездки
+            DataGridViewTextBoxColumn colStartTrip = new DataGridViewTextBoxColumn();
+            colStartTrip.Name = "start_trip_display";
+            colStartTrip.HeaderText = "Начало поездки";
+            colStartTrip.DataPropertyName = "start_trip_display";
+            colStartTrip.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            colStartTrip.DefaultCellStyle.NullValue = "—";
+            colStartTrip.Width = 140;
+            dataGridViewOrders.Columns.Add(colStartTrip);
 
-            // Добавляем кнопку "Отзыв"
-            if (!dataGridViewOrders.Columns.Contains("ReviewButton"))
-            {
-                DataGridViewButtonColumn reviewButton = new DataGridViewButtonColumn();
-                reviewButton.Name = "ReviewButton";
-                reviewButton.HeaderText = "⭐ Отзыв";
-                reviewButton.UseColumnTextForButtonValue = false;
-                reviewButton.Width = 70;
-                reviewButton.FillWeight = 6;
-                dataGridViewOrders.Columns.Add(reviewButton);
-            }
+            // 3. Завершение поездки
+            DataGridViewTextBoxColumn colEndTrip = new DataGridViewTextBoxColumn();
+            colEndTrip.Name = "end_trip_display";
+            colEndTrip.HeaderText = "Завершение поездки";
+            colEndTrip.DataPropertyName = "end_trip_display";
+            colEndTrip.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            colEndTrip.DefaultCellStyle.NullValue = "—";
+            colEndTrip.Width = 140;
+            dataGridViewOrders.Columns.Add(colEndTrip);
 
-            // Добавляем кнопку "Маршрут"
-            if (!dataGridViewOrders.Columns.Contains("RouteButton"))
-            {
-                DataGridViewButtonColumn routeButton = new DataGridViewButtonColumn();
-                routeButton.Name = "RouteButton";
-                routeButton.HeaderText = "🗺️ Маршрут";
-                routeButton.Text = "На карте";
-                routeButton.UseColumnTextForButtonValue = true;
-                routeButton.Width = 70;
-                routeButton.FillWeight = 6;
-                dataGridViewOrders.Columns.Add(routeButton);
-            }
+            // 4. Водитель
+            DataGridViewTextBoxColumn colDriver = new DataGridViewTextBoxColumn();
+            colDriver.Name = "driver_name";
+            colDriver.HeaderText = "Водитель";
+            colDriver.DataPropertyName = "driver_name";
+            colDriver.Width = 180;
+            dataGridViewOrders.Columns.Add(colDriver);
+
+            // 5. Автомобиль
+            DataGridViewTextBoxColumn colCar = new DataGridViewTextBoxColumn();
+            colCar.Name = "car_info";
+            colCar.HeaderText = "Автомобиль";
+            colCar.DataPropertyName = "car_info";
+            colCar.Width = 280;
+            dataGridViewOrders.Columns.Add(colCar);
+
+            // 6. Откуда
+            DataGridViewTextBoxColumn colFrom = new DataGridViewTextBoxColumn();
+            colFrom.Name = "address_from";
+            colFrom.HeaderText = "Откуда";
+            colFrom.DataPropertyName = "address_from";
+            colFrom.Width = 320;
+            dataGridViewOrders.Columns.Add(colFrom);
+
+            // 7. Куда
+            DataGridViewTextBoxColumn colTo = new DataGridViewTextBoxColumn();
+            colTo.Name = "address_to";
+            colTo.HeaderText = "Куда";
+            colTo.DataPropertyName = "address_to";
+            colTo.Width = 320;
+            dataGridViewOrders.Columns.Add(colTo);
+
+            // 8. Тариф
+            DataGridViewTextBoxColumn colTariff = new DataGridViewTextBoxColumn();
+            colTariff.Name = "tariff_name";
+            colTariff.HeaderText = "Тариф";
+            colTariff.DataPropertyName = "tariff_name";
+            colTariff.Width = 120;
+            dataGridViewOrders.Columns.Add(colTariff);
+
+            // 9. Статус
+            DataGridViewTextBoxColumn colStatus = new DataGridViewTextBoxColumn();
+            colStatus.Name = "order_status";
+            colStatus.HeaderText = "Статус";
+            colStatus.DataPropertyName = "order_status";
+            colStatus.Width = 120;
+            dataGridViewOrders.Columns.Add(colStatus);
+
+            // 10. Оплата
+            DataGridViewTextBoxColumn colPayment = new DataGridViewTextBoxColumn();
+            colPayment.Name = "payment_method";
+            colPayment.HeaderText = "Оплата";
+            colPayment.DataPropertyName = "payment_method";
+            colPayment.Width = 120;
+            dataGridViewOrders.Columns.Add(colPayment);
+
+            // 11. Стоимость
+            DataGridViewTextBoxColumn colCost = new DataGridViewTextBoxColumn();
+            colCost.Name = "final_cost";
+            colCost.HeaderText = "Стоимость";
+            colCost.DataPropertyName = "final_cost";
+            colCost.DefaultCellStyle.Format = "N2";
+            colCost.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
+            colCost.Width = 120;
+            dataGridViewOrders.Columns.Add(colCost);
+
+            // 12. Акция
+            DataGridViewTextBoxColumn colPromo = new DataGridViewTextBoxColumn();
+            colPromo.Name = "promotion_name";
+            colPromo.HeaderText = "Акция";
+            colPromo.DataPropertyName = "promotion_name";
+            colPromo.Width = 180;
+            dataGridViewOrders.Columns.Add(colPromo);
+
+            // 13. Скидка, %
+            DataGridViewTextBoxColumn colPercent = new DataGridViewTextBoxColumn();
+            colPercent.Name = "promotion_percent";
+            colPercent.HeaderText = "Скидка, %";
+            colPercent.DataPropertyName = "promotion_percent";
+            colPercent.DefaultCellStyle.Format = "F0";
+            colPercent.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            colPercent.Width = 100;
+            dataGridViewOrders.Columns.Add(colPercent);
+
+            // 14. Сумма скидки
+            DataGridViewTextBoxColumn colAmount = new DataGridViewTextBoxColumn();
+            colAmount.Name = "promotion_amount";
+            colAmount.HeaderText = "Сумма скидки";
+            colAmount.DataPropertyName = "promotion_amount";
+            colAmount.DefaultCellStyle.Format = "F2";
+            colAmount.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
+            colAmount.Width = 130;
+            dataGridViewOrders.Columns.Add(colAmount);
+
+            // 15. Кнопка "Отзыв" (В КОНЦЕ)
+            DataGridViewButtonColumn reviewButton = new DataGridViewButtonColumn();
+            reviewButton.Name = "ReviewButton";
+            reviewButton.HeaderText = "Отзыв";
+            reviewButton.UseColumnTextForButtonValue = false;
+            reviewButton.Width = 80;
+            dataGridViewOrders.Columns.Add(reviewButton);
+
+            // 16. Кнопка "Маршрут" (В КОНЦЕ)
+            DataGridViewButtonColumn routeButton = new DataGridViewButtonColumn();
+            routeButton.Name = "RouteButton";
+            routeButton.HeaderText = "Маршрут";
+            routeButton.Text = "На карте";
+            routeButton.UseColumnTextForButtonValue = true;
+            routeButton.Width = 80;
+            dataGridViewOrders.Columns.Add(routeButton);
 
             // Стиль заголовков
-            dataGridViewOrders.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 9, FontStyle.Bold);
+            dataGridViewOrders.ColumnHeadersDefaultCellStyle.Font = new Font("Microsoft Sans Serif", 9, FontStyle.Bold);
             dataGridViewOrders.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(52, 73, 94);
             dataGridViewOrders.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
             dataGridViewOrders.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewOrders.ColumnHeadersHeight = 45;
+            dataGridViewOrders.ColumnHeadersHeight = 40;
 
             // Стиль строк
-            dataGridViewOrders.DefaultCellStyle.Font = new Font("Segoe UI", 9);
+            dataGridViewOrders.DefaultCellStyle.Font = new Font("Microsoft Sans Serif", 9);
             dataGridViewOrders.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(248, 249, 249);
             dataGridViewOrders.RowHeadersVisible = false;
             dataGridViewOrders.ReadOnly = true;
             dataGridViewOrders.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dataGridViewOrders.AllowUserToAddRows = false;
             dataGridViewOrders.AllowUserToDeleteRows = false;
+            dataGridViewOrders.ScrollBars = ScrollBars.Both;
+            dataGridViewOrders.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
+
+            // ПРИНУДИТЕЛЬНО ОБНОВЛЯЕМ
+            dataGridViewOrders.Refresh();
+        }
+
+        private void SetColumnWidth(string columnName, string headerText, int width)
+        {
+            if (dataGridViewOrders.Columns[columnName] != null)
+            {
+                dataGridViewOrders.Columns[columnName].HeaderText = headerText;
+                dataGridViewOrders.Columns[columnName].Width = width;
+                dataGridViewOrders.Columns[columnName].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            }
         }
 
         private void SetColumnFill(string columnName, string headerText, int fillWeight)

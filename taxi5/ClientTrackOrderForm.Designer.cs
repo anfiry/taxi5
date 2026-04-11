@@ -43,6 +43,7 @@ namespace taxi4
             this.dataGridViewOrders.ReadOnly = true;
             this.dataGridViewOrders.RowHeadersVisible = false;
             this.dataGridViewOrders.RowHeadersWidth = 51;
+            this.dataGridViewOrders.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.dataGridViewOrders.Size = new System.Drawing.Size(1060, 500);
             this.dataGridViewOrders.TabIndex = 0;
             this.dataGridViewOrders.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridViewOrders_CellDoubleClick);
@@ -50,10 +51,10 @@ namespace taxi4
             // buttonRefresh
             // 
             this.buttonRefresh.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonRefresh.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(251)))), ((int)(((byte)(228)))), ((int)(((byte)(255)))));
+            this.buttonRefresh.BackColor = System.Drawing.Color.FromArgb(251, 228, 255);
             this.buttonRefresh.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonRefresh.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
-            this.buttonRefresh.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(4)))), ((int)(((byte)(0)))), ((int)(((byte)(66)))));
+            this.buttonRefresh.ForeColor = System.Drawing.Color.FromArgb(4, 0, 66);
             this.buttonRefresh.Location = new System.Drawing.Point(824, 20);
             this.buttonRefresh.Name = "buttonRefresh";
             this.buttonRefresh.Size = new System.Drawing.Size(134, 40);
@@ -65,10 +66,10 @@ namespace taxi4
             // buttonBack
             // 
             this.buttonBack.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonBack.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(227)))), ((int)(((byte)(227)))));
+            this.buttonBack.BackColor = System.Drawing.Color.FromArgb(255, 227, 227);
             this.buttonBack.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonBack.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
-            this.buttonBack.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(4)))), ((int)(((byte)(0)))), ((int)(((byte)(66)))));
+            this.buttonBack.ForeColor = System.Drawing.Color.FromArgb(4, 0, 66);
             this.buttonBack.Location = new System.Drawing.Point(990, 20);
             this.buttonBack.Name = "buttonBack";
             this.buttonBack.Size = new System.Drawing.Size(100, 40);

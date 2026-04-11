@@ -1,17 +1,23 @@
 ﻿using Newtonsoft.Json.Linq;
 using Npgsql;
 using System;
+using System.Collections.Generic;
+using System.Configuration;
 using System.Data;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Configuration;
 
 namespace taxi4
 {
     public class ClientOrderData
     {
         private string connectionString = "Host=localhost;Port=5432;Database=taxi4;Username=postgres;Password=123";
+
+        public string GetConnectionString()
+        {
+            return connectionString;
+        }
 
         public DataRow GetClientInfo(int accountId)
         {
@@ -132,12 +138,17 @@ namespace taxi4
                 try
                 {
                     conn.Open();
+
+                    // Просто получаем все активные акции без всяких проверок
                     string query = @"
-                        SELECT p.promotion_id, p.name, p.discont_percent
-                        FROM promotion p
-                        WHERE p.start_date <= CURRENT_DATE 
-                          AND p.end_date >= CURRENT_DATE
-                        ORDER BY p.name";
+                SELECT 
+                    p.promotion_id, 
+                    p.name, 
+                    p.discont_percent
+                FROM promotion p
+                WHERE p.start_date <= CURRENT_DATE 
+                  AND p.end_date >= CURRENT_DATE
+                ORDER BY p.promotion_id";
 
                     using (var adapter = new NpgsqlDataAdapter(query, conn))
                     {
@@ -152,6 +163,22 @@ namespace taxi4
                 }
             }
             return dt;
+        }
+
+        // Вспомогательный метод для проверки, делал ли клиент заказы
+        private bool HasClientMadeOrders(int clientId, NpgsqlConnection conn)
+        {
+            string query = @"
+        SELECT COUNT(*) 
+        FROM ""Order"" 
+        WHERE client_id = @clientId";
+
+            using (var cmd = new NpgsqlCommand(query, conn))
+            {
+                cmd.Parameters.AddWithValue("@clientId", clientId);
+                long count = (long)cmd.ExecuteScalar();
+                return count > 0; // Если есть хотя бы один заказ - не новый клиент
+            }
         }
 
         public DataTable GetActiveTariffs()
@@ -262,7 +289,7 @@ namespace taxi4
         }
 
         public int CreateOrderWithAddresses(int clientId, string fromAddress, string toAddress,
-                                     decimal price, int? promotionId, int tariffId)
+                             decimal price, int? promotionId, int tariffId)
         {
             using (var conn = new NpgsqlConnection(connectionString))
             {
@@ -282,13 +309,14 @@ namespace taxi4
                         }
 
                         string orderQuery = @"
-                            INSERT INTO ""Order"" 
-                                (client_id, tariff_id, order_status, payment_method, 
-                                 address_from, address_to, order_datetime, final_cost, driver_id)
-                            VALUES 
-                                (@clientId, @tariffId, 1, 1, @fromAddressId, @toAddressId, @orderDatetime, @price, NULL)
-                            RETURNING order_id";
+                    INSERT INTO ""Order"" 
+                        (client_id, tariff_id, order_status, payment_method, 
+                         address_from, address_to, order_datetime, final_cost, driver_id)
+                    VALUES 
+                        (@clientId, @tariffId, 1, 1, @fromAddressId, @toAddressId, @orderDatetime, @price, NULL)
+                    RETURNING order_id";
 
+                        int orderId;
                         using (var cmd = new NpgsqlCommand(orderQuery, conn, transaction))
                         {
                             cmd.Parameters.AddWithValue("@clientId", clientId);
@@ -298,37 +326,63 @@ namespace taxi4
                             cmd.Parameters.AddWithValue("@orderDatetime", DateTime.Now);
                             cmd.Parameters.AddWithValue("@price", price);
 
-                            int orderId = (int)cmd.ExecuteScalar();
+                            orderId = (int)cmd.ExecuteScalar();
+                        }
 
-                            if (promotionId.HasValue && promotionId.Value > 0)
+                        // ========== ДОБАВЛЕННЫЙ БЛОК: ЗАПИСЬ ИСПОЛЬЗОВАНИЯ АКЦИИ ==========
+                        if (promotionId.HasValue && promotionId.Value > 0)
+                        {
+                            // Получаем процент скидки
+                            string promoQuery = "SELECT discont_percent, name FROM promotion WHERE promotion_id = @promotionId";
+                            decimal discountPercent = 0;
+                            string promoName = "";
+                            using (var promoCmd = new NpgsqlCommand(promoQuery, conn, transaction))
                             {
-                                string promoQuery = "SELECT discont_percent FROM promotion WHERE promotion_id = @promotionId";
-                                decimal discountPercent = 0;
-                                using (var promoCmd = new NpgsqlCommand(promoQuery, conn, transaction))
+                                promoCmd.Parameters.AddWithValue("@promotionId", promotionId.Value);
+                                using (var reader = promoCmd.ExecuteReader())
                                 {
-                                    promoCmd.Parameters.AddWithValue("@promotionId", promotionId.Value);
-                                    discountPercent = Convert.ToDecimal(promoCmd.ExecuteScalar());
-                                }
-
-                                string orderPromoQuery = @"
-                                    INSERT INTO order_promotion 
-                                        (order_id, promotion_percent, promotion_name, promotion_amount)
-                                    VALUES 
-                                        (@orderId, @discountPercent, @promotionName, @discountAmount)";
-
-                                using (var promoOrderCmd = new NpgsqlCommand(orderPromoQuery, conn, transaction))
-                                {
-                                    promoOrderCmd.Parameters.AddWithValue("@orderId", orderId);
-                                    promoOrderCmd.Parameters.AddWithValue("@discountPercent", discountPercent);
-                                    promoOrderCmd.Parameters.AddWithValue("@promotionName", "Акция");
-                                    promoOrderCmd.Parameters.AddWithValue("@discountAmount", price * (discountPercent / 100));
-                                    promoOrderCmd.ExecuteNonQuery();
+                                    if (reader.Read())
+                                    {
+                                        discountPercent = reader.GetDecimal(0);
+                                        promoName = reader.GetString(1);
+                                    }
                                 }
                             }
 
-                            transaction.Commit();
-                            return orderId;
+                            // Записываем использование акции в clent_promotion
+                            string clientPromoQuery = @"
+                        INSERT INTO clent_promotion (clent_id, promotion_id, assigned_percent)
+                        VALUES (@clientId, @promotionId, @assignedPercent)";
+
+                            using (var clientPromoCmd = new NpgsqlCommand(clientPromoQuery, conn, transaction))
+                            {
+                                clientPromoCmd.Parameters.AddWithValue("@clientId", clientId);
+                                clientPromoCmd.Parameters.AddWithValue("@promotionId", promotionId.Value);
+                                clientPromoCmd.Parameters.AddWithValue("@assignedPercent", discountPercent);
+                                clientPromoCmd.ExecuteNonQuery();
+                            }
+
+                            // Записываем информацию об акции в заказ
+                            string orderPromoQuery = @"
+                        INSERT INTO order_promotion 
+                            (order_id, promotion_percent, promotion_name, promotion_amount)
+                        VALUES 
+                            (@orderId, @discountPercent, @promotionName, @discountAmount)";
+
+                            using (var promoOrderCmd = new NpgsqlCommand(orderPromoQuery, conn, transaction))
+                            {
+                                decimal discountAmount = price * (discountPercent / 100);
+                                promoOrderCmd.Parameters.AddWithValue("@orderId", orderId);
+                                promoOrderCmd.Parameters.AddWithValue("@discountPercent", discountPercent);
+                                promoOrderCmd.Parameters.AddWithValue("@promotionName", promoName);
+                                promoOrderCmd.Parameters.AddWithValue("@discountAmount", discountAmount);
+                                promoOrderCmd.ExecuteNonQuery();
+                            }
                         }
+                        // ========== КОНЕЦ ДОБАВЛЕННОГО БЛОКА ==========
+
+                        transaction.Commit();
+                        return orderId;
                     }
                     catch (Exception ex)
                     {

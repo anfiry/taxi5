@@ -18,6 +18,9 @@ namespace taxi4
             LoadOrderStatuses();
             LoadOrders();
             ConfigureDataGridView();
+
+            this.dataGridViewOrders.Refresh();
+
             dataGridViewOrders.CellClick += DataGridViewOrders_CellClick;
         }
 
@@ -92,12 +95,13 @@ namespace taxi4
             if (dataGridViewOrders.Columns.Contains("driver_id"))
                 dataGridViewOrders.Columns["driver_id"].Visible = false;
 
-            // Настройка колонок с датами (меняем заголовки)
+            // НАСТРОЙКА КОЛОНОК С ДАТАМИ
             if (dataGridViewOrders.Columns.Contains("order_datetime"))
             {
                 dataGridViewOrders.Columns["order_datetime"].HeaderText = "Дата создания";
                 dataGridViewOrders.Columns["order_datetime"].DefaultCellStyle.Format = "dd.MM.yyyy HH:mm";
                 dataGridViewOrders.Columns["order_datetime"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+                dataGridViewOrders.Columns["order_datetime"].Width = 130;
             }
 
             if (dataGridViewOrders.Columns.Contains("start_trip_time"))
@@ -106,6 +110,7 @@ namespace taxi4
                 dataGridViewOrders.Columns["start_trip_time"].DefaultCellStyle.Format = "dd.MM.yyyy HH:mm";
                 dataGridViewOrders.Columns["start_trip_time"].DefaultCellStyle.NullValue = "—";
                 dataGridViewOrders.Columns["start_trip_time"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+                dataGridViewOrders.Columns["start_trip_time"].Width = 130;
             }
 
             if (dataGridViewOrders.Columns.Contains("end_trip_time"))
@@ -114,31 +119,69 @@ namespace taxi4
                 dataGridViewOrders.Columns["end_trip_time"].DefaultCellStyle.Format = "dd.MM.yyyy HH:mm";
                 dataGridViewOrders.Columns["end_trip_time"].DefaultCellStyle.NullValue = "—";
                 dataGridViewOrders.Columns["end_trip_time"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+                dataGridViewOrders.Columns["end_trip_time"].Width = 130;
             }
 
-            // Настройка остальных колонок
+            // НАСТРОЙКА ОСТАЛЬНЫХ КОЛОНОК
             if (dataGridViewOrders.Columns.Contains("client_name"))
+            {
                 dataGridViewOrders.Columns["client_name"].HeaderText = "Клиент";
+                dataGridViewOrders.Columns["client_name"].Width = 180;
+            }
+
             if (dataGridViewOrders.Columns.Contains("driver_name"))
+            {
                 dataGridViewOrders.Columns["driver_name"].HeaderText = "Водитель";
+                dataGridViewOrders.Columns["driver_name"].Width = 150;
+            }
+
+            // НАСТРОЙКА КОЛОНКИ АВТОМОБИЛЯ
+            if (dataGridViewOrders.Columns.Contains("car_info"))
+            {
+                dataGridViewOrders.Columns["car_info"].HeaderText = "Автомобиль";
+                dataGridViewOrders.Columns["car_info"].Width = 220;
+                dataGridViewOrders.Columns["car_info"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            }
+
             if (dataGridViewOrders.Columns.Contains("tariff_name"))
+            {
                 dataGridViewOrders.Columns["tariff_name"].HeaderText = "Тариф";
+                dataGridViewOrders.Columns["tariff_name"].Width = 100;
+            }
+
             if (dataGridViewOrders.Columns.Contains("order_status_name"))
+            {
                 dataGridViewOrders.Columns["order_status_name"].HeaderText = "Статус";
+                dataGridViewOrders.Columns["order_status_name"].Width = 100;
+            }
+
             if (dataGridViewOrders.Columns.Contains("payment_method_name"))
+            {
                 dataGridViewOrders.Columns["payment_method_name"].HeaderText = "Оплата";
+                dataGridViewOrders.Columns["payment_method_name"].Width = 100;
+            }
+
             if (dataGridViewOrders.Columns.Contains("address_from_text"))
+            {
                 dataGridViewOrders.Columns["address_from_text"].HeaderText = "Откуда";
+                dataGridViewOrders.Columns["address_from_text"].Width = 250;
+            }
+
             if (dataGridViewOrders.Columns.Contains("address_to_text"))
+            {
                 dataGridViewOrders.Columns["address_to_text"].HeaderText = "Куда";
+                dataGridViewOrders.Columns["address_to_text"].Width = 250;
+            }
+
             if (dataGridViewOrders.Columns.Contains("final_cost"))
             {
                 dataGridViewOrders.Columns["final_cost"].HeaderText = "Стоимость";
                 dataGridViewOrders.Columns["final_cost"].DefaultCellStyle.Format = "N2";
                 dataGridViewOrders.Columns["final_cost"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
+                dataGridViewOrders.Columns["final_cost"].Width = 100;
             }
 
-            // Добавляем кнопки
+            // ДОБАВЛЯЕМ КНОПКИ
             DataGridViewButtonColumn reviewButton = new DataGridViewButtonColumn();
             reviewButton.Name = "ReviewButton";
             reviewButton.HeaderText = "Отзыв";
@@ -154,6 +197,55 @@ namespace taxi4
             routeButton.UseColumnTextForButtonValue = true;
             routeButton.Width = 80;
             dataGridViewOrders.Columns.Add(routeButton);
+
+            // ПРИНУДИТЕЛЬНАЯ УСТАНОВКА ПОРЯДКА СТОЛБЦОВ
+            // Сначала отключаем автоматическое создание порядка
+            dataGridViewOrders.AutoGenerateColumns = false;
+
+            // Устанавливаем DisplayIndex для каждой колонки
+            int idx = 0;
+
+            if (dataGridViewOrders.Columns["order_datetime"] != null)
+                dataGridViewOrders.Columns["order_datetime"].DisplayIndex = idx++;
+
+            if (dataGridViewOrders.Columns["start_trip_time"] != null)
+                dataGridViewOrders.Columns["start_trip_time"].DisplayIndex = idx++;
+
+            if (dataGridViewOrders.Columns["end_trip_time"] != null)
+                dataGridViewOrders.Columns["end_trip_time"].DisplayIndex = idx++;
+
+            if (dataGridViewOrders.Columns["client_name"] != null)
+                dataGridViewOrders.Columns["client_name"].DisplayIndex = idx++;
+
+            if (dataGridViewOrders.Columns["driver_name"] != null)
+                dataGridViewOrders.Columns["driver_name"].DisplayIndex = idx++;
+
+            if (dataGridViewOrders.Columns["car_info"] != null)
+                dataGridViewOrders.Columns["car_info"].DisplayIndex = idx++;
+
+            if (dataGridViewOrders.Columns["tariff_name"] != null)
+                dataGridViewOrders.Columns["tariff_name"].DisplayIndex = idx++;
+
+            if (dataGridViewOrders.Columns["order_status_name"] != null)
+                dataGridViewOrders.Columns["order_status_name"].DisplayIndex = idx++;
+
+            if (dataGridViewOrders.Columns["payment_method_name"] != null)
+                dataGridViewOrders.Columns["payment_method_name"].DisplayIndex = idx++;
+
+            if (dataGridViewOrders.Columns["address_from_text"] != null)
+                dataGridViewOrders.Columns["address_from_text"].DisplayIndex = idx++;
+
+            if (dataGridViewOrders.Columns["address_to_text"] != null)
+                dataGridViewOrders.Columns["address_to_text"].DisplayIndex = idx++;
+
+            if (dataGridViewOrders.Columns["final_cost"] != null)
+                dataGridViewOrders.Columns["final_cost"].DisplayIndex = idx++;
+
+            if (dataGridViewOrders.Columns["ReviewButton"] != null)
+                dataGridViewOrders.Columns["ReviewButton"].DisplayIndex = idx++;
+
+            if (dataGridViewOrders.Columns["RouteButton"] != null)
+                dataGridViewOrders.Columns["RouteButton"].DisplayIndex = idx++;
 
             // Стиль заголовков
             dataGridViewOrders.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 10, FontStyle.Bold);
@@ -175,8 +267,8 @@ namespace taxi4
             dataGridViewOrders.AllowUserToAddRows = false;
             dataGridViewOrders.AllowUserToDeleteRows = false;
 
-            // Автоматическая ширина колонок
-            dataGridViewOrders.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            // Отключаем автоматическую ширину, используем ручную
+            dataGridViewOrders.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
         }
 
         // ---------- ОБРАБОТЧИК КЛИКА ПО КНОПКАМ В ТАБЛИЦЕ ----------

@@ -45,9 +45,9 @@ namespace taxi4
             this.Startingshifts.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.Startingshifts.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold);
             this.Startingshifts.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(4)))), ((int)(((byte)(0)))), ((int)(((byte)(66)))));
-            this.Startingshifts.Location = new System.Drawing.Point(200, 200);
+            this.Startingshifts.Location = new System.Drawing.Point(166, 278);
             this.Startingshifts.Name = "Startingshifts";
-            this.Startingshifts.Size = new System.Drawing.Size(220, 60);
+            this.Startingshifts.Size = new System.Drawing.Size(246, 60);
             this.Startingshifts.TabIndex = 2;
             this.Startingshifts.Text = "Начать смену";
             this.Startingshifts.UseVisualStyleBackColor = false;
@@ -61,9 +61,9 @@ namespace taxi4
             this.EndShif.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.EndShif.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold);
             this.EndShif.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(4)))), ((int)(((byte)(0)))), ((int)(((byte)(66)))));
-            this.EndShif.Location = new System.Drawing.Point(460, 200);
+            this.EndShif.Location = new System.Drawing.Point(478, 278);
             this.EndShif.Name = "EndShif";
-            this.EndShif.Size = new System.Drawing.Size(220, 60);
+            this.EndShif.Size = new System.Drawing.Size(292, 60);
             this.EndShif.TabIndex = 3;
             this.EndShif.Text = "Завершить смену";
             this.EndShif.UseVisualStyleBackColor = false;
@@ -77,9 +77,9 @@ namespace taxi4
             this.Orders.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.Orders.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold);
             this.Orders.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(4)))), ((int)(((byte)(0)))), ((int)(((byte)(66)))));
-            this.Orders.Location = new System.Drawing.Point(200, 300);
+            this.Orders.Location = new System.Drawing.Point(166, 390);
             this.Orders.Name = "Orders";
-            this.Orders.Size = new System.Drawing.Size(220, 60);
+            this.Orders.Size = new System.Drawing.Size(246, 60);
             this.Orders.TabIndex = 4;
             this.Orders.Text = "Заказы";
             this.Orders.UseVisualStyleBackColor = false;
@@ -92,9 +92,9 @@ namespace taxi4
             this.Statistics.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.Statistics.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold);
             this.Statistics.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(4)))), ((int)(((byte)(0)))), ((int)(((byte)(66)))));
-            this.Statistics.Location = new System.Drawing.Point(460, 300);
+            this.Statistics.Location = new System.Drawing.Point(478, 390);
             this.Statistics.Name = "Statistics";
-            this.Statistics.Size = new System.Drawing.Size(220, 60);
+            this.Statistics.Size = new System.Drawing.Size(292, 60);
             this.Statistics.TabIndex = 5;
             this.Statistics.Text = "Статистика";
             this.Statistics.UseVisualStyleBackColor = false;
@@ -107,9 +107,9 @@ namespace taxi4
             this.Shifts.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.Shifts.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold);
             this.Shifts.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(4)))), ((int)(((byte)(0)))), ((int)(((byte)(66)))));
-            this.Shifts.Location = new System.Drawing.Point(720, 300);
+            this.Shifts.Location = new System.Drawing.Point(835, 390);
             this.Shifts.Name = "Shifts";
-            this.Shifts.Size = new System.Drawing.Size(220, 60);
+            this.Shifts.Size = new System.Drawing.Size(242, 60);
             this.Shifts.TabIndex = 6;
             this.Shifts.Text = "История смен";
             this.Shifts.UseVisualStyleBackColor = false;
@@ -122,9 +122,9 @@ namespace taxi4
             this.buttonBack.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonBack.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold);
             this.buttonBack.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(4)))), ((int)(((byte)(0)))), ((int)(((byte)(66)))));
-            this.buttonBack.Location = new System.Drawing.Point(720, 200);
+            this.buttonBack.Location = new System.Drawing.Point(835, 278);
             this.buttonBack.Name = "buttonBack";
-            this.buttonBack.Size = new System.Drawing.Size(220, 60);
+            this.buttonBack.Size = new System.Drawing.Size(242, 60);
             this.buttonBack.TabIndex = 7;
             this.buttonBack.Text = "Выход";
             this.buttonBack.UseVisualStyleBackColor = false;
@@ -137,7 +137,7 @@ namespace taxi4
             this.panelTop.Dock = System.Windows.Forms.DockStyle.Top;
             this.panelTop.Location = new System.Drawing.Point(0, 0);
             this.panelTop.Name = "panelTop";
-            this.panelTop.Size = new System.Drawing.Size(1100, 80);
+            this.panelTop.Size = new System.Drawing.Size(1209, 80);
             this.panelTop.TabIndex = 8;
             // 
             // labelTitle
@@ -146,7 +146,7 @@ namespace taxi4
             this.labelTitle.AutoSize = true;
             this.labelTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Bold);
             this.labelTitle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(4)))), ((int)(((byte)(0)))), ((int)(((byte)(66)))));
-            this.labelTitle.Location = new System.Drawing.Point(444, 20);
+            this.labelTitle.Location = new System.Drawing.Point(498, 20);
             this.labelTitle.Name = "labelTitle";
             this.labelTitle.Size = new System.Drawing.Size(253, 36);
             this.labelTitle.TabIndex = 0;
@@ -168,7 +168,7 @@ namespace taxi4
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(1100, 500);
+            this.ClientSize = new System.Drawing.Size(1209, 671);
             this.Controls.Add(this.buttonBack);
             this.Controls.Add(this.Shifts);
             this.Controls.Add(this.Statistics);

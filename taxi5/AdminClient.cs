@@ -31,7 +31,7 @@ namespace taxi4
                     c.address_id,
                     COALESCE(CONCAT(a.city, ', ', a.street, ', д.', a.house, 
                            CASE WHEN a.entrance IS NOT NULL AND a.entrance != '' 
-                                THEN ', подъезд ' || a.entrance ELSE '' END), 'Не указан') as address_info,
+                                THEN ', подъезд ' || a.entrance ELSE '' END), 'Не указан') as full_address,
                     a.city,
                     a.street,
                     a.house,

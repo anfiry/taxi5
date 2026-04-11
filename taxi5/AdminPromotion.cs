@@ -142,18 +142,22 @@ namespace taxi4
                 try
                 {
                     conn.Open();
-                    string query = "DELETE FROM promotion WHERE promotion_id = @promotionId";
-                    using (var cmd = new NpgsqlCommand(query, conn))
+
+                    // Сначала удаляем связи с клиентами (clent_promotion)
+                    string deleteClientPromoQuery = "DELETE FROM clent_promotion WHERE promotion_id = @promotionId";
+                    using (var cmdClient = new NpgsqlCommand(deleteClientPromoQuery, conn))
+                    {
+                        cmdClient.Parameters.AddWithValue("@promotionId", promotionId);
+                        cmdClient.ExecuteNonQuery();
+                    }
+
+                    // Затем удаляем саму акцию
+                    string deletePromotionQuery = "DELETE FROM promotion WHERE promotion_id = @promotionId";
+                    using (var cmd = new NpgsqlCommand(deletePromotionQuery, conn))
                     {
                         cmd.Parameters.AddWithValue("@promotionId", promotionId);
                         return cmd.ExecuteNonQuery() > 0;
                     }
-                }
-                catch (NpgsqlException ex) when (ex.Message.Contains("23503") || ex.Message.Contains("foreign key"))
-                {
-                    MessageBox.Show("Невозможно удалить акцию: она используется в назначениях клиентам.",
-                        "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return false;
                 }
                 catch (Exception ex)
                 {

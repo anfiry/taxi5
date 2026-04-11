@@ -16,6 +16,7 @@ namespace taxi4
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.ComboBox comboBoxStatusFilter;
         private System.Windows.Forms.Label labelStatusFilter;
+        private System.Windows.Forms.Panel panelTop;
 
         protected override void Dispose(bool disposing)
         {
@@ -35,7 +36,9 @@ namespace taxi4
             this.label8 = new System.Windows.Forms.Label();
             this.comboBoxStatusFilter = new System.Windows.Forms.ComboBox();
             this.labelStatusFilter = new System.Windows.Forms.Label();
+            this.panelTop = new System.Windows.Forms.Panel();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewOrders)).BeginInit();
+            this.panelTop.SuspendLayout();
             this.SuspendLayout();
             // 
             // dataGridViewOrders
@@ -43,28 +46,30 @@ namespace taxi4
             this.dataGridViewOrders.AllowUserToAddRows = false;
             this.dataGridViewOrders.AllowUserToDeleteRows = false;
             this.dataGridViewOrders.AllowUserToResizeRows = false;
-            this.dataGridViewOrders.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.dataGridViewOrders.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.dataGridViewOrders.BackgroundColor = System.Drawing.Color.White;
             this.dataGridViewOrders.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.dataGridViewOrders.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridViewOrders.Location = new System.Drawing.Point(12, 120);
+            this.dataGridViewOrders.Location = new System.Drawing.Point(12, 95);
             this.dataGridViewOrders.Name = "dataGridViewOrders";
             this.dataGridViewOrders.ReadOnly = true;
             this.dataGridViewOrders.RowHeadersVisible = false;
             this.dataGridViewOrders.RowHeadersWidth = 51;
-            this.dataGridViewOrders.Size = new System.Drawing.Size(1471, 713);
+            this.dataGridViewOrders.Size = new System.Drawing.Size(1471, 738);
             this.dataGridViewOrders.TabIndex = 0;
             // 
             // buttonRefresh
             // 
-            this.buttonRefresh.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.buttonRefresh.BackColor = System.Drawing.Color.FromArgb(251, 228, 255);
+            this.buttonRefresh.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.buttonRefresh.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(251)))), ((int)(((byte)(228)))), ((int)(((byte)(255)))));
             this.buttonRefresh.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonRefresh.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
-            this.buttonRefresh.ForeColor = System.Drawing.Color.FromArgb(4, 0, 66);
-            this.buttonRefresh.Location = new System.Drawing.Point(1102, 35);
+            this.buttonRefresh.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(4)))), ((int)(((byte)(0)))), ((int)(((byte)(66)))));
+            this.buttonRefresh.Location = new System.Drawing.Point(1232, 22);
             this.buttonRefresh.Name = "buttonRefresh";
-            this.buttonRefresh.Size = new System.Drawing.Size(120, 40);
+            this.buttonRefresh.Size = new System.Drawing.Size(119, 40);
             this.buttonRefresh.TabIndex = 0;
             this.buttonRefresh.Text = "Обновить";
             this.buttonRefresh.UseVisualStyleBackColor = false;
@@ -72,12 +77,12 @@ namespace taxi4
             // 
             // buttonSearch
             // 
-            this.buttonSearch.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.buttonSearch.BackColor = System.Drawing.Color.FromArgb(230, 227, 255);
+            this.buttonSearch.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.buttonSearch.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(227)))), ((int)(((byte)(255)))));
             this.buttonSearch.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonSearch.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
-            this.buttonSearch.ForeColor = System.Drawing.Color.FromArgb(4, 0, 66);
-            this.buttonSearch.Location = new System.Drawing.Point(907, 35);
+            this.buttonSearch.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(4)))), ((int)(((byte)(0)))), ((int)(((byte)(66)))));
+            this.buttonSearch.Location = new System.Drawing.Point(930, 22);
             this.buttonSearch.Name = "buttonSearch";
             this.buttonSearch.Size = new System.Drawing.Size(90, 40);
             this.buttonSearch.TabIndex = 4;
@@ -87,14 +92,14 @@ namespace taxi4
             // 
             // buttonBack
             // 
-            this.buttonBack.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.buttonBack.BackColor = System.Drawing.Color.FromArgb(255, 227, 227);
+            this.buttonBack.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.buttonBack.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(227)))), ((int)(((byte)(227)))));
             this.buttonBack.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonBack.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
-            this.buttonBack.ForeColor = System.Drawing.Color.FromArgb(4, 0, 66);
-            this.buttonBack.Location = new System.Drawing.Point(1316, 35);
+            this.buttonBack.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(4)))), ((int)(((byte)(0)))), ((int)(((byte)(66)))));
+            this.buttonBack.Location = new System.Drawing.Point(1369, 22);
             this.buttonBack.Name = "buttonBack";
-            this.buttonBack.Size = new System.Drawing.Size(120, 40);
+            this.buttonBack.Size = new System.Drawing.Size(106, 40);
             this.buttonBack.TabIndex = 1;
             this.buttonBack.Text = "Назад";
             this.buttonBack.UseVisualStyleBackColor = false;
@@ -102,14 +107,13 @@ namespace taxi4
             // 
             // buttonApplyFilter
             // 
-            this.buttonApplyFilter.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.buttonApplyFilter.BackColor = System.Drawing.Color.FromArgb(230, 227, 255);
+            this.buttonApplyFilter.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(227)))), ((int)(((byte)(255)))));
             this.buttonApplyFilter.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonApplyFilter.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
-            this.buttonApplyFilter.ForeColor = System.Drawing.Color.FromArgb(4, 0, 66);
-            this.buttonApplyFilter.Location = new System.Drawing.Point(386, 35);
+            this.buttonApplyFilter.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(4)))), ((int)(((byte)(0)))), ((int)(((byte)(66)))));
+            this.buttonApplyFilter.Location = new System.Drawing.Point(386, 22);
             this.buttonApplyFilter.Name = "buttonApplyFilter";
-            this.buttonApplyFilter.Size = new System.Drawing.Size(122, 40);
+            this.buttonApplyFilter.Size = new System.Drawing.Size(134, 40);
             this.buttonApplyFilter.TabIndex = 7;
             this.buttonApplyFilter.Text = "Применить";
             this.buttonApplyFilter.UseVisualStyleBackColor = false;
@@ -117,19 +121,19 @@ namespace taxi4
             // 
             // textBoxSearch
             // 
-            this.textBoxSearch.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.textBoxSearch.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.textBoxSearch.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
-            this.textBoxSearch.Location = new System.Drawing.Point(687, 43);
+            this.textBoxSearch.Location = new System.Drawing.Point(715, 31);
             this.textBoxSearch.Name = "textBoxSearch";
             this.textBoxSearch.Size = new System.Drawing.Size(200, 24);
             this.textBoxSearch.TabIndex = 3;
             // 
             // label8
             // 
-            this.label8.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.label8.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.label8.AutoSize = true;
             this.label8.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
-            this.label8.Location = new System.Drawing.Point(603, 49);
+            this.label8.Location = new System.Drawing.Point(647, 35);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(62, 18);
             this.label8.TabIndex = 2;
@@ -137,24 +141,39 @@ namespace taxi4
             // 
             // comboBoxStatusFilter
             // 
-            this.comboBoxStatusFilter.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.comboBoxStatusFilter.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBoxStatusFilter.FormattingEnabled = true;
-            this.comboBoxStatusFilter.Location = new System.Drawing.Point(181, 42);
+            this.comboBoxStatusFilter.Location = new System.Drawing.Point(181, 31);
             this.comboBoxStatusFilter.Name = "comboBoxStatusFilter";
             this.comboBoxStatusFilter.Size = new System.Drawing.Size(180, 24);
             this.comboBoxStatusFilter.TabIndex = 6;
             // 
             // labelStatusFilter
             // 
-            this.labelStatusFilter.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.labelStatusFilter.AutoSize = true;
             this.labelStatusFilter.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
-            this.labelStatusFilter.Location = new System.Drawing.Point(30, 48);
+            this.labelStatusFilter.Location = new System.Drawing.Point(30, 35);
             this.labelStatusFilter.Name = "labelStatusFilter";
             this.labelStatusFilter.Size = new System.Drawing.Size(126, 18);
             this.labelStatusFilter.TabIndex = 5;
             this.labelStatusFilter.Text = "Статус заказа:";
+            // 
+            // panelTop
+            // 
+            this.panelTop.BackColor = System.Drawing.Color.White;
+            this.panelTop.Controls.Add(this.buttonApplyFilter);
+            this.panelTop.Controls.Add(this.comboBoxStatusFilter);
+            this.panelTop.Controls.Add(this.labelStatusFilter);
+            this.panelTop.Controls.Add(this.buttonSearch);
+            this.panelTop.Controls.Add(this.textBoxSearch);
+            this.panelTop.Controls.Add(this.label8);
+            this.panelTop.Controls.Add(this.buttonBack);
+            this.panelTop.Controls.Add(this.buttonRefresh);
+            this.panelTop.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panelTop.Location = new System.Drawing.Point(0, 0);
+            this.panelTop.Name = "panelTop";
+            this.panelTop.Size = new System.Drawing.Size(1495, 80);
+            this.panelTop.TabIndex = 8;
             // 
             // AdminOrderForm
             // 
@@ -162,24 +181,18 @@ namespace taxi4
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(1495, 845);
-            this.Controls.Add(this.buttonApplyFilter);
-            this.Controls.Add(this.comboBoxStatusFilter);
-            this.Controls.Add(this.labelStatusFilter);
-            this.Controls.Add(this.buttonSearch);
-            this.Controls.Add(this.textBoxSearch);
-            this.Controls.Add(this.label8);
-            this.Controls.Add(this.buttonBack);
-            this.Controls.Add(this.buttonRefresh);
             this.Controls.Add(this.dataGridViewOrders);
-            this.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F);
+            this.Controls.Add(this.panelTop);
             this.MinimumSize = new System.Drawing.Size(1200, 664);
             this.Name = "AdminOrderForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Просмотр заказов";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewOrders)).EndInit();
+            this.panelTop.ResumeLayout(false);
+            this.panelTop.PerformLayout();
             this.ResumeLayout(false);
-            this.PerformLayout();
+
         }
     }
 }

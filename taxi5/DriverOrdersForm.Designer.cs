@@ -32,8 +32,8 @@ namespace taxi4
             // 
             // flowLayoutPanel
             // 
-            this.flowLayoutPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
+            this.flowLayoutPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.flowLayoutPanel.AutoScroll = true;
             this.flowLayoutPanel.BackColor = System.Drawing.Color.White;
@@ -49,7 +49,7 @@ namespace taxi4
             // btnBack
             // 
             this.btnBack.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnBack.BackColor = System.Drawing.Color.FromArgb(231, 76, 60);
+            this.btnBack.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(231)))), ((int)(((byte)(76)))), ((int)(((byte)(60)))));
             this.btnBack.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnBack.FlatAppearance.BorderSize = 0;
             this.btnBack.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
@@ -59,13 +59,13 @@ namespace taxi4
             this.btnBack.Name = "btnBack";
             this.btnBack.Size = new System.Drawing.Size(100, 40);
             this.btnBack.TabIndex = 1;
-            this.btnBack.Text = "◀ Назад";
+            this.btnBack.Text = "Назад";
             this.btnBack.UseVisualStyleBackColor = false;
             this.btnBack.Click += new System.EventHandler(this.BtnBack_Click);
             // 
             // lblActiveOrderInfo
             // 
-            this.lblActiveOrderInfo.BackColor = System.Drawing.Color.FromArgb(255, 200, 200);
+            this.lblActiveOrderInfo.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(200)))), ((int)(((byte)(200)))));
             this.lblActiveOrderInfo.Dock = System.Windows.Forms.DockStyle.Top;
             this.lblActiveOrderInfo.Font = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Bold);
             this.lblActiveOrderInfo.ForeColor = System.Drawing.Color.DarkRed;
@@ -79,7 +79,7 @@ namespace taxi4
             // 
             // panelTop
             // 
-            this.panelTop.BackColor = System.Drawing.Color.FromArgb(52, 73, 94);
+            this.panelTop.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(52)))), ((int)(((byte)(73)))), ((int)(((byte)(94)))));
             this.panelTop.Controls.Add(this.labelTitle);
             this.panelTop.Controls.Add(this.btnBack);
             this.panelTop.Dock = System.Windows.Forms.DockStyle.Top;
@@ -96,7 +96,7 @@ namespace taxi4
             this.labelTitle.ForeColor = System.Drawing.Color.White;
             this.labelTitle.Location = new System.Drawing.Point(440, 15);
             this.labelTitle.Name = "labelTitle";
-            this.labelTitle.Size = new System.Drawing.Size(280, 32);
+            this.labelTitle.Size = new System.Drawing.Size(288, 41);
             this.labelTitle.TabIndex = 0;
             this.labelTitle.Text = "Доступные заказы";
             this.labelTitle.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -118,6 +118,7 @@ namespace taxi4
             this.panelTop.ResumeLayout(false);
             this.panelTop.PerformLayout();
             this.ResumeLayout(false);
+
         }
     }
 }

@@ -107,21 +107,33 @@ namespace taxi4
         {
             DataTable dt = orderData.GetAvailablePromotions(clientId);
 
-            if (dt == null)
-            {
-                dt = new DataTable();
-                dt.Columns.Add("promotion_id", typeof(int));
-                dt.Columns.Add("name", typeof(string));
-                dt.Columns.Add("discont_percent", typeof(decimal));
-            }
+            // Создаем новую таблицу для отображения
+            DataTable displayDt = new DataTable();
+            displayDt.Columns.Add("promotion_id", typeof(int));
+            displayDt.Columns.Add("name", typeof(string));
+            displayDt.Columns.Add("discont_percent", typeof(decimal));
 
-            DataRow emptyRow = dt.NewRow();
+            // Добавляем строку "Без акции"
+            DataRow emptyRow = displayDt.NewRow();
             emptyRow["promotion_id"] = DBNull.Value;
             emptyRow["name"] = "Без акции";
             emptyRow["discont_percent"] = 0;
-            dt.Rows.InsertAt(emptyRow, 0);
+            displayDt.Rows.Add(emptyRow);
 
-            cmbPromotion.DataSource = dt;
+            // Добавляем доступные акции
+            if (dt != null && dt.Rows.Count > 0)
+            {
+                foreach (DataRow row in dt.Rows)
+                {
+                    DataRow newRow = displayDt.NewRow();
+                    newRow["promotion_id"] = row["promotion_id"];
+                    newRow["name"] = row["name"].ToString();
+                    newRow["discont_percent"] = row["discont_percent"];
+                    displayDt.Rows.Add(newRow);
+                }
+            }
+
+            cmbPromotion.DataSource = displayDt;
             cmbPromotion.DisplayMember = "name";
             cmbPromotion.ValueMember = "promotion_id";
             cmbPromotion.SelectedIndex = 0;
@@ -353,7 +365,9 @@ namespace taxi4
 
             int? promotionId = null;
             if (cmbPromotion.SelectedValue != null && cmbPromotion.SelectedValue != DBNull.Value)
+            {
                 promotionId = Convert.ToInt32(cmbPromotion.SelectedValue);
+            }
 
             int tariffId = Convert.ToInt32(cmbTariff.SelectedValue);
 
@@ -368,9 +382,15 @@ namespace taxi4
                     tariffId
                 );
 
-                MessageBox.Show($"Заказ №{orderId} успешно создан!", "Готово",
-                                MessageBoxButtons.OK, MessageBoxIcon.Information);
-                this.Close();
+                if (orderId > 0)
+                {
+                    MessageBox.Show($"Заказ №{orderId} успешно создан!", "Готово",
+                                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    ClientMenu ClientMenu = new ClientMenu(accountId);
+                    ClientMenu.Show();
+                    back = true;
+                    this.Close();
+                }
             }
             catch (Exception ex)
             {

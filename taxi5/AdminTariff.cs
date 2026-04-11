@@ -129,22 +129,47 @@ namespace taxi4
                 try
                 {
                     conn.Open();
-                    string query = "DELETE FROM tariff WHERE tariff_id = @tariffId";
-                    using (NpgsqlCommand cmd = new NpgsqlCommand(query, conn))
+
+                    // Находим ID статуса "Неактивен"
+                    string getInactiveStatusQuery = "SELECT status_id FROM tariff_status WHERE LOWER(status_name) = 'неактивен'";
+                    int inactiveStatusId = 2; // значение по умолчанию
+
+                    using (NpgsqlCommand statusCmd = new NpgsqlCommand(getInactiveStatusQuery, conn))
                     {
-                        cmd.Parameters.AddWithValue("@tariffId", tariffId);
-                        return cmd.ExecuteNonQuery() > 0;
+                        var result = statusCmd.ExecuteScalar();
+                        if (result != null && result != DBNull.Value)
+                        {
+                            inactiveStatusId = Convert.ToInt32(result);
+                        }
                     }
-                }
-                catch (NpgsqlException ex) when (ex.Message.Contains("23503"))
-                {
-                    MessageBox.Show("Невозможно удалить тариф: он используется в заказах.",
-                        "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return false;
+
+                    // Деактивируем тариф (меняем статус, но не удаляем)
+                    string updateQuery = "UPDATE tariff SET tariff_status = @inactiveStatusId WHERE tariff_id = @tariffId";
+                    using (NpgsqlCommand updateCmd = new NpgsqlCommand(updateQuery, conn))
+                    {
+                        updateCmd.Parameters.AddWithValue("@inactiveStatusId", inactiveStatusId);
+                        updateCmd.Parameters.AddWithValue("@tariffId", tariffId);
+                        int rowsAffected = updateCmd.ExecuteNonQuery();
+
+                        if (rowsAffected > 0)
+                        {
+                            MessageBox.Show("Тариф деактивирован.\n\n" +
+                                "✓ Информация о тарифе сохранена в существующих заказах\n" +
+                                "✓ Новые заказы не смогут использовать этот тариф",
+                                "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            return true;
+                        }
+                        else
+                        {
+                            MessageBox.Show("Тариф не найден", "Ошибка",
+                                MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return false;
+                        }
+                    }
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Ошибка удаления тарифа:\n{ex.Message}", "Ошибка",
+                    MessageBox.Show($"Ошибка деактивации тарифа:\n{ex.Message}", "Ошибка",
                         MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return false;
                 }
